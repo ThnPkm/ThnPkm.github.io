@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Test - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="Test">
+  <meta property="og:description" content="信息泄露 漏洞利用 如果MinIO以集群方式部署，存在信息泄露漏洞，攻击者可以通过HTTP请求获取目标进程的所有环境变量，包括MINIO_SECRET_KEY和MINIO_ROOT_PASSWORD.
+vulhub有环境可以复现
+payload：
+POST: /minio/bootstrap/v1/verify 拿到预存的用户名和密码可以直接登录了
+漏洞分析 根据main.go中的加载模块得知代码逻辑在minio/cmd中
+package main // import &#34;github.com/minio/minio&#34; import ( &#34;os&#34; // MUST be first import. _ &#34;github.com/minio/minio/internal/init&#34; minio &#34;github.com/minio/minio/cmd&#34; ) func main() { minio.Main(os.Args) } 漏洞代码在minio/cmd/bootstrap-peer-server.go
+接受HTTP请求的方法只有两个
+line133,代码新建上下文对象，用于传递HTTP请求和响应。 line135,用于输出错误日志。 line134作为则是获取服务器系统配置。
+跟进line134的getServerSystemCfg()
+在getServerSystemCfg()方法中获取所有以MINIO_开头的环境变量
+将环境变量存储在envValues里面，其中envValues采用遍历的方式获取了skipEnvs[envK]的value
+然后，函数返回一个名为ServerSystemConfig的结构体，其中包含了全局变量和环境变量。
+跟进skipEnvs
+包含一些敏感信息，有预先设置的密码MINIO_CERT_PASSWD
+bootstrap-peer-server.go也定义了Verify的路由
+cmd/routers.go:75 判断了一下是集群才会注册上述路由
+漏洞修复 环境变量进行了加密处理
+https://github.com/minio/minio/commit/3b5dbf90468b874e99253d241d16d175c2454077?diff=splitRCE 漏洞分析 当通过信息泄漏获得账号密码之后，可以登陆MinIO更新恶意升级URL，并且执行update触发RCE
+验证管理员权限→获取最新版本→获取最新版本的sha256sum信息→下载并验证sha256sum→验证无误后替换自身并重启。
+cmd/admin-handlers.go ，ServerUpdateHandler函数
+在/minio/admin/v3/update?updateURL={updateURL}这个路由的功能中，可以从远程加载二进制文件，下载并更新。
+func (a adminAPIHandlers) ServerUpdateHandler(w http.ResponseWriter, r *http.Request) { // 验证是否是admin权限 objectAPI, _ := validateAdminReq(ctx, w, r, iampolicy.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-22T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-22T23:51:36+08:00">
+    <meta property="article:tag" content="Golang">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Test">
+  <meta name="twitter:description" content="信息泄露 漏洞利用 如果MinIO以集群方式部署，存在信息泄露漏洞，攻击者可以通过HTTP请求获取目标进程的所有环境变量，包括MINIO_SECRET_KEY和MINIO_ROOT_PASSWORD.
+vulhub有环境可以复现
+payload：
+POST: /minio/bootstrap/v1/verify 拿到预存的用户名和密码可以直接登录了
+漏洞分析 根据main.go中的加载模块得知代码逻辑在minio/cmd中
+package main // import &#34;github.com/minio/minio&#34; import ( &#34;os&#34; // MUST be first import. _ &#34;github.com/minio/minio/internal/init&#34; minio &#34;github.com/minio/minio/cmd&#34; ) func main() { minio.Main(os.Args) } 漏洞代码在minio/cmd/bootstrap-peer-server.go
+接受HTTP请求的方法只有两个
+line133,代码新建上下文对象，用于传递HTTP请求和响应。 line135,用于输出错误日志。 line134作为则是获取服务器系统配置。
+跟进line134的getServerSystemCfg()
+在getServerSystemCfg()方法中获取所有以MINIO_开头的环境变量
+将环境变量存储在envValues里面，其中envValues采用遍历的方式获取了skipEnvs[envK]的value
+然后，函数返回一个名为ServerSystemConfig的结构体，其中包含了全局变量和环境变量。
+跟进skipEnvs
+包含一些敏感信息，有预先设置的密码MINIO_CERT_PASSWD
+bootstrap-peer-server.go也定义了Verify的路由
+cmd/routers.go:75 判断了一下是集群才会注册上述路由
+漏洞修复 环境变量进行了加密处理
+https://github.com/minio/minio/commit/3b5dbf90468b874e99253d241d16d175c2454077?diff=splitRCE 漏洞分析 当通过信息泄漏获得账号密码之后，可以登陆MinIO更新恶意升级URL，并且执行update触发RCE
+验证管理员权限→获取最新版本→获取最新版本的sha256sum信息→下载并验证sha256sum→验证无误后替换自身并重启。
+cmd/admin-handlers.go ，ServerUpdateHandler函数
+在/minio/admin/v3/update?updateURL={updateURL}这个路由的功能中，可以从远程加载二进制文件，下载并更新。
+func (a adminAPIHandlers) ServerUpdateHandler(w http.ResponseWriter, r *http.Request) { // 验证是否是admin权限 objectAPI, _ := validateAdminReq(ctx, w, r, iampolicy.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Test",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/cve\/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce\/"
+        },"genre": "posts","keywords": "golang","wordcount":  149 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/cve\/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce\/","datePublished": "2024-08-22T23:51:36+08:00","dateModified": "2024-08-22T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA"
+        data-srcset="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA, https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA 1.5x, https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA 2x"
+        data-sizes="auto"
+        alt="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA"
+        title="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA"
+        data-srcset="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA, https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA 1.5x, https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA 2x"
+        data-sizes="auto"
+        alt="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA"
+        title="https://i2.imgs.ovh/d/BQACAgEAAx0EUvSR8wACMVpmx12khSpkDxWqiPSQlKzUSBzQmwACEwUAArbkOEb0K7UAAa5Y4qo1BA" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Test</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/cve%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVE分析</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-22">2024-08-22</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;149 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#信息泄露">信息泄露</a>
+      <ul>
+        <li><a href="#漏洞利用">漏洞利用</a></li>
+        <li><a href="#漏洞分析">漏洞分析</a></li>
+        <li><a href="#漏洞修复">漏洞修复</a></li>
+      </ul>
+    </li>
+    <li><a href="#rce">RCE</a>
+      <ul>
+        <li><a href="#漏洞分析-1">漏洞分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考文章">参考文章</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="信息泄露">信息泄露</h2>
+<h3 id="漏洞利用">漏洞利用</h3>
+<p>如果MinIO以集群方式部署，存在信息泄露漏洞，攻击者可以通过HTTP请求获取目标进程的所有环境变量，包括<code>MINIO_SECRET_KEY</code>和<code>MINIO_ROOT_PASSWORD</code>.</p>
+<p>vulhub有环境可以复现</p>
+<p>payload：</p>
+<pre tabindex="0"><code>POST:  /minio/bootstrap/v1/verify
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/8dac1aea23816c5fd22a4d04b044ae10.png"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/8dac1aea23816c5fd22a4d04b044ae10.png, https://i-blog.csdnimg.cn/blog_migrate/8dac1aea23816c5fd22a4d04b044ae10.png 1.5x, https://i-blog.csdnimg.cn/blog_migrate/8dac1aea23816c5fd22a4d04b044ae10.png 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/8dac1aea23816c5fd22a4d04b044ae10.png"
+        title="image-20230408152805286" /></p>
+<p>拿到预存的用户名和密码可以直接登录了</p>
+<h3 id="漏洞分析">漏洞分析</h3>
+<p>根据main.go中的加载模块得知代码逻辑在minio/cmd中</p>
+<pre tabindex="0"><code>package main // import &#34;github.com/minio/minio&#34;
+
+import (
+    &#34;os&#34;
+
+    // MUST be first import.
+    _ &#34;github.com/minio/minio/internal/init&#34;
+
+    minio &#34;github.com/minio/minio/cmd&#34;
+)
+
+func main() {
+    minio.Main(os.Args)
+}
+</code></pre><p>漏洞代码在minio/cmd/bootstrap-peer-server.go</p>
+<p>接受HTTP请求的方法只有两个</p>
+<!-- raw HTML omitted -->
+<p>line133,代码新建上下文对象，用于传递HTTP请求和响应。 line135,用于输出错误日志。 line134作为则是获取服务器系统配置。</p>
+<p>跟进line134的<code>getServerSystemCfg()</code></p>
+<!-- raw HTML omitted -->
+<p>在getServerSystemCfg()方法中获取所有以<code>MINIO_</code>开头的环境变量</p>
+<p>将环境变量存储在envValues里面，其中envValues采用遍历的方式获取了skipEnvs[envK]的value</p>
+<p>然后，函数返回一个名为<code>ServerSystemConfig</code>的结构体，其中包含了全局变量和环境变量。</p>
+<p>跟进skipEnvs</p>
+<!-- raw HTML omitted -->
+<p>包含一些敏感信息，有预先设置的密码MINIO_CERT_PASSWD</p>
+<p>bootstrap-peer-server.go也定义了Verify的路由</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>cmd/routers.go:75 判断了一下是集群才会注册上述路由</p>
+<!-- raw HTML omitted -->
+<h3 id="漏洞修复">漏洞修复</h3>
+<p>环境变量进行了加密处理</p>
+<p><a href="https://github.com/minio/minio/commit/3b5dbf90468b874e99253d241d16d175c2454077?diff=split" target="_blank" rel="noopener noreffer">https://github.com/minio/minio/commit/3b5dbf90468b874e99253d241d16d175c2454077?diff=split</a>
+</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/b6a10260ef5cf9800a3b94c4bc49a4eb.png"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/b6a10260ef5cf9800a3b94c4bc49a4eb.png, https://i-blog.csdnimg.cn/blog_migrate/b6a10260ef5cf9800a3b94c4bc49a4eb.png 1.5x, https://i-blog.csdnimg.cn/blog_migrate/b6a10260ef5cf9800a3b94c4bc49a4eb.png 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/b6a10260ef5cf9800a3b94c4bc49a4eb.png"
+        title="image-20230408152928069" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://i-blog.csdnimg.cn/blog_migrate/5a7920c088e6c4788f65beea0af737c5.png"
+        data-srcset="https://i-blog.csdnimg.cn/blog_migrate/5a7920c088e6c4788f65beea0af737c5.png, https://i-blog.csdnimg.cn/blog_migrate/5a7920c088e6c4788f65beea0af737c5.png 1.5x, https://i-blog.csdnimg.cn/blog_migrate/5a7920c088e6c4788f65beea0af737c5.png 2x"
+        data-sizes="auto"
+        alt="https://i-blog.csdnimg.cn/blog_migrate/5a7920c088e6c4788f65beea0af737c5.png"
+        title="image-20230408152933961" /></p>
+<h2 id="rce">RCE</h2>
+<h3 id="漏洞分析-1">漏洞分析</h3>
+<p>当通过信息泄漏获得账号密码之后，可以登陆MinIO更新恶意升级URL，并且执行update触发RCE</p>
+<p>验证管理员权限→获取最新版本→获取最新版本的sha256sum信息→下载并验证sha256sum→验证无误后替换自身并重启。</p>
+<p>cmd/admin-handlers.go ，ServerUpdateHandler函数</p>
+<p>在<code>/minio/admin/v3/update?updateURL={updateURL}</code>这个路由的功能中，可以从远程加载二进制文件，下载并更新。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">a</span> <span style="color:#a6e22e">adminAPIHandlers</span>) <span style="color:#a6e22e">ServerUpdateHandler</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 验证是否是admin权限
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">objectAPI</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">validateAdminReq</span>(<span style="color:#a6e22e">ctx</span>, <span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">r</span>, <span style="color:#a6e22e">iampolicy</span>.<span style="color:#a6e22e">ServerUpdateAdminAction</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 从POST /minio/admin/v3/update?updateURL={updateURL}取updateURL参数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">vars</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">mux</span>.<span style="color:#a6e22e">Vars</span>(<span style="color:#a6e22e">r</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">updateURL</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">vars</span>[<span style="color:#e6db74">&#34;updateURL&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">mode</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">getMinioMode</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 解析url
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">updateURL</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 下载Release信息并解析出对应的更新信息
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">content</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">downloadReleaseURL</span>(<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">updateTimeout</span>, <span style="color:#a6e22e">mode</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sha256Sum</span>, <span style="color:#a6e22e">lrTime</span>, <span style="color:#a6e22e">releaseInfo</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">parseReleaseData</span>(<span style="color:#a6e22e">content</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 指定二进制文件的下载路径
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">u</span>.<span style="color:#a6e22e">Path</span> = <span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">Dir</span>(<span style="color:#a6e22e">u</span>.<span style="color:#a6e22e">Path</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">SlashSeparator</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">releaseInfo</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 下载二进制文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">reader</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">downloadBinary</span>(<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">mode</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 验证签名
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">verifyBinary</span>(<span style="color:#a6e22e">u</span>, <span style="color:#a6e22e">sha256Sum</span>, <span style="color:#a6e22e">releaseInfo</span>, <span style="color:#a6e22e">mode</span>, <span style="color:#a6e22e">reader</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 提交二进制文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">err</span> = <span style="color:#a6e22e">commitBinary</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 发送重启信号给channel
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">globalServiceSignalCh</span> <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">serviceRestart</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>验证签名用的<code>verifyBinary()</code>,跟进后是</p>
+<!-- raw HTML omitted -->
+<p>由于envMinisignPubKey为空，所以sha256sum失效了。所以我们可以构造恶意升级包，最终形成RCE</p>
+<p>具体利用可以参考https://github.com/AbelChe/evil_minio</p>
+<h2 id="参考文章">参考文章</h2>
+<p><a href="https://www.gksec.com/MinIO_RCE.html" target="_blank" rel="noopener noreffer">https://www.gksec.com/MinIO_RCE.html</a>
+</p>
+<p><a href="https://y4er.com/posts/minio-cve-2023-28432/" target="_blank" rel="noopener noreffer">https://y4er.com/posts/minio-cve-2023-28432/</a>
+</p>
+<p><a href="https://ek1ng.com/CVE-2023-28432.html" target="_blank" rel="noopener noreffer">https://ek1ng.com/CVE-2023-28432.html</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-22</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" data-title="Test" data-hashtags="golang"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" data-hashtag="golang"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" data-title="Test"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" data-title="Test"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/" data-title="Test"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/golang/">Golang</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/" class="prev" rel="prev" title="春秋云镜 Initial"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>春秋云镜 Initial</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
