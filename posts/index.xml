@@ -24,10 +24,10 @@ sudo mysql -e &#39;\! find / -name flag*&#39; 读flag]]></description>
 </item>
 <item>
     <title>2020羊城杯</title>
-    <link>https://thnpkm.github.io/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/</link>
+    <link>https://thnpkm.github.io/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
     <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/</guid>
+    <guid>https://thnpkm.github.io/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/</guid>
     <description><![CDATA[WEB easycon 打开就是
 扫出来个index.php 然后访问
 提示eval post cmd，看来是post了个cmd可以执行命令
@@ -36,11 +36,11 @@ easyphp 源码
 &lt;?php $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !== &#34;index.php&#34;) { unlink($file); } } } if(!isset($_GET[&#39;content&#39;]) || !isset($_GET[&#39;filename&#39;])) { highlight_file(__FILE__); die(); } $content = $_GET[&#39;content&#39;]; if(stristr($content,&#39;on&#39;) || stristr($content,&#39;html&#39;) || stristr($content,&#39;type&#39;) || stristr($content,&#39;flag&#39;) || stristr($content,&#39;upload&#39;) || stristr($content,&#39;file&#39;)) { echo &#34;Hacker&#34;; die(); } $filename = $_GET[&#39;filename&#39;]; if(preg_match(&#34;/[^a-z\.]/&#34;, $filename) == 1) { echo &#34;Hacker&#34;; die(); } $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !]]></description>
 </item>
 <item>
-    <title>Python pth文件写入getshell </title>
-    <link>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</link>
+    <title>Python pth文件写入getshell</title>
+    <link>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
     <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</guid>
+    <guid>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</guid>
     <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
 python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
 sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为

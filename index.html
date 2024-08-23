@@ -127,7 +127,7 @@ sudo mysql -e &#39;\! find / -name flag*&#39; 读flag</div><div class="post-foot
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E5%9F%9F%E6%B8%97%E9%80%8F/">域渗透</a>,&nbsp;<a href="/tags/%E7%A5%A8%E6%8D%AE/">票据</a>,&nbsp;<a href="/tags/%E6%B0%B8%E6%81%92%E4%B9%8B%E8%93%9D/">永恒之蓝</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/">2020羊城杯</a>
+        <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/">2020羊城杯</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CTF</a></span></div><div class="content">WEB easycon 打开就是
 扫出来个index.php 然后访问
@@ -135,9 +135,9 @@ sudo mysql -e &#39;\! find / -name flag*&#39; 读flag</div><div class="post-foot
 找到bbbbbbbbb.txt文件，用base64解码得到包含flag的图片
 easyphp 源码
 &lt;?php $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !== &#34;index.php&#34;) { unlink($file); } } } if(!isset($_GET[&#39;content&#39;]) || !isset($_GET[&#39;filename&#39;])) { highlight_file(__FILE__); die(); } $content = $_GET[&#39;content&#39;]; if(stristr($content,&#39;on&#39;) || stristr($content,&#39;html&#39;) || stristr($content,&#39;type&#39;) || stristr($content,&#39;flag&#39;) || stristr($content,&#39;upload&#39;) || stristr($content,&#39;file&#39;)) { echo &#34;Hacker&#34;; die(); } $filename = $_GET[&#39;filename&#39;]; if(preg_match(&#34;/[^a-z\.]/&#34;, $filename) == 1) { echo &#34;Hacker&#34;; die(); } $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !</div><div class="post-footer">
-        <a href="/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/">Read More</a></div>
+        <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/">Read More</a></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/">Python pth文件写入getshell </a>
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Python pth文件写入getshell</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CTF</a>&nbsp;<a href="/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>杂文记录</a></span></div><div class="content">原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
 python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
@@ -146,7 +146,7 @@ D:/Python/temp/ 重新启动python
 1.path的路径被添加到sys.path中
 site.py的实现中，有这么一段
 def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.</div><div class="post-footer">
-        <a href="/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/">Read More</a><div class="post-tags">
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/%E5%AD%97%E8%8A%82ctf/">字节CTF </a>
