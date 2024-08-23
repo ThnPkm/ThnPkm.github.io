@@ -110,33 +110,6 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/">Test</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-22">2024-08-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/cve%E5%88%86%E6%9E%90/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>CVE分析</a></span></div><div class="content">信息泄露 漏洞利用 如果MinIO以集群方式部署，存在信息泄露漏洞，攻击者可以通过HTTP请求获取目标进程的所有环境变量，包括MINIO_SECRET_KEY和MINIO_ROOT_PASSWORD.
-vulhub有环境可以复现
-payload：
-POST: /minio/bootstrap/v1/verify 拿到预存的用户名和密码可以直接登录了
-漏洞分析 根据main.go中的加载模块得知代码逻辑在minio/cmd中
-package main // import &#34;github.com/minio/minio&#34; import ( &#34;os&#34; // MUST be first import. _ &#34;github.com/minio/minio/internal/init&#34; minio &#34;github.com/minio/minio/cmd&#34; ) func main() { minio.Main(os.Args) } 漏洞代码在minio/cmd/bootstrap-peer-server.go
-接受HTTP请求的方法只有两个
-line133,代码新建上下文对象，用于传递HTTP请求和响应。 line135,用于输出错误日志。 line134作为则是获取服务器系统配置。
-跟进line134的getServerSystemCfg()
-在getServerSystemCfg()方法中获取所有以MINIO_开头的环境变量
-将环境变量存储在envValues里面，其中envValues采用遍历的方式获取了skipEnvs[envK]的value
-然后，函数返回一个名为ServerSystemConfig的结构体，其中包含了全局变量和环境变量。
-跟进skipEnvs
-包含一些敏感信息，有预先设置的密码MINIO_CERT_PASSWD
-bootstrap-peer-server.go也定义了Verify的路由
-cmd/routers.go:75 判断了一下是集群才会注册上述路由
-漏洞修复 环境变量进行了加密处理
-https://github.com/minio/minio/commit/3b5dbf90468b874e99253d241d16d175c2454077?diff=splitRCE 漏洞分析 当通过信息泄漏获得账号密码之后，可以登陆MinIO更新恶意升级URL，并且执行update触发RCE
-验证管理员权限→获取最新版本→获取最新版本的sha256sum信息→下载并验证sha256sum→验证无误后替换自身并重启。
-cmd/admin-handlers.go ，ServerUpdateHandler函数
-在/minio/admin/v3/update?updateURL={updateURL}这个路由的功能中，可以从远程加载二进制文件，下载并更新。
-func (a adminAPIHandlers) ServerUpdateHandler(w http.ResponseWriter, r *http.Request) { // 验证是否是admin权限 objectAPI, _ := validateAdminReq(ctx, w, r, iampolicy.</div><div class="post-footer">
-        <a href="/posts/cve/minio%E4%BB%8E%E4%BF%A1%E6%81%AF%E6%B3%84%E6%BC%8F%E5%88%B0rce/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/golang/">Golang</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/">春秋云镜 Initial</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-22">2024-08-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">春秋云镜 Initial 外网打点 站点图标很好判断是TP的站
