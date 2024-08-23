@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>burpsuite靶场请求走私 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="burpsuite靶场请求走私">
+  <meta property="og:description" content="HTTP 请求走私 什么是 HTTP 请求走私？ HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。
+HTTP请求走私漏洞是如何产生的？ 大多数 HTTP 请求走私漏洞的出现是因为 HTTP 规范提供了两种不同的方式来指定请求的结束位置：Content-Length标头和Transfer-Encoding标头。
+标Content-Length头很简单：它以字节为单位指定消息正文的长度。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 11q=smuggling 标Transfer-Encoding头可用于指定消息正文使用分块编码。这意味着消息正文包含一个或多个数据块。每个块由以字节为单位的块大小（以十六进制表示）、后跟换行符和块内容组成。消息以大小为0的块终止。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedTransfer-Encoding: chunkedbq=smuggling0 由于 HTTP 规范提供了两种不同的方法来指定 HTTP 消息的长度，因此一条消息可能会同时使用这两种方法，从而导致它们相互冲突。HTTP 规范试图通过声明如果Content-Length和Transfer-Encoding标头都存在，Content-Length则应忽略该标头来防止出现此问题。当只有一个服务器在运行时，这可能足以避免歧义，但当两个或多个服务器链接在一起时就不行了。在这种情况下，出现问题的原因有两个：
+某些服务器不支持Transfer-Encoding请求中的标头。 Transfer-Encoding如果以某种方式混淆了标头，则可以诱导 某些支持标头的服务器不处理它。 如果前端和后端服务器对（可能混淆的）Transfer-Encoding 标头的行为不同，那么它们可能不同意连续请求之间的边界，从而导致请求走私漏洞。
+如何执行 HTTP 请求走私攻击 请求走私攻击涉及将Content-Length标头和Transfer-Encoding 标头放入单个 HTTP 请求中并操纵它们，以便前端和后端服务器以不同方式处理请求。完成此操作的确切方式取决于两个服务器的行为：
+CL.TE：前端服务器使用Content-Lengthheader，后端服务器使用Transfer-Encodingheader。 TE.CL：前端服务器使用Transfer-Encodingheader，后端服务器使用Content-Lengthheader。 TE.TE：前端和后端服务器都支持Transfer-Encodingheader，但是可以通过某种方式混淆header来诱导其中一台服务器不处理它。 基本 CL.TE 漏洞 目标是 让下一个请求为GPOST ,如下图发送两次即可
+前端服务器处理Content-Length，判断请求体长度为6个字节(5-10试了都可以)，一直到结尾G，认为是一个包。该请求被转发到后端服务器。
+Content-Length计算时，要把\r\n计算在内（2字节），且首行的\r\n不计算
+后端服务器处理Transfer-Encoding标头，服务器会接收前端服务器的转发的请求数据，放在缓冲区中，当读取到 0\r\n 时，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的G就成了下一次请求的开始，变成 GPOST / HTTP/1.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:tag" content="请求走私">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="burpsuite靶场请求走私">
+  <meta name="twitter:description" content="HTTP 请求走私 什么是 HTTP 请求走私？ HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。
+HTTP请求走私漏洞是如何产生的？ 大多数 HTTP 请求走私漏洞的出现是因为 HTTP 规范提供了两种不同的方式来指定请求的结束位置：Content-Length标头和Transfer-Encoding标头。
+标Content-Length头很简单：它以字节为单位指定消息正文的长度。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 11q=smuggling 标Transfer-Encoding头可用于指定消息正文使用分块编码。这意味着消息正文包含一个或多个数据块。每个块由以字节为单位的块大小（以十六进制表示）、后跟换行符和块内容组成。消息以大小为0的块终止。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedTransfer-Encoding: chunkedbq=smuggling0 由于 HTTP 规范提供了两种不同的方法来指定 HTTP 消息的长度，因此一条消息可能会同时使用这两种方法，从而导致它们相互冲突。HTTP 规范试图通过声明如果Content-Length和Transfer-Encoding标头都存在，Content-Length则应忽略该标头来防止出现此问题。当只有一个服务器在运行时，这可能足以避免歧义，但当两个或多个服务器链接在一起时就不行了。在这种情况下，出现问题的原因有两个：
+某些服务器不支持Transfer-Encoding请求中的标头。 Transfer-Encoding如果以某种方式混淆了标头，则可以诱导 某些支持标头的服务器不处理它。 如果前端和后端服务器对（可能混淆的）Transfer-Encoding 标头的行为不同，那么它们可能不同意连续请求之间的边界，从而导致请求走私漏洞。
+如何执行 HTTP 请求走私攻击 请求走私攻击涉及将Content-Length标头和Transfer-Encoding 标头放入单个 HTTP 请求中并操纵它们，以便前端和后端服务器以不同方式处理请求。完成此操作的确切方式取决于两个服务器的行为：
+CL.TE：前端服务器使用Content-Lengthheader，后端服务器使用Transfer-Encodingheader。 TE.CL：前端服务器使用Transfer-Encodingheader，后端服务器使用Content-Lengthheader。 TE.TE：前端和后端服务器都支持Transfer-Encodingheader，但是可以通过某种方式混淆header来诱导其中一台服务器不处理它。 基本 CL.TE 漏洞 目标是 让下一个请求为GPOST ,如下图发送两次即可
+前端服务器处理Content-Length，判断请求体长度为6个字节(5-10试了都可以)，一直到结尾G，认为是一个包。该请求被转发到后端服务器。
+Content-Length计算时，要把\r\n计算在内（2字节），且首行的\r\n不计算
+后端服务器处理Transfer-Encoding标头，服务器会接收前端服务器的转发的请求数据，放在缓冲区中，当读取到 0\r\n 时，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的G就成了下一次请求的开始，变成 GPOST / HTTP/1.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" /><link rel="prev" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/" /><link rel="next" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "burpsuite靶场请求走私",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81\/"
+        },"genre": "posts","keywords": "请求走私","wordcount":  161 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81\/","datePublished": "2024-08-20T22:52:36+08:00","dateModified": "2024-08-20T22:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">burpsuite靶场请求走私</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;161 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是-http-请求走私">什么是 HTTP 请求走私？</a></li>
+    <li><a href="#http请求走私漏洞是如何产生的">HTTP请求走私漏洞是如何产生的？</a></li>
+    <li><a href="#如何执行-http-请求走私攻击">如何执行 HTTP 请求走私攻击</a></li>
+    <li><a href="#基本-clte-漏洞">基本 CL.TE 漏洞</a></li>
+    <li><a href="#基本-tecl-漏洞">基本 TE.CL 漏洞</a></li>
+    <li><a href="#tete-行为混淆-te-标头">TE.TE 行为：混淆 TE 标头</a></li>
+    <li><a href="#通过差异响应确认-clte-漏洞">通过差异响应确认 CL.TE 漏洞</a></li>
+    <li><a href="#通过差异响应确认-tecl-漏洞">通过差异响应确认 TE.CL 漏洞</a></li>
+    <li><a href="#请求走私绕过前端安全控制clte-漏洞">请求走私绕过前端安全控制，CL.TE 漏洞</a></li>
+    <li><a href="#请求走私绕过前端安全控制tecl-漏洞">请求走私绕过前端安全控制，TE.CL 漏洞</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="http-请求走私">HTTP 请求走私</h1>
+<h2 id="什么是-http-请求走私">什么是 HTTP 请求走私？</h2>
+<p>HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。</p>
+<h2 id="http请求走私漏洞是如何产生的">HTTP请求走私漏洞是如何产生的？</h2>
+<p>大多数 HTTP 请求走私漏洞的出现是因为 HTTP 规范提供了两种不同的方式来指定请求的结束位置：<code>Content-Length</code>标头和<code>Transfer-Encoding</code>标头。</p>
+<p>标<code>Content-Length</code>头很简单：它以字节为单位指定消息正文的长度。例如：</p>
+<pre tabindex="0"><code>POST /search HTTP/1.1
+Host: normal-website.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 11
+
+q=smuggling
+</code></pre><p>标<code>Transfer-Encoding</code>头可用于指定消息正文使用分块编码。这意味着消息正文包含一个或多个数据块。每个块由以字节为单位的块大小（以十六进制表示）、后跟换行符和块内容组成。消息以大小为0的块终止。例如：</p>
+<pre tabindex="0"><code>POST /search HTTP/1.1
+Host: normal-website.com
+Content-Type: application/x-www-form-urlencoded
+Transfer-Encoding: chunked
+
+b
+q=smuggling
+0
+</code></pre><p>由于 HTTP 规范提供了两种不同的方法来指定 HTTP 消息的长度，因此一条消息可能会同时使用这两种方法，从而导致它们相互冲突。HTTP 规范试图通过声明如果<code>Content-Length</code>和<code>Transfer-Encoding</code>标头都存在，<code>Content-Length</code>则应忽略该标头来防止出现此问题。当只有一个服务器在运行时，这可能足以避免歧义，但当两个或多个服务器链接在一起时就不行了。在这种情况下，出现问题的原因有两个：</p>
+<ul>
+<li>某些服务器不支持<code>Transfer-Encoding</code>请求中的标头。</li>
+<li><code>Transfer-Encoding</code>如果以某种方式混淆了标头，则可以诱导 某些支持标头的服务器不处理它。</li>
+</ul>
+<p>如果前端和后端服务器对（可能混淆的）<code>Transfer-Encoding</code> 标头的行为不同，那么它们可能不同意连续请求之间的边界，从而导致请求走私漏洞。</p>
+<h2 id="如何执行-http-请求走私攻击">如何执行 HTTP 请求走私攻击</h2>
+<p>请求走私攻击涉及将<code>Content-Length</code>标头和<code>Transfer-Encoding</code> 标头放入单个 HTTP 请求中并操纵它们，以便前端和后端服务器以不同方式处理请求。完成此操作的确切方式取决于两个服务器的行为：</p>
+<ul>
+<li>CL.TE：前端服务器使用<code>Content-Length</code>header，后端服务器使用<code>Transfer-Encoding</code>header。</li>
+<li>TE.CL：前端服务器使用<code>Transfer-Encoding</code>header，后端服务器使用<code>Content-Length</code>header。</li>
+<li>TE.TE：前端和后端服务器都支持<code>Transfer-Encoding</code>header，但是可以通过某种方式混淆header来诱导其中一台服务器不处理它。</li>
+</ul>
+<h2 id="基本-clte-漏洞">基本 CL.TE 漏洞</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212162242235.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212162242235.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212162242235.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212162242235.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212162242235.png"
+        title="image-20221216224233186" /></p>
+<p>目标是 让下一个请求为<code>GPOST</code>  ,如下图发送两次即可</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171450378.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171450378.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171450378.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171450378.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171450378.png"
+        title="image-20221217145012332" /></p>
+<p>前端服务器处理<code>Content-Length</code>，判断请求体长度为6个字节(5-10试了都可以)，一直到结尾G，认为是一个包。该请求被转发到后端服务器。</p>
+<blockquote>
+<p><code>Content-Length</code>计算时，要把<code>\r\n</code>计算在内（2字节），且首行的<code>\r\n</code>不计算</p>
+</blockquote>
+<p>后端服务器处理<code>Transfer-Encoding</code>标头，服务器会接收前端服务器的转发的请求数据，放在缓冲区中，当读取到     0\r\n 时，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的G就成了下一次请求的开始，变成  GPOST / HTTP/1.1 ，成功构造 GPOST请求，完成实验</p>
+<blockquote>
+<p>CL.TE我觉得就是0在中间，前端看长度，后端看分块</p>
+</blockquote>
+<h2 id="基本-tecl-漏洞">基本 TE.CL 漏洞</h2>
+<p>需求同样是下一个请求为<code>GPOST</code></p>
+<blockquote>
+<p><code>chunked</code>下，需要在每个<code>chunk</code>前用十六进制表示该<code>chunk</code>的大小（不算表示块终的<code>\r\n</code>）</p>
+</blockquote>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170205705.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170205705.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170205705.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170205705.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170205705.png"
+        title="image-20221217020501658" /></p>
+<p>这里，前端服务器使用<code>Transfer-Encoding</code>header，后端服务器使用<code>Content-Length</code>header</p>
+<p>前端服务器处理<code>Transfer-Encoding</code>标头，因此将消息正文视为使用分块编码。它处理第一个块，据说是 5c 个字节长，直到<code>aaa</code>. 它处理第二个块，该块被声明为零长度，因此被视为终止请求。该请求被转发到后端服务器。</p>
+<p>后端服务器处理<code>Content-Length</code>标头并确定请求正文为 4 个字节长(精确)，直到以下行的开头<code>5c</code>。开头的字节<code>GPOST</code>未处理，后端服务器会将这些字节视为序列中下一个请求的开始。</p>
+<p>这里的第二个请求大小5c要精确，下面的Content-Length：15够用即可，可大不可小</p>
+<pre tabindex="0"><code>需要转到 Repeater 菜单并确保未选中“Update Content-Length”选项
+需要\r\n\r\n在最后一个0后面
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170158389.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170158389.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170158389.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170158389.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212170158389.png"
+        title="image-20221217015814337" /></p>
+<p>官方题解属实看的迷迷糊糊的</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171538211.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171538211.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171538211.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171538211.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171538211.png"
+        title="image-20221217153811153" /></p>
+<p>重新来了一遍，看了一些文章后的个人理解</p>
+<blockquote>
+<p>TE.CL我觉得就是0在最后面，前端看分块，后端看长度</p>
+</blockquote>
+<p>前端看分块没毛病，就是一个包，因为<code>0\r\n</code>在最后结尾</p>
+<p>到了后端看长度，也就是CL</p>
+<p>上面的CL为4指的是<code>57\r\n</code>这就是第一个包，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的 GPOST / HTTP/1.1 就成了下一次请求的开始，成功构造 GPOST请求。</p>
+<p>注意这里的57是16进制，10进制大小是87，就是从GPOST到10\r\n这一段的大小，需要精确</p>
+<h2 id="tete-行为混淆-te-标头">TE.TE 行为：混淆 TE 标头</h2>
+<p>这里，前端和后端服务器都支持该<code>Transfer-Encoding</code>标头，但可以通过某种方式混淆标头来诱导其中一台服务器不对其进行处理。</p>
+<p>有可能有无穷无尽的方法来混淆<code>Transfer-Encoding</code>标头。例如：</p>
+<pre tabindex="0"><code>Transfer-Encoding: xchunked
+
+Transfer-Encoding : chunked
+
+Transfer-Encoding: chunked
+Transfer-Encoding: x
+
+Transfer-Encoding:[tab]chunked
+
+[space]Transfer-Encoding: chunked
+
+X: X[\n]Transfer-Encoding: chunked
+
+Transfer-Encoding
+: chunked
+</code></pre><p>这些技术中的每一种都与 HTTP 规范有细微的差别。实现协议规范的真实世界代码很少绝对精确地遵守它，并且不同的实现容忍规范的不同变化是很常见的。要发现 TE.TE 漏洞，有必要找到<code>Transfer-Encoding</code>标头的某些变体，以便只有一个前端或后端服务器处理它，而另一个服务器忽略它。</p>
+<p>根据可以诱导前端或后端服务器不处理混淆<code>Transfer-Encoding</code>标头，攻击的其余部分将采用与已经描述的 CL.TE 或 TE.CL 漏洞相同的形式。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171437364.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171437364.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171437364.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171437364.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171437364.png"
+        title="image-20221217143707299" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171441195.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171441195.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171441195.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171441195.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171441195.png"
+        title="image-20221217144110136" /></p>
+<h2 id="通过差异响应确认-clte-漏洞">通过差异响应确认 CL.TE 漏洞</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171442814.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171442814.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171442814.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171442814.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171442814.png"
+        title="image-20221217144259771" /></p>
+<p>前端不支持分块，采用CL-TE，0在中间后端分块</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171513849.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171513849.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171513849.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171513849.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171513849.png"
+        title="image-20221217151326790" /></p>
+<p>只是payload不同</p>
+<h2 id="通过差异响应确认-tecl-漏洞">通过差异响应确认 TE.CL 漏洞</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171549772.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171549772.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171549772.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171549772.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171549772.png"
+        title="image-20221217154947726" /></p>
+<p>后端不支持分块，采用TE.CL，0在最后前端分块</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171557483.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171557483.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171557483.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171557483.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171557483.png"
+        title="image-20221217155757412" /></p>
+<h2 id="请求走私绕过前端安全控制clte-漏洞">请求走私绕过前端安全控制，CL.TE 漏洞</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171611630.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171611630.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171611630.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171611630.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212171611630.png"
+        title="image-20221217161144585" /></p>
+<p>尝试访问<code>/admin</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172005384.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172005384.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172005384.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172005384.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172005384.png"
+        title="image-20221217200509293" /></p>
+<p>提示需要local users</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172014669.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172014669.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172014669.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172014669.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172014669.png"
+        title="image-20221217201457600" /></p>
+<p>不允许重复的标头名称，Host和第一个请求冲突了，构造第二个请求走私过去</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172113646.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172113646.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172113646.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172113646.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172113646.png"
+        title="image-20221217211313568" /></p>
+<p>可以看到删除的url请求了，构造一下</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172123228.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172123228.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172123228.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172123228.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212172123228.png"
+        title="image-20221217212359166" /></p>
+<h2 id="请求走私绕过前端安全控制tecl-漏洞">请求走私绕过前端安全控制，TE.CL 漏洞</h2>
+<p>与上题一样，不过换成TE.CL</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212180022397.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212180022397.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212180022397.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212180022397.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212180022397.png"
+        title="image-20221218002229317" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" data-title="burpsuite靶场请求走私" data-hashtags="请求走私"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" data-hashtag="请求走私"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" data-title="burpsuite靶场请求走私"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" data-title="burpsuite靶场请求走私"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" data-title="burpsuite靶场请求走私"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">请求走私</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/" class="prev" rel="prev" title="burpsuite靶场跨站请求伪造( CSRF )"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>burpsuite靶场跨站请求伪造( CSRF )</a>
+            <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" class="next" rel="next" title="burpsuite靶场XXE">burpsuite靶场XXE<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

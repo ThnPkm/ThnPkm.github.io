@@ -1,0 +1,24 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Ssti - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/ssti/</link>
+        <description>Ssti - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/ssti/" rel="self" type="application/rss+xml" /><item>
+    <title>go语言模板注入</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/</guid>
+    <description><![CDATA[前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
+很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。
+本文想来浅谈一下go语言下的SSTI，
+关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。
+go 模板注入 和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。
+GO语言提供了两个模板包，一个是 html/template 模块，另一个是 text/template 模块，两个模块都可以在它的官网文档中找到。
+这两个模板有很大的不同，例如，在 text/template 中，您可以使用call值直接调用任何公共函数，但是在 html/template 中则不是这种情况,text/template 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 html/template 增加了 HTML 编码等安全保护。
+感觉跟Flask的 render_template() 和render_template_string() 类似吧
+代码示例 我们编写如下代码来进行测试，代码中引入了text/template，会导致SSTI漏洞出现
+package main import ( &#34;fmt&#34; &#34;net/http&#34; &#34;strings&#34; &#34;text/template&#34; ) type User struct { Id int Name string Passwd string } func StringTplExam(w http.ResponseWriter, r *http.Request) { user := &amp;User{1, &#34;admin&#34;, &#34;123456&#34;} r.ParseForm() //解析用户提交的表单 为一个键值对的形式 arg := strings.]]></description>
+</item>
+</channel>
+</rss>

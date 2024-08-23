@@ -1,0 +1,32 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>条件竞争 - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/</link>
+        <description>条件竞争 - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/" rel="self" type="application/rss+xml" /><item>
+    <title>条件竞争</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/</guid>
+    <description><![CDATA[前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
+什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
+通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
+假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
+我觉得还挺好理解的。
+例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
+我有10元，但是flag需要10000000000元
+可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
+import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
+例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
+https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
+burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
+2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
+在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
+文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
+PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
+由此原理我们可以写进shell然后rce
+首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell]]></description>
+</item>
+</channel>
+</rss>

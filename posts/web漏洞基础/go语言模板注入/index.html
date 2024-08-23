@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>go语言模板注入 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="go语言模板注入">
+  <meta property="og:description" content="前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
+很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。
+本文想来浅谈一下go语言下的SSTI，
+关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。
+go 模板注入 和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。
+GO语言提供了两个模板包，一个是 html/template 模块，另一个是 text/template 模块，两个模块都可以在它的官网文档中找到。
+这两个模板有很大的不同，例如，在 text/template 中，您可以使用call值直接调用任何公共函数，但是在 html/template 中则不是这种情况,text/template 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 html/template 增加了 HTML 编码等安全保护。
+感觉跟Flask的 render_template() 和render_template_string() 类似吧
+代码示例 我们编写如下代码来进行测试，代码中引入了text/template，会导致SSTI漏洞出现
+package main import ( &#34;fmt&#34; &#34;net/http&#34; &#34;strings&#34; &#34;text/template&#34; ) type User struct { Id int Name string Passwd string } func StringTplExam(w http.ResponseWriter, r *http.Request) { user := &amp;User{1, &#34;admin&#34;, &#34;123456&#34;} r.ParseForm() //解析用户提交的表单 为一个键值对的形式 arg := strings.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:53:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:53:36+08:00">
+    <meta property="article:tag" content="Ssti">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="go语言模板注入">
+  <meta name="twitter:description" content="前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
+很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。
+本文想来浅谈一下go语言下的SSTI，
+关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。
+go 模板注入 和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。
+GO语言提供了两个模板包，一个是 html/template 模块，另一个是 text/template 模块，两个模块都可以在它的官网文档中找到。
+这两个模板有很大的不同，例如，在 text/template 中，您可以使用call值直接调用任何公共函数，但是在 html/template 中则不是这种情况,text/template 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 html/template 增加了 HTML 编码等安全保护。
+感觉跟Flask的 render_template() 和render_template_string() 类似吧
+代码示例 我们编写如下代码来进行测试，代码中引入了text/template，会导致SSTI漏洞出现
+package main import ( &#34;fmt&#34; &#34;net/http&#34; &#34;strings&#34; &#34;text/template&#34; ) type User struct { Id int Name string Passwd string } func StringTplExam(w http.ResponseWriter, r *http.Request) { user := &amp;User{1, &#34;admin&#34;, &#34;123456&#34;} r.ParseForm() //解析用户提交的表单 为一个键值对的形式 arg := strings.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" /><link rel="prev" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "go语言模板注入",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5\/"
+        },"genre": "posts","keywords": "ssti","wordcount":  319 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5\/","datePublished": "2024-08-20T22:53:36+08:00","dateModified": "2024-08-20T22:53:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">go语言模板注入</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;319 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#go-模板注入">go 模板注入</a>
+      <ul>
+        <li><a href="#代码示例">代码示例</a></li>
+        <li><a href="#漏洞利用">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li><a href="#总结">总结：</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p>go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）</p>
+<p>很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。</p>
+<p>本文想来浅谈一下go语言下的SSTI，</p>
+<p>关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。</p>
+<h2 id="go-模板注入">go 模板注入</h2>
+<p>和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。</p>
+<p>GO语言提供了两个模板包，一个是 <a href="https://pkg.go.dev/html/template" target="_blank" rel="noopener noreffer">html/template 模块</a>
+，另一个是 <a href="https://pkg.go.dev/text/template" target="_blank" rel="noopener noreffer">text/template 模块</a>
+，两个模块都可以在它的官网文档中找到。</p>
+<p>这两个模板有很大的不同，例如，在<code> text/template</code> 中，您可以使用<code>call</code>值直接调用任何公共函数，但是在<code> html/template</code> 中则不是这种情况,<code>text/template</code> 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 <code>html/template</code> 增加了 HTML 编码等安全保护。</p>
+<p>感觉跟Flask的 <code>render_template()</code> 和<code>render_template_string()</code> 类似吧</p>
+<h3 id="代码示例">代码示例</h3>
+<p>我们编写如下代码来进行测试，代码中引入了<code>text/template</code>，会导致SSTI漏洞出现</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;net/http&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;strings&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;text/template&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">User</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Id</span>     <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span>   <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Passwd</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">StringTplExam</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">user</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">User</span>{<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;admin&#34;</span>, <span style="color:#e6db74">&#34;123456&#34;</span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">ParseForm</span>()                               <span style="color:#75715e">//解析用户提交的表单 为一个键值对的形式
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">arg</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">PostForm</span>[<span style="color:#e6db74">&#34;name&#34;</span>], <span style="color:#e6db74">&#34;&#34;</span>) <span style="color:#75715e">//post传参name
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">tpl1</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">`&lt;h1&gt;Hi, `</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">arg</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">`&lt;/h1&gt; Your name is `</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">arg</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">`!`</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">html</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;login&#34;</span>).<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">tpl1</span>) <span style="color:#75715e">//进行模板渲染
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">html</span> = <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">Must</span>(<span style="color:#a6e22e">html</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">html</span>.<span style="color:#a6e22e">Execute</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">user</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">server</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Server</span>{
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">Addr</span>: <span style="color:#e6db74">&#34;127.0.0.1:8080&#34;</span>,
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">HandleFunc</span>(<span style="color:#e6db74">&#34;/login&#34;</span>, <span style="color:#a6e22e">StringTplExam</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">ListenAndServe</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>进入login路由 可以post传入 name 参数</p>
+<!-- raw HTML omitted -->
+<h3 id="漏洞利用">漏洞利用</h3>
+<h4 id="信息泄露">信息泄露</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">User</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Id</span>     <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Name</span>   <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">Passwd</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">user</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">User</span>{<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;admin&#34;</span>, <span style="color:#e6db74">&#34;123456&#34;</span>}
+</span></span></code></pre></div><p>结构体是Go中一个非常重要的类型，Go通过结构体来类比一个对象，因此他的字段就是一个对象的属性。通常Json的编码和解析都需要通过结构体来实现，加之模板渲染支持传入一个结构体的实例来渲染它的字段，这就造成了信息泄漏的可能。如代码所示，输入可控且直接拼接进模板，仿造<code>{{ .Name }}</code>的结构构造<code>{{.Passwd}}</code>就能获得Passwd字段值。</p>
+<p>使用了 模板<code>&amp;User</code> 因此<code>{{.Passwd}}</code>模板使用 user 的 Passwd 属性，就会导致密码的泄露</p>
+<!-- raw HTML omitted -->
+<p>我们还可以直接利用<code>{{ . }}</code> 这种形式来返回全部的模板中的内容，在我们的例子中是 user 结构。这可以被认为是其他模板引擎中的 {{ self }} 的等价物</p>
+<!-- raw HTML omitted -->
+<p>防御：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">StringTpl2Exam</span>(<span style="color:#a6e22e">w</span> <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">ResponseWriter</span>, <span style="color:#a6e22e">r</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">Request</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">user</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">User</span>{<span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;admin&#34;</span>, <span style="color:#e6db74">&#34;123456&#34;</span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">ParseForm</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">arg</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strings</span>.<span style="color:#a6e22e">Join</span>(<span style="color:#a6e22e">r</span>.<span style="color:#a6e22e">PostForm</span>[<span style="color:#e6db74">&#34;name&#34;</span>], <span style="color:#e6db74">&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">tpl</span> <span style="color:#f92672">:=</span> <span style="color:#e6db74">`&lt;h1&gt;Hi, </span><span style="color:#75715e">{{</span> <span style="color:#a6e22e">.arg</span> <span style="color:#75715e">}}</span><span style="color:#e6db74">&lt;/h1&gt;&lt;br&gt;Your name is </span><span style="color:#75715e">{{</span> <span style="color:#a6e22e">.Name</span> <span style="color:#75715e">}}</span><span style="color:#e6db74">`</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">data</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">string</span>]<span style="color:#66d9ef">string</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;arg&#34;</span>:  <span style="color:#a6e22e">arg</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;Name&#34;</span>: <span style="color:#a6e22e">user</span>.<span style="color:#a6e22e">Name</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">html</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">Must</span>(<span style="color:#a6e22e">template</span>.<span style="color:#a6e22e">New</span>(<span style="color:#e6db74">&#34;login&#34;</span>).<span style="color:#a6e22e">Parse</span>(<span style="color:#a6e22e">tpl</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">html</span>.<span style="color:#a6e22e">Execute</span>(<span style="color:#a6e22e">w</span>, <span style="color:#a6e22e">data</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>tyskill师傅文章对应的防御代码, 跟原来的不同是</p>
+<ol>
+<li>模板中使用 <code>{{ .arg }}</code> 和 <code>{{ .Name }}</code> 来引用变量。可以防止直接将用户输入的内容作为字符串插入到模板中，模板引擎会对这些变量进行合适的转义。</li>
+<li>创建了一个名为 <code>data</code> 的 <code>map</code>，用于存储模板中需要的数据。在这个 <code>map</code> 中，键名与模板中的变量名相对应，键值则为相应的数据。这样可以避免直接将用户输入的值作为变量名，减少了可能的安全风险。</li>
+</ol>
+<!-- raw HTML omitted -->
+<h4 id="xss">XSS</h4>
+<p>熟悉html模板包的时候就知道，可以对XSS进行防御，那么我们不使用的时候我们就来尝试一下能不能进行XSS攻击</p>
+<pre tabindex="0"><code>{{&#34;&lt;script&gt;alert(/xss/)&lt;/script&gt;&#34;}}
+{{print &#34;&lt;script&gt;alert(/xss/)&lt;/script&gt;&#34;}}
+</code></pre><p>借助Go模板提供的字符串打印功能，可以直接输出XSS语句，上面修改的的防御方法也无法阻挡弹窗</p>
+<!-- raw HTML omitted -->
+<p>防御：</p>
+<p>1 当然可以使用另一个模板包<code>html/template</code> 就不会有问题</p>
+<p>2 <code>text/template</code>在模板处理阶段还定义<code>template.HTMLEscapeString</code>等转义函数</p>
+<p>3 <code>text/template</code>提供了内置函数html来转义特殊字符，除此之外还提供了js函数转义js代码。</p>
+<pre tabindex="0"><code>{{html &#34;&lt;script&gt;alert(/xss/)&lt;/script&gt;&#34;}}
+{{js &#34;js代码&#34;}}
+</code></pre><h4 id="rce">RCE</h4>
+<p>到了我们最喜闻乐见的rce 了，但是发现go语言下的SSTI不像python那么通过语言特性灵活调用出来命令执行库。</p>
+<p>竟然是很蠢的直接引用了命令执行库，定义了这个命令执行方法 ， 不然也利用不了。</p>
+<p>所以还得是存在这种危险的函数 才可能利用ssti达到rce的效果</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">u</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">User</span>) <span style="color:#a6e22e">System</span>(<span style="color:#a6e22e">cmd</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">arg</span> <span style="color:#f92672">...</span><span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">exec</span>.<span style="color:#a6e22e">Command</span>(<span style="color:#a6e22e">cmd</span>, <span style="color:#a6e22e">arg</span><span style="color:#f92672">...</span>).<span style="color:#a6e22e">CombinedOutput</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> string(<span style="color:#a6e22e">out</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>在原代码添加<code>&quot;os/exec&quot;</code> 库 然后定义一个 命令执行函数<code>System()</code></p>
+<!-- raw HTML omitted -->
+<p>嗯 感觉很难实现</p>
+<h4 id="任意文件读取">任意文件读取</h4>
+<p>同rce ，需要存在危险函数 和 引入<code>&quot;io/ioutil&quot;</code>包</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;io/ioutil&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">u</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">User</span>) <span style="color:#a6e22e">FileRead</span>(<span style="color:#a6e22e">File</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">ioutil</span>.<span style="color:#a6e22e">ReadFile</span>(<span style="color:#a6e22e">File</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Print</span>(<span style="color:#e6db74">&#34;File read error&#34;</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> string(<span style="color:#a6e22e">data</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code>name={{.FileRead &#34;test.txt&#34;}}
+</code></pre><p><code>ioutil.ReadFile(File)</code> 没成功，<code>ReadFile</code>已经弃用了</p>
+<h2 id="总结">总结：</h2>
+<p>模板注入作为一种攻击方式绝不是简单的flask，对各种语言的模板使用与规则进行研究面，对各种模板进行研究，都是必要的。</p>
+<p>比如nodejs也有这种问题。<code>hxpctf2022 valentine</code> 就涉及到了nodejs的模板渲染 利用，很有特色地可以利用自定义分隔符来绕过check</p>
+<p>可参考我之前写的wp</p>
+<p><a href="https://blog.csdn.net/qq_61768489/article/details/129503772" target="_blank" rel="noopener noreffer">https://blog.csdn.net/qq_61768489/article/details/129503772</a>
+</p>
+<p>参考：</p>
+<p><a href="https://tyskill.github.io/posts/gossti/" target="_blank" rel="noopener noreffer">https://tyskill.github.io/posts/gossti/</a>
+</p>
+<p><a href="https://forum.butian.net/share/1286" target="_blank" rel="noopener noreffer">https://forum.butian.net/share/1286</a>
+</p>
+<p><a href="https://xz.aliyun.com/t/12642#toc-1" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/12642#toc-1</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" data-title="go语言模板注入" data-hashtags="ssti"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" data-hashtag="ssti"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" data-title="go语言模板注入"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" data-title="go语言模板注入"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" data-title="go语言模板注入"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssti/">Ssti</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/" class="prev" rel="prev" title="nodejsVM2沙箱逃逸"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>nodejsVM2沙箱逃逸</a>
+            <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" class="next" rel="next" title="西湖论剑">西湖论剑<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

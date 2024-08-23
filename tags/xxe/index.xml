@@ -1,0 +1,24 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Xxe - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/xxe/</link>
+        <description>Xxe - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/xxe/" rel="self" type="application/rss+xml" /><item>
+    <title>burpsuite靶场XXE</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/</guid>
+    <description><![CDATA[参考以下文章学习
+https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
+什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
+什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
+什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;my entity value&quot; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
+什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
+使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
+然后就是构造外部实体来查看文件
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
+利用 XXE 执行 SSRF 攻击 与上题payload类似]]></description>
+</item>
+</channel>
+</rss>

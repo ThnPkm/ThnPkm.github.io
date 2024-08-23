@@ -1,0 +1,208 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Web漏洞基础 - Category - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/</link>
+        <description>Web漏洞基础 - Category - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/" rel="self" type="application/rss+xml" /><item>
+    <title>go语言模板注入</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/</guid>
+    <description><![CDATA[前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
+很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。
+本文想来浅谈一下go语言下的SSTI，
+关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。
+go 模板注入 和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。
+GO语言提供了两个模板包，一个是 html/template 模块，另一个是 text/template 模块，两个模块都可以在它的官网文档中找到。
+这两个模板有很大的不同，例如，在 text/template 中，您可以使用call值直接调用任何公共函数，但是在 html/template 中则不是这种情况,text/template 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 html/template 增加了 HTML 编码等安全保护。
+感觉跟Flask的 render_template() 和render_template_string() 类似吧
+代码示例 我们编写如下代码来进行测试，代码中引入了text/template，会导致SSTI漏洞出现
+package main import ( &#34;fmt&#34; &#34;net/http&#34; &#34;strings&#34; &#34;text/template&#34; ) type User struct { Id int Name string Passwd string } func StringTplExam(w http.ResponseWriter, r *http.Request) { user := &amp;User{1, &#34;admin&#34;, &#34;123456&#34;} r.ParseForm() //解析用户提交的表单 为一个键值对的形式 arg := strings.]]></description>
+</item>
+<item>
+    <title>nodejsVM2沙箱逃逸</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/</guid>
+    <description><![CDATA[什么是沙箱以及VM？ 什么是沙箱：
+沙箱就是能够像一个集装箱一样，把你的应用“装”起来的技术。这样，应用与应用之间，就因为有了边界而不至于相互干扰而被装进集装箱的应用，也可以被方便地搬来搬去。
+什么是VM：
+VM就是虚拟环境，虚拟机，VM的特点就是不受环境的影响，也可以说他就是一个 沙箱环境 （沙箱模式给模块提供一个环境运行而不影响其它模块和它们私有的沙箱）类似于docker，docker是属于 Sandbox（沙箱） 的一种。
+简而言之，vm提供了一个干净的独立环境，提供测试。
+在Nodejs中，我们可以通过引入vm模块来创建一个“沙箱”，但其实这个vm模块的隔离功能并不完善，还有很多缺陷，因此Node后续升级了vm，也就是现在的vm2沙箱，vm2引用了vm模块的功能，并在其基础上做了一些优化。
+vm模块 参考：https://xz.aliyun.com/t/11859#toc-1
+nodejs作用域 用例子来解释很清晰
+#1.js var height1 = 175 exports.height = height1 Node给我们提供了一个将js文件中元素输出的接口exports
+#2.js const age = 20 const user = require(&#34;./1&#34;) console.log(age) console.log(user.height) 输出
+20175 height的作用域是1.js,通过exports创建被require引入2.js
+age的作用域是2.js
+还有一个global作用域，就是全局变量。Nodejs下其他的所有属性和包都挂载在这个global对象下。在global下挂载了一些全局变量，我们在访问这些全局变量时不需要用global.xxx的方式来访问，直接用xxx就可以调用这个变量。举个例子，console就是挂载在global下的一个全局变量，我们在用console.log输出时并不需要写成global.console.log，其他常见全局变量还有process（一会逃逸要用到）。
+我们可以自定义一个name的全局变量，
+# 1.js var height1 = 175 global.name = &#34;ThnPkm&#34; exports.height = height1 全局变量则不需要exports创建
+# 2.js const age = 20 const user = require(&#34;./1&#34;) console.log(age) console.log(user.height) console.log(name) 输出时也不需要user.name来引用，name直接是global变量
+vm沙箱 前面提到了作用域这个概念，所以我们现在思考一下，如果想要实现沙箱的隔离作用，我们是不是可以创建一个新的作用域，让代码在这个新的作用域里面去运行，这样就和其他的作用域进行了隔离，这也就是vm模块运行的原理。]]></description>
+</item>
+<item>
+    <title>nodejs原型链污染</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/</guid>
+    <description><![CDATA[原型链污染原理 网上很多文章,p神讲的很好
+https://www.leavesongs.com/PENETRATION/javascript-prototype-pollution-attack.html例题（待补充） CTFshow 主要通过题目来进行更好的理解
+web338 源码下来主要是这里
+/* GET home page. */ router.post(&#39;/&#39;, require(&#39;body-parser&#39;).json(),function(req, res, next) { res.type(&#39;html&#39;); var flag=&#39;flag_here&#39;; var secert = {}; var sess = req.session; let user = {}; utils.copy(user,req.body); if(secert.ctfshow===&#39;36dboy&#39;){ res.end(flag); }else{ return res.json({ret_code: 2, ret_msg: &#39;登录失败&#39;+JSON.stringify(user)}); } }); 创建了一个secret对象和user对象
+utils.copy(user,req.body);让我们可以传入post数据操作user，跟进到copy()方法
+function copy(object1, object2){ for (let key in object2) { if (key in object2 &amp;&amp; key in object1) { copy(object1[key], object2[key]) } else { object1[key] = object2[key] } } } 可以发现其实就是merge方法的逻辑，只不过换了变量名]]></description>
+</item>
+<item>
+    <title>python总结</title>
+    <link>https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/</guid>
+    <description><![CDATA[任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
+#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
+path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
+if os.path.isfile(path): return send_file(path) 实现了任意文件读取
+使用open打开文件但未close 配合任意文件读取/proc/self/fd
+2020网鼎杯白虎组Web-PicDown app.py源码如下
+from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.]]></description>
+</item>
+<item>
+    <title>burpsuite靶场ssrf</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/</guid>
+    <description><![CDATA[服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞]]></description>
+</item>
+<item>
+    <title>burpsuite靶场XXE</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/</guid>
+    <description><![CDATA[参考以下文章学习
+https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
+什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
+什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
+什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;my entity value&quot; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
+什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
+使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
+然后就是构造外部实体来查看文件
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
+利用 XXE 执行 SSRF 攻击 与上题payload类似]]></description>
+</item>
+<item>
+    <title>burpsuite靶场请求走私</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/</guid>
+    <description><![CDATA[HTTP 请求走私 什么是 HTTP 请求走私？ HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。
+HTTP请求走私漏洞是如何产生的？ 大多数 HTTP 请求走私漏洞的出现是因为 HTTP 规范提供了两种不同的方式来指定请求的结束位置：Content-Length标头和Transfer-Encoding标头。
+标Content-Length头很简单：它以字节为单位指定消息正文的长度。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 11q=smuggling 标Transfer-Encoding头可用于指定消息正文使用分块编码。这意味着消息正文包含一个或多个数据块。每个块由以字节为单位的块大小（以十六进制表示）、后跟换行符和块内容组成。消息以大小为0的块终止。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedTransfer-Encoding: chunkedbq=smuggling0 由于 HTTP 规范提供了两种不同的方法来指定 HTTP 消息的长度，因此一条消息可能会同时使用这两种方法，从而导致它们相互冲突。HTTP 规范试图通过声明如果Content-Length和Transfer-Encoding标头都存在，Content-Length则应忽略该标头来防止出现此问题。当只有一个服务器在运行时，这可能足以避免歧义，但当两个或多个服务器链接在一起时就不行了。在这种情况下，出现问题的原因有两个：
+某些服务器不支持Transfer-Encoding请求中的标头。 Transfer-Encoding如果以某种方式混淆了标头，则可以诱导 某些支持标头的服务器不处理它。 如果前端和后端服务器对（可能混淆的）Transfer-Encoding 标头的行为不同，那么它们可能不同意连续请求之间的边界，从而导致请求走私漏洞。
+如何执行 HTTP 请求走私攻击 请求走私攻击涉及将Content-Length标头和Transfer-Encoding 标头放入单个 HTTP 请求中并操纵它们，以便前端和后端服务器以不同方式处理请求。完成此操作的确切方式取决于两个服务器的行为：
+CL.TE：前端服务器使用Content-Lengthheader，后端服务器使用Transfer-Encodingheader。 TE.CL：前端服务器使用Transfer-Encodingheader，后端服务器使用Content-Lengthheader。 TE.TE：前端和后端服务器都支持Transfer-Encodingheader，但是可以通过某种方式混淆header来诱导其中一台服务器不处理它。 基本 CL.TE 漏洞 目标是 让下一个请求为GPOST ,如下图发送两次即可
+前端服务器处理Content-Length，判断请求体长度为6个字节(5-10试了都可以)，一直到结尾G，认为是一个包。该请求被转发到后端服务器。
+Content-Length计算时，要把\r\n计算在内（2字节），且首行的\r\n不计算
+后端服务器处理Transfer-Encoding标头，服务器会接收前端服务器的转发的请求数据，放在缓冲区中，当读取到 0\r\n 时，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的G就成了下一次请求的开始，变成 GPOST / HTTP/1.]]></description>
+</item>
+<item>
+    <title>burpsuite靶场跨站请求伪造( CSRF )</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/</guid>
+    <description><![CDATA[什么是CSRF？ 跨站点请求伪造（也称为 CSRF）是一种网络安全漏洞，允许攻击者诱使用户执行他们不打算执行的操作。它允许攻击者部分规避同源策略，该策略旨在防止不同网站相互干扰。
+CSRF 攻击的影响是什么？ 在成功的 CSRF 攻击中，攻击者会导致受害用户无意中执行某个操作。例如，这可能是更改他们帐户上的电子邮件地址、更改密码或进行资金转帐。根据操作的性质，攻击者可能能够完全控制用户的帐户。如果受感染的用户在应用程序中具有特权角色，则攻击者可能能够完全控制应用程序的所有数据和功能。
+CSRF 是如何工作的？ 要使 CSRF 攻击成为可能，必须具备三个关键条件：
+**一个相关的动作。**应用程序中存在攻击者有理由诱导的操作。这可能是特权操作（例如修改其他用户的权限）或针对用户特定数据的任何操作（例如更改用户自己的密码）。 **基于 cookie 的会话处理。**执行该操作涉及发出一个或多个 HTTP 请求，应用程序仅依赖会话 cookie 来识别发出请求的用户。没有其他机制来跟踪会话或验证用户请求。 **没有不可预测的请求参数。**执行操作的请求不包含任何参数，其值攻击者无法确定或猜测。例如，当导致用户更改密码时，如果攻击者需要知道现有密码的值，则该函数不易受到攻击。 例如，假设一个应用程序包含一个允许用户更改其帐户电子邮件地址的功能。当用户执行此操作时，他们会发出如下 HTTP 请求：
+POST /email/change HTTP/1.1Host: vulnerable-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 30Cookie: session=yvthwsztyeQkAPzeQ5gHgTvlyxHfsAfEemail=wiener@normal-user.com 这样就满足了CSRF需要的条件：
+更改用户帐户上的电子邮件地址的操作是攻击者感兴趣的。执行此操作后，攻击者通常能够触发密码重置并完全控制用户帐户。 应用程序使用会话 cookie 来识别哪个用户发出了请求。没有其他Token或机制来跟踪用户会话。 攻击者可以轻松确定执行操作所需的请求参数的值。 有了这些条件，攻击者就可以构建一个包含以下 HTML 的网页：
+&lt;html&gt; &lt;body&gt; &lt;form action=&#34;https://vulnerable-website.com/email/change&#34; method=&#34;POST&#34;&gt; &lt;input type=&#34;hidden&#34; name=&#34;email&#34; value=&#34;pwned@evil-user.net&#34; /&gt; &lt;/form&gt; &lt;script&gt; document.forms[0].submit(); &lt;/script&gt; &lt;/body&gt; &lt;/html&gt; 如果受害用户访问攻击者的网页，会发生以下情况：
+攻击者的页面将触发对易受攻击网站的 HTTP 请求。 如果用户登录到易受攻击的网站，他们的浏览器将自动在请求中包含他们的会话 cookie（假设未使用SameSite cookie）。 易受攻击的网站将以正常方式处理请求，将其视为受害用户发出的请求，并更改其电子邮件地址。 没有防御的 CSRF 漏洞 登录后修改邮箱抓包]]></description>
+</item>
+<item>
+    <title>burpsuite靶场身份验证</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81/</guid>
+    <description><![CDATA[身份验证漏洞 通过不同响应枚举用户名 就是所谓的暴力破解，用户名和密码的字典都给了
+首先遍历用户名得到 atlas
+同样方法得到密码2000
+2FA 简单旁路 就是使用密码后还有个验证码，我们无法拿到对方的验证码，如何进行登录呢
+先使用自己的账密登录
+通过自己的电子邮件拿到验证码 ，成功登录后记录一下url
+这个url提供了成功登录后的地址信息 也就是url/my-account
+拿carlos:montoya进行登录后跳过验证码环节，直接访问/my-account
+密码重置破坏逻辑 跟上面比较像
+https://0a8e00b204609bacc0f64a2600d400ea.web-security-academy.net/forgot-password?temp-forgot-password-token=zClSL4YN2T76ZNfEqHE4A6wXFANxnbHq 抓包来分析修改密码时的包
+删除URL和请求体中temp-forgot-password-token参数的value。将用户名参数更改为 carlos将新密码设置为想要的任何内容并发送请求。
+然后carlos的密码就被改为了1234
+通过细微不同的响应枚举用户名 也是暴力破解 ，不同的是，这次简单的看响应长度找正确结果不可行
+可以设置一下返回有用的响应信息，以便分辨正确的结果
+有一个结果没有. 就是他了
+然后爆破密码 看长度或状态302跳转即可
+通过响应计时的用户名枚举 这题的特点呢，首先需要X-Forwarded-For伪造ip，否则多次请求会封ip，但并不会检测ip格式，所以就1-100就行
+然后这里的通过响应时间来进行区分，经过测试，如果用户名正确，则响应时间根据你设置密码的长度增加而增加。
+用户名不正确则直接响应结束，所以这个点可以进行用户名爆破。
+ip和username一一对应进行爆破（Pirchfork模块），响应时间长的即为正确用户名
+ad的响应时间明显大很多，所以ad可能是用户名，有了用户名正常方法爆密码即可
+ad : love
+破解暴力保护，IP 封锁 这题的情况是： 错误登录只允许三次，否则要等待1分钟继续登录，可利用的点是我们可以正常登录自己的用户来重置次数。
+所以在爆破carlos的密码时，中间要穿插正确的账号密码，准备这样的字典进行爆破。
+为了方便呢，这两用户就交叉跑
+carlos pass1wiener peter carlos pass2wiener peter 准备如上的字典即可
+账号好搞，密码字典写个脚本生成一下
+with open(&#39;小脚本\pass.txt&#39;) as f: c = f.readlines() targ = open(&#39;小脚本\pass2.txt&#39;,&#34;w&#34;) s = &#39;peter&#39; for i in range(100): targ.]]></description>
+</item>
+<item>
+    <title>条件竞争</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/</guid>
+    <description><![CDATA[前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
+什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
+通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
+假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
+我觉得还挺好理解的。
+例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
+我有10元，但是flag需要10000000000元
+可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
+import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
+例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
+https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
+burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
+2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
+在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
+文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
+PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
+由此原理我们可以写进shell然后rce
+首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell]]></description>
+</item>
+</channel>
+</rss>

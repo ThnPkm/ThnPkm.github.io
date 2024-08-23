@@ -110,29 +110,18 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Python pth文件写入getshell</a>
+        <a href="/posts/ctf/nodejs/">nodejs</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a>&nbsp;<a href="/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>杂文记录</a></span></div><div class="content">原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
-python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
-sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
-D:/Python/temp/ 重新启动python
-1.path的路径被添加到sys.path中
-site.py的实现中，有这么一段
-def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.</div><div class="post-footer">
-        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">python总结</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
-#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
-path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
-if os.path.isfile(path): return send_file(path) 实现了任意文件读取
-使用open打开文件但未close 配合任意文件读取/proc/self/fd
-2020网鼎杯白虎组Web-PicDown app.py源码如下
-from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.</div><div class="post-footer">
-        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
+nnodejs语言的缺点 大小写特性 toUpperCase()toLowerCase()对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K) 例题：ctfshow 334 打开题目是一个登录界面，阅读源码，这里贴出关键代码
+module.exports = { items: [ {username: &#39;CTFSHOW&#39;, password: &#39;123456&#39;} ] }; var findUser = function(name, password){ return users.find(function(item){ return name!==&#39;CTFSHOW&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; }); }; 这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。
+将题面改成这样又该如何绕过呢？
+return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; js中有大小写特性
+这题刚好用到了类s字符，输入 ctfſhow/123456。成功登录
+弱类型比较 大小比较
+console.log(1==&#39;1&#39;); //true console.log(1&gt;&#39;2&#39;); //false console.log(&#39;1&#39;&lt;&#39;2&#39;); //true console.log(111&gt;&#39;3&#39;); //true console.log(&#39;111&#39;&gt;&#39;3&#39;); //false console.</div><div class="post-footer">
+        <a href="/posts/ctf/nodejs/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/nodejs/">Nodejs</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/sctf2023/">SCTF2023</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
@@ -192,6 +181,20 @@ https://github.com/jas502n/Grafana-CVE-2021-43798获取数据库密码
 secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境</div><div class="post-footer">
         <a href="/posts/ctf/%E5%AD%97%E8%8A%82ctf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/grafana/">Grafana</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">强网拟态wp</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web noumisotuitennnoka 本地测一下，确实是，执行了默认的create 、zip 、unzip后
+会在/var/www/html目录下生成jsons文件夹，里面就是backdoor.php 和 .hatccess
+刚开始想通过clean把/var/www/html/jsons/.htaccess 删掉，但是$substr的正则匹配拦住了，绕不过。
+换个思路，通过'remove_path' =&gt; $dev_dir 来清除。
+要满足realpath($dev_dir) == $dir 并且 删除.htaccess
+可以构造dev=/tmp/. 这里是重点，这样就可以在压缩过程中删除.htaccess了。
+所以创建和解压也用/tmp作为目录
+?action=create&amp;subdir=/tmp?action=zip&amp;subdir=/tmp&amp;dev=/tmp/.?action=unzip&amp;subdir=/tmp 解压后就没有.htaccess了
+直接访问backdoor.php</div><div class="post-footer">
+        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -217,6 +220,10 @@ secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境</div><d
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/7/">7</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

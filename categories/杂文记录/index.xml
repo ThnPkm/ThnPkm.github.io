@@ -3,10 +3,10 @@
         <title>杂文记录 - Category - ThnPinkman’s blog</title>
         <link>https://thnpkm.github.io/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/</link>
         <description>杂文记录 - Category - ThnPinkman’s blog</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/" rel="self" type="application/rss+xml" /><item>
     <title>Python pth文件写入getshell</title>
     <link>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</guid>
     <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html

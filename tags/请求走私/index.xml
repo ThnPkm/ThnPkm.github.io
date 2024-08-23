@@ -1,0 +1,25 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>请求走私 - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/</link>
+        <description>请求走私 - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/" rel="self" type="application/rss+xml" /><item>
+    <title>burpsuite靶场请求走私</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/</guid>
+    <description><![CDATA[HTTP 请求走私 什么是 HTTP 请求走私？ HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。
+HTTP请求走私漏洞是如何产生的？ 大多数 HTTP 请求走私漏洞的出现是因为 HTTP 规范提供了两种不同的方式来指定请求的结束位置：Content-Length标头和Transfer-Encoding标头。
+标Content-Length头很简单：它以字节为单位指定消息正文的长度。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 11q=smuggling 标Transfer-Encoding头可用于指定消息正文使用分块编码。这意味着消息正文包含一个或多个数据块。每个块由以字节为单位的块大小（以十六进制表示）、后跟换行符和块内容组成。消息以大小为0的块终止。例如：
+POST /search HTTP/1.1Host: normal-website.comContent-Type: application/x-www-form-urlencodedTransfer-Encoding: chunkedbq=smuggling0 由于 HTTP 规范提供了两种不同的方法来指定 HTTP 消息的长度，因此一条消息可能会同时使用这两种方法，从而导致它们相互冲突。HTTP 规范试图通过声明如果Content-Length和Transfer-Encoding标头都存在，Content-Length则应忽略该标头来防止出现此问题。当只有一个服务器在运行时，这可能足以避免歧义，但当两个或多个服务器链接在一起时就不行了。在这种情况下，出现问题的原因有两个：
+某些服务器不支持Transfer-Encoding请求中的标头。 Transfer-Encoding如果以某种方式混淆了标头，则可以诱导 某些支持标头的服务器不处理它。 如果前端和后端服务器对（可能混淆的）Transfer-Encoding 标头的行为不同，那么它们可能不同意连续请求之间的边界，从而导致请求走私漏洞。
+如何执行 HTTP 请求走私攻击 请求走私攻击涉及将Content-Length标头和Transfer-Encoding 标头放入单个 HTTP 请求中并操纵它们，以便前端和后端服务器以不同方式处理请求。完成此操作的确切方式取决于两个服务器的行为：
+CL.TE：前端服务器使用Content-Lengthheader，后端服务器使用Transfer-Encodingheader。 TE.CL：前端服务器使用Transfer-Encodingheader，后端服务器使用Content-Lengthheader。 TE.TE：前端和后端服务器都支持Transfer-Encodingheader，但是可以通过某种方式混淆header来诱导其中一台服务器不处理它。 基本 CL.TE 漏洞 目标是 让下一个请求为GPOST ,如下图发送两次即可
+前端服务器处理Content-Length，判断请求体长度为6个字节(5-10试了都可以)，一直到结尾G，认为是一个包。该请求被转发到后端服务器。
+Content-Length计算时，要把\r\n计算在内（2字节），且首行的\r\n不计算
+后端服务器处理Transfer-Encoding标头，服务器会接收前端服务器的转发的请求数据，放在缓冲区中，当读取到 0\r\n 时，认为一个请求完全结束，后面的数据依然存在于缓冲区，等待下一次转发的数据进入缓冲区，而当我们第二次发送请求时，我们缓冲区的G就成了下一次请求的开始，变成 GPOST / HTTP/1.]]></description>
+</item>
+</channel>
+</rss>

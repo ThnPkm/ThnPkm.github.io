@@ -28,6 +28,14 @@
     <description><![CDATA[]]></description>
 </item>
 <item>
+    <title>Python</title>
+    <link>https://thnpkm.github.io/tags/python/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/tags/python/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
     <title>Grafana</title>
     <link>https://thnpkm.github.io/tags/grafana/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
@@ -44,11 +52,35 @@
     <description><![CDATA[]]></description>
 </item>
 <item>
-    <title>Python</title>
-    <link>https://thnpkm.github.io/tags/python/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <title>Ssti</title>
+    <link>https://thnpkm.github.io/tags/ssti/</link>
+    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
     <author>Author</author>
-    <guid>https://thnpkm.github.io/tags/python/</guid>
+    <guid>https://thnpkm.github.io/tags/ssti/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Csrf</title>
+    <link>https://thnpkm.github.io/tags/csrf/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/tags/csrf/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Ssrf</title>
+    <link>https://thnpkm.github.io/tags/ssrf/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/tags/ssrf/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
+    <title>Xxe</title>
+    <link>https://thnpkm.github.io/tags/xxe/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/tags/xxe/</guid>
     <description><![CDATA[]]></description>
 </item>
 </channel>

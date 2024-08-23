@@ -1,0 +1,30 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Ssrf - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/ssrf/</link>
+        <description>Ssrf - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/ssrf/" rel="self" type="application/rss+xml" /><item>
+    <title>burpsuite靶场ssrf</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/</guid>
+    <description><![CDATA[服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞]]></description>
+</item>
+</channel>
+</rss>

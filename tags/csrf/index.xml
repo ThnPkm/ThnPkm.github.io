@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Csrf - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/csrf/</link>
+        <description>Csrf - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/csrf/" rel="self" type="application/rss+xml" /><item>
+    <title>burpsuite靶场跨站请求伪造( CSRF )</title>
+    <link>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/</link>
+    <pubDate>Tue, 20 Aug 2024 22:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%B7%A8%E7%AB%99%E8%AF%B7%E6%B1%82%E4%BC%AA%E9%80%A0-csrf-/</guid>
+    <description><![CDATA[什么是CSRF？ 跨站点请求伪造（也称为 CSRF）是一种网络安全漏洞，允许攻击者诱使用户执行他们不打算执行的操作。它允许攻击者部分规避同源策略，该策略旨在防止不同网站相互干扰。
+CSRF 攻击的影响是什么？ 在成功的 CSRF 攻击中，攻击者会导致受害用户无意中执行某个操作。例如，这可能是更改他们帐户上的电子邮件地址、更改密码或进行资金转帐。根据操作的性质，攻击者可能能够完全控制用户的帐户。如果受感染的用户在应用程序中具有特权角色，则攻击者可能能够完全控制应用程序的所有数据和功能。
+CSRF 是如何工作的？ 要使 CSRF 攻击成为可能，必须具备三个关键条件：
+**一个相关的动作。**应用程序中存在攻击者有理由诱导的操作。这可能是特权操作（例如修改其他用户的权限）或针对用户特定数据的任何操作（例如更改用户自己的密码）。 **基于 cookie 的会话处理。**执行该操作涉及发出一个或多个 HTTP 请求，应用程序仅依赖会话 cookie 来识别发出请求的用户。没有其他机制来跟踪会话或验证用户请求。 **没有不可预测的请求参数。**执行操作的请求不包含任何参数，其值攻击者无法确定或猜测。例如，当导致用户更改密码时，如果攻击者需要知道现有密码的值，则该函数不易受到攻击。 例如，假设一个应用程序包含一个允许用户更改其帐户电子邮件地址的功能。当用户执行此操作时，他们会发出如下 HTTP 请求：
+POST /email/change HTTP/1.1Host: vulnerable-website.comContent-Type: application/x-www-form-urlencodedContent-Length: 30Cookie: session=yvthwsztyeQkAPzeQ5gHgTvlyxHfsAfEemail=wiener@normal-user.com 这样就满足了CSRF需要的条件：
+更改用户帐户上的电子邮件地址的操作是攻击者感兴趣的。执行此操作后，攻击者通常能够触发密码重置并完全控制用户帐户。 应用程序使用会话 cookie 来识别哪个用户发出了请求。没有其他Token或机制来跟踪用户会话。 攻击者可以轻松确定执行操作所需的请求参数的值。 有了这些条件，攻击者就可以构建一个包含以下 HTML 的网页：
+&lt;html&gt; &lt;body&gt; &lt;form action=&#34;https://vulnerable-website.com/email/change&#34; method=&#34;POST&#34;&gt; &lt;input type=&#34;hidden&#34; name=&#34;email&#34; value=&#34;pwned@evil-user.net&#34; /&gt; &lt;/form&gt; &lt;script&gt; document.forms[0].submit(); &lt;/script&gt; &lt;/body&gt; &lt;/html&gt; 如果受害用户访问攻击者的网页，会发生以下情况：
+攻击者的页面将触发对易受攻击网站的 HTTP 请求。 如果用户登录到易受攻击的网站，他们的浏览器将自动在请求中包含他们的会话 cookie（假设未使用SameSite cookie）。 易受攻击的网站将以正常方式处理请求，将其视为受害用户发出的请求，并更改其电子邮件地址。 没有防御的 CSRF 漏洞 登录后修改邮箱抓包]]></description>
+</item>
+</channel>
+</rss>

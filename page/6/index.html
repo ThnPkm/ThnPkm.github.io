@@ -110,20 +110,6 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">强网拟态wp</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web noumisotuitennnoka 本地测一下，确实是，执行了默认的create 、zip 、unzip后
-会在/var/www/html目录下生成jsons文件夹，里面就是backdoor.php 和 .hatccess
-刚开始想通过clean把/var/www/html/jsons/.htaccess 删掉，但是$substr的正则匹配拦住了，绕不过。
-换个思路，通过'remove_path' =&gt; $dev_dir 来清除。
-要满足realpath($dev_dir) == $dir 并且 删除.htaccess
-可以构造dev=/tmp/. 这里是重点，这样就可以在压缩过程中删除.htaccess了。
-所以创建和解压也用/tmp作为目录
-?action=create&amp;subdir=/tmp?action=zip&amp;subdir=/tmp&amp;dev=/tmp/.?action=unzip&amp;subdir=/tmp 解压后就没有.htaccess了
-直接访问backdoor.php</div><div class="post-footer">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">西湖论剑</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web 扭转乾坤 在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务
@@ -138,67 +124,86 @@ function Flag1Controller(req,res){ try { if(req.cookies.user === SECRET_COOKIE){
         <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">VulnHub — CH4INRULZ_v1.0.1</a>
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">go语言模板注入</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
-curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
-frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
-将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
-登录刚才的development目录 ，成功登录
-然后有提示 uploader目录需要安全审查 访问后可以上传图片
-传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
-8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
-没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
-并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
-nc 反弹shell nc 先监听webshell里设置的4444端口
-文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
-反弹shell 成功
-www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
+很多题可能是以go搭建web，漏洞点的设置与go关系不大，就像刚刚结束的BRICS-CTF，两个web题是go语言下的sql注入。
+本文想来浅谈一下go语言下的SSTI，
+关于模板注入漏洞产生的原因，之前通过Flask等探究过，不再赘述，直接看go语言下是如何利用的。
+go 模板注入 和其他像Python、PHP环境下的模板注入一样Go语言下的模板注入也是因为未使用 Go 中渲染模板的预期方式来利用，用户传入的数据直接传递到了能够被模板执行的位置，导致了一系列的安全问题。
+GO语言提供了两个模板包，一个是 html/template 模块，另一个是 text/template 模块，两个模块都可以在它的官网文档中找到。
+这两个模板有很大的不同，例如，在 text/template 中，您可以使用call值直接调用任何公共函数，但是在 html/template 中则不是这种情况,text/template 包对 XSS 或任何类型的 HTML 编码没有任何保护，第二个包 html/template 增加了 HTML 编码等安全保护。
+感觉跟Flask的 render_template() 和render_template_string() 类似吧
+代码示例 我们编写如下代码来进行测试，代码中引入了text/template，会导致SSTI漏洞出现
+package main import ( &#34;fmt&#34; &#34;net/http&#34; &#34;strings&#34; &#34;text/template&#34; ) type User struct { Id int Name string Passwd string } func StringTplExam(w http.ResponseWriter, r *http.Request) { user := &amp;User{1, &#34;admin&#34;, &#34;123456&#34;} r.ParseForm() //解析用户提交的表单 为一个键值对的形式 arg := strings.</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssti/">Ssti</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/">VulnHub — DC-1</a>
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/">nodejsVM2沙箱逃逸</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — DC-1 信息收集 主机发现 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题
-既然扫到了, 就不管了，80端口开了 信息收集 直接访问网站扫目录
-Drupal 是使用PHP语言编写的开源内容管理框架（CMF），由内容管理系统(CMS)和PHP开发框架共同构成。 形象的说Drupal是一个福袋CMS的PHP开发框架
-msf漏洞发现 1启动：msfconsole2搜索利用脚本：search Drupal3进入利用脚本：use4查看需要参数：show opitons5设置参数：set6执行攻击：run msf启动 然后search一下 找exp 不少东西，其实可以试试用哪个，这里就直接用drupal_drupalgeddon2 也就是序号4
-看options 只需要配置RHOSTS 也就是靶机地址
-payload也已经配置好了
-session 传入 直接进入shell
-查看权限www-data 进入交互式
-python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; SUID提权（find） Set User ID是一种权限类型，允许用户使用指定用户的权限执行文件。那些具有suid权限的文件以最高的权限运行。假设我们以非root用户身份访问目标系统，井且我们发现二进制文件启用了suid位，那么这些文件/程序/命令可以root权限运行. SUID的目的就是:让本来没有相应权限的用户运行这个程序时，可以访问他没有权限访问的资源。 1、查看具有SUID的二进制可执行文件 find / -user root -perm -4000 -print 2&amp;gt;/dev/null2、一直可用来提权的linux可行性的文件列表如下：Nmap 、 Vim 、 find 、 Bash 、 More 、 Less 、Nano 、 cp3、利用find获得root权限shell find / -name cron.</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">什么是沙箱以及VM？ 什么是沙箱：
+沙箱就是能够像一个集装箱一样，把你的应用“装”起来的技术。这样，应用与应用之间，就因为有了边界而不至于相互干扰而被装进集装箱的应用，也可以被方便地搬来搬去。
+什么是VM：
+VM就是虚拟环境，虚拟机，VM的特点就是不受环境的影响，也可以说他就是一个 沙箱环境 （沙箱模式给模块提供一个环境运行而不影响其它模块和它们私有的沙箱）类似于docker，docker是属于 Sandbox（沙箱） 的一种。
+简而言之，vm提供了一个干净的独立环境，提供测试。
+在Nodejs中，我们可以通过引入vm模块来创建一个“沙箱”，但其实这个vm模块的隔离功能并不完善，还有很多缺陷，因此Node后续升级了vm，也就是现在的vm2沙箱，vm2引用了vm模块的功能，并在其基础上做了一些优化。
+vm模块 参考：https://xz.aliyun.com/t/11859#toc-1
+nodejs作用域 用例子来解释很清晰
+#1.js var height1 = 175 exports.height = height1 Node给我们提供了一个将js文件中元素输出的接口exports
+#2.js const age = 20 const user = require(&#34;./1&#34;) console.log(age) console.log(user.height) 输出
+20175 height的作用域是1.js,通过exports创建被require引入2.js
+age的作用域是2.js
+还有一个global作用域，就是全局变量。Nodejs下其他的所有属性和包都挂载在这个global对象下。在global下挂载了一些全局变量，我们在访问这些全局变量时不需要用global.xxx的方式来访问，直接用xxx就可以调用这个变量。举个例子，console就是挂载在global下的一个全局变量，我们在用console.log输出时并不需要写成global.console.log，其他常见全局变量还有process（一会逃逸要用到）。
+我们可以自定义一个name的全局变量，
+# 1.js var height1 = 175 global.name = &#34;ThnPkm&#34; exports.height = height1 全局变量则不需要exports创建
+# 2.js const age = 20 const user = require(&#34;./1&#34;) console.log(age) console.log(user.height) console.log(name) 输出时也不需要user.name来引用，name直接是global变量
+vm沙箱 前面提到了作用域这个概念，所以我们现在思考一下，如果想要实现沙箱的隔离作用，我们是不是可以创建一个新的作用域，让代码在这个新的作用域里面去运行，这样就和其他的作用域进行了隔离，这也就是vm模块运行的原理。</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejsvm2%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/nodejs/">Nodejs</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/">VulnHub — Lampiao</a>
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/">nodejs原型链污染</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — Lampiao 信息收集 msfconsole 脏牛提权
-信息收集 扫描ip和端口 namp -sP 扫描网段 ，得到靶机ip 利用nmap的TCP半开放扫描，对网站端口进行快速探测
-nmap -sS -p 1-65535 192.168.164.135 该扫描方式因为它不打开一个完全的TCP连接，所以是使用频率最高的扫描方式。扫描结果发现开放22、80、1898端口
-可以通过-A 来详细扫描， -p扫描所有的端口 ，时间长一点
-nmap -A 192.168.164.133 -p 0-65535 可以看到1898端口也是http服务
-访问web 扫描目录 继续收集信息, 在1898 端口有页面
-80端口没有啥有用功能，在1898 端口 扫目录
-得到框架的版本信息 Drupal 7.54 漏洞发发现与利用 msfconsole 使用 1.搜索利用脚本: search2.进入利用脚本: use exploit/unix/ftp/proftpd_133c_backdoor3.查看需要设置的参数: show options4.设置参数: set rhost 192.168.1.45.设置payload: set payload cmd/unix/reverse6.查看payload需要设置的参数: show options7.设置payload参数:set rhost 192.168.1.48.输入命令: run, 执行攻击，成功getshell, 井且直接为root权限 1，搜索脚本 search 2，利用脚本 use 3，查看需要参数 show options</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">原型链污染原理 网上很多文章,p神讲的很好
+https://www.leavesongs.com/PENETRATION/javascript-prototype-pollution-attack.html例题（待补充） CTFshow 主要通过题目来进行更好的理解
+web338 源码下来主要是这里
+/* GET home page. */ router.post(&#39;/&#39;, require(&#39;body-parser&#39;).json(),function(req, res, next) { res.type(&#39;html&#39;); var flag=&#39;flag_here&#39;; var secert = {}; var sess = req.session; let user = {}; utils.copy(user,req.body); if(secert.ctfshow===&#39;36dboy&#39;){ res.end(flag); }else{ return res.json({ret_code: 2, ret_msg: &#39;登录失败&#39;+JSON.stringify(user)}); } }); 创建了一个secret对象和user对象
+utils.copy(user,req.body);让我们可以传入post数据操作user，跟进到copy()方法
+function copy(object1, object2){ for (let key in object2) { if (key in object2 &amp;&amp; key in object1) { copy(object1[key], object2[key]) } else { object1[key] = object2[key] } } } 可以发现其实就是merge方法的逻辑，只不过换了变量名</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/nodejs%E5%8E%9F%E5%9E%8B%E9%93%BE%E6%B1%A1%E6%9F%93/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/nodejs/">Nodejs</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">VulnHub — Me-and-My-Girlfriend-1</a>
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">python总结</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — Me-and-My-Girlfriend-1 安装好靶场镜像，打开就这样
-在kali 查自己ip 用 nmap扫描 ，看有没有其他段 ，顺利找到靶场ip
-然后访问靶场ip ，查看源码 源码提示，用X-Forwarded-For 修改成 本地ip ，直接用插件改了
-顺利进入网站 ​​​
-进入注册页面，成功注册，然后进行登录
-登录进来，观察到这里可以修改 user_id的号， 修改试试
-试出来5时候，名字是alice ，正是本题女主的名字 F12成功看到密码 用ssh 命令 进行远程登录
-格式如下，密码输入以上密码就可，然后成功连接，可以操作了 隐藏文件有个 my_secret ,访问进去 继续查看
-成功看到flag1.txt ，获得第一个flag
-这题还需要提权，查看alice的权限 ，需要用php 提权
-php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 升为 root ，直接find flag文件啦</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a>&nbsp;<a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
+#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
+path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
+if os.path.isfile(path): return send_file(path) 实现了任意文件读取
+使用open打开文件但未close 配合任意文件读取/proc/self/fd
+2020网鼎杯白虎组Web-PicDown app.py源码如下
+from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.</div><div class="post-footer">
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">burpsuite靶场ssrf</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssrf/">Ssrf</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -220,6 +225,10 @@ php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/7/">7</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/8/">8</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
