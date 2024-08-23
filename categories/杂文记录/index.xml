@@ -1,0 +1,21 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>杂文记录 - Category - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/</link>
+        <description>杂文记录 - Category - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/categories/%E6%9D%82%E6%96%87%E8%AE%B0%E5%BD%95/" rel="self" type="application/rss+xml" /><item>
+    <title>Python pth文件写入getshell </title>
+    <link>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/%E9%97%BD%E7%9B%BE%E6%9D%AF2023/</guid>
+    <description><![CDATA[原理：Python pth文件写入getshell 参考https://www.cnblogs.com/Nestar/p/17336664.html
+python的site模块支持&quot;Site-specific configuration hook&quot;的功能，这个功能点本身是用来将特定路径加入模块搜索路径。该模块在初始化期间自动导入
+sys.prefix和sys.exec_prefix在D:/Python，那么创建路径为D:\Python\Lib\site-packages\1.pth的pth文件，然后其内容为
+D:/Python/temp/ 重新启动python
+1.path的路径被添加到sys.path中
+site.py的实现中，有这么一段
+def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.]]></description>
+</item>
+</channel>
+</rss>
