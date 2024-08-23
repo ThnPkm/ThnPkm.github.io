@@ -31,7 +31,7 @@ site.py的实现中，有这么一段
 def addpackage(sitedir, name, known_paths): if known_paths is None: known_paths = _init_pathinfo() reset = True else: reset = False fullname = os.path.join(sitedir, name) _trace(f&#34;Processing .pth file: {fullname!r}&#34;) try: # locale encoding is not ideal especially on Windows. But we have used # it for a long time. setuptools uses the locale encoding too. f = io.TextIOWrapper(io.open_code(fullname), encoding=&#34;locale&#34;) except OSError: return with f: for n, line in enumerate(f): if line.]]></description>
 </item>
 <item>
-    <title>字节CTF </title>
+    <title>字节CTF</title>
     <link>https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/</link>
     <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
     <author>Author</author>
