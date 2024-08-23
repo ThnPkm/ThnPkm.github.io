@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java动态代理 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java动态代理">
+  <meta property="og:description" content="通过demo来学习
+静态代理 静态代理 需要 代理类和目标类实现同一个接口
+先创建一个接口IUser：
+say_name方法是空的
+public interface IUser { public void say_name(); } 目标类User:
+实现了say_name()
+public class User implements IUser{ @Override public void say_name(){ System.out.println(&#34;ThnPkm&#34;); } } 代理类UserProxy：
+实现IUser接口,扩展了say_name()
+public class UserProxy implements IUser{ private IUser target; //构造函数 public UserProxy(IUser user1){ this.target=user1; } @Override public void say_name() { System.out.println(&#34;我是他的代理&#34;); //调用user1的 say_name() this.target.say_name(); } } 最后创建一个测试代理效果的类
+public class App { public static void main(String[] args) { IUser user = new User(); IUser userProxy = new UserProxy(user); userProxy.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:37+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:37+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java动态代理">
+  <meta name="twitter:description" content="通过demo来学习
+静态代理 静态代理 需要 代理类和目标类实现同一个接口
+先创建一个接口IUser：
+say_name方法是空的
+public interface IUser { public void say_name(); } 目标类User:
+实现了say_name()
+public class User implements IUser{ @Override public void say_name(){ System.out.println(&#34;ThnPkm&#34;); } } 代理类UserProxy：
+实现IUser接口,扩展了say_name()
+public class UserProxy implements IUser{ private IUser target; //构造函数 public UserProxy(IUser user1){ this.target=user1; } @Override public void say_name() { System.out.println(&#34;我是他的代理&#34;); //调用user1的 say_name() this.target.say_name(); } } 最后创建一个测试代理效果的类
+public class App { public static void main(String[] args) { IUser user = new User(); IUser userProxy = new UserProxy(user); userProxy.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%B0%84/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java动态代理",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86\/"
+        },"genre": "posts","keywords": "java","wordcount":  676 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86\/","datePublished": "2024-08-20T22:54:37+08:00","dateModified": "2024-08-20T22:54:37+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java动态代理</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;676 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#静态代理">静态代理</a></li>
+    <li><a href="#动态代理">动态代理</a></li>
+    <li><a href="#小例子">小例子</a></li>
+    <li><a href="#参考文章">参考文章：</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>通过demo来学习</p>
+<h2 id="静态代理">静态代理</h2>
+<p>静态代理 需要 代理类和目标类实现同一个接口</p>
+<p>先创建一个接口IUser：</p>
+<p>say_name方法是空的</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">IUser</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">say_name</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>目标类User:</p>
+<p>实现了say_name()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span> <span style="color:#66d9ef">implements</span> IUser{
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">say_name</span>(){
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;ThnPkm&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>代理类UserProxy：</p>
+<p>实现IUser接口,扩展了say_name()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserProxy</span> <span style="color:#66d9ef">implements</span> IUser{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> IUser target;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//构造函数</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">UserProxy</span>(IUser user1){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span><span style="color:#f92672">=</span>user1;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">say_name</span>() {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;我是他的代理&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//调用user1的 say_name()</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">say_name</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最后创建一个测试代理效果的类</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">App</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        IUser user <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> User();
+</span></span><span style="display:flex;"><span>        IUser userProxy <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> UserProxy(user);
+</span></span><span style="display:flex;"><span>        userProxy.<span style="color:#a6e22e">say_name</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//我是他的代理</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//ThnPkm</span>
+</span></span></code></pre></div><h2 id="动态代理">动态代理</h2>
+<p>上面提到的静态代理很好理解，就是在目标对象外又包装了一层，那什么又是动态代理呢？它俩的区别如下：</p>
+<ul>
+<li>静态代理在编译时就已经实现，编译完成后代理类是一个实际的class文件</li>
+<li>动态代理是在运行时动态生成的，即编译完成后没有实际的class文件，而是在运行时动态生成类字节码，并加载到JVM中</li>
+</ul>
+<p>动态代理不需要实现目标对象的接口，但是要求目标对象必须实现接口</p>
+<p>接口以及实现类还是用到上面的IUser 和 User</p>
+<p>除了上面两个类，再创建一个动态类</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ProxyFactory</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Object target;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//构造方法</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">ProxyFactory</span>(Object target){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span><span style="color:#f92672">=</span>target;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">getProxyInstance</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> Proxy.<span style="color:#a6e22e">newProxyInstance</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getClassLoader</span>(), <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">target</span>.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getInterfaces</span>(), <span style="color:#66d9ef">new</span> InvocationHandler() {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">invoke</span>(Object o, Method method, Object<span style="color:#f92672">[]</span> objects) <span style="color:#66d9ef">throws</span> Throwable {
+</span></span><span style="display:flex;"><span>                System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;我是他的代理&#34;</span>);
+</span></span><span style="display:flex;"><span>                method.<span style="color:#a6e22e">invoke</span>(target,objects);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>动态代理工厂类（ProxyFactory），用于创建代理对象。通过使用 Java 中的反射机制和动态代理技术，它可以在运行时为目标对象生成代理对象。</p>
+<p>动态代理的类为啥必须实现接口，因为这个方法中的第二个参数需要</p>
+<blockquote>
+<ol>
+<li><code>public Object getProxyInstance()</code>：该方法返回一个代理对象。</li>
+<li><code>Proxy.newProxyInstance(this.target.getClass().getClassLoader(), this.target.getClass().getInterfaces(), new InvocationHandler() {...});</code>：使用 <code>Proxy.newProxyInstance()</code> 方法创建代理对象。参数分别是目标对象的类加载器、目标对象实现的接口列表以及 InvocationHandler 接口的实现。</li>
+<li><code>new InvocationHandler() {...}</code>：创建了一个匿名内部类作为 InvocationHandler 的实现。</li>
+<li><code>public Object invoke(Object o, Method method, Object[] objects) throws Throwable</code>：实现 InvocationHandler 接口的 invoke() 方法。</li>
+<li><code>method.invoke(target, objects);</code>：通过反射调用目标对象的方法。</li>
+</ol>
+</blockquote>
+<p>同样的，我们最后创建一个测试程序来测试下动态代理的效果：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">App1</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        IUser user <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> User();
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//创建动态代理</span>
+</span></span><span style="display:flex;"><span>        ProxyFactory proxyFactory <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ProxyFactory(user);
+</span></span><span style="display:flex;"><span>        IUser userProxy <span style="color:#f92672">=</span> (IUser) proxyFactory.<span style="color:#a6e22e">getProxyInstance</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 打印生成的代理对象的类名</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(userProxy.<span style="color:#a6e22e">getClass</span>());
+</span></span><span style="display:flex;"><span>        userProxy.<span style="color:#a6e22e">say_name</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307161627351.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307161627351.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307161627351.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307161627351.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307161627351.png"
+        title="image-20230716162735311" /></p>
+<p>关于动态代理这边还是挺抽象 ，不太清楚具体作用</p>
+<p>看到网上有不错的生动例子来解释</p>
+<h2 id="小例子">小例子</h2>
+<p>一个老哥写的例子，非常生动</p>
+<blockquote>
+<p>有小学生若干，他们都实现了一个 小学生日常 的接口（吃饭、写作 …），现在校长开会，我们校方应该把所有孩子日常行为，都记录下来，日后好向他们家长要钱，同时，这个班里有几名领导的孩子，区长家的孩子吃饭时候加鸡腿、市长儿子吃饭的时候加汉堡包，省长儿子更牛逼，吃汉堡包还要给瓶可乐，并且他们的儿子写作的时候要加分 …</p>
+<p>如果是改写方法本身，那就是多态就行了。如果冒出来更多别的儿子，难道要一直多态下去吗？</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">Behaviour</span> { <span style="color:#75715e">// 定义小学生日常行为接口</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span>();    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">write</span>(String title);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Student</span> <span style="color:#66d9ef">implements</span> Behaviour { <span style="color:#75715e">// 抽象类 实现小学生日常行为 这里本身没有实现 交给它的子类实现</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#75715e">// 学生姓名</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#75715e">// 作文题目</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> score <span style="color:#f92672">=</span> 0; <span style="color:#75715e">// 作文得分</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> Foods foods <span style="color:#f92672">=</span> Foods.<span style="color:#a6e22e">FRI</span>; <span style="color:#75715e">// 今天吃什么 枚举类</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Student</span>() { <span style="color:#75715e">// 构造方法，没有传姓名生成随机姓名</span>
+</span></span><span style="display:flex;"><span>        Integer n <span style="color:#f92672">=</span> (<span style="color:#66d9ef">int</span>) ((Math.<span style="color:#a6e22e">random</span>() <span style="color:#f92672">*</span> 9) <span style="color:#f92672">+</span> 1) <span style="color:#f92672">*</span> 100000;
+</span></span><span style="display:flex;"><span>        setName(n.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Student</span>(String name) {
+</span></span><span style="display:flex;"><span>        setName(name);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span>(String name) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setScore</span>(<span style="color:#66d9ef">int</span> score) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">score</span> <span style="color:#f92672">=</span> score;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getScore</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">score</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setTitle</span>(String title) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">title</span> <span style="color:#f92672">=</span> title;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getTitle</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">title</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> Foods <span style="color:#a6e22e">getFoods</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">foods</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>普通学生</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Ordinary</span> <span style="color:#66d9ef">extends</span> Student { <span style="color:#75715e">// 继承自抽象的学生类</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Ordinary</span>() {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Ordinary</span>(String name) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>(name);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">write</span>(String title) {
+</span></span><span style="display:flex;"><span>        setTitle(title);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 给作文打个分</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> scores <span style="color:#f92672">=</span> {5, 10, 15, 20};
+</span></span><span style="display:flex;"><span>        Random random <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Random();
+</span></span><span style="display:flex;"><span>        setScore(scores<span style="color:#f92672">[</span>random.<span style="color:#a6e22e">nextInt</span>(3) <span style="color:#f92672">+</span> 0<span style="color:#f92672">]</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span>() {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;今天&#34;</span> <span style="color:#f92672">+</span> getFoods().<span style="color:#a6e22e">day</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, 我吃了&#34;</span> <span style="color:#f92672">+</span> getFoods());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;写了一篇作文《&#34;</span> <span style="color:#f92672">+</span> getTitle() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;》,得分&#34;</span> <span style="color:#f92672">+</span> getScore();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>区长的儿子</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">District</span> <span style="color:#66d9ef">extends</span> Student {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">District</span>() {}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">District</span>(String name) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>(name);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">write</span>(String title) {
+</span></span><span style="display:flex;"><span>        setTitle(title);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 给作文打个分</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> scores <span style="color:#f92672">=</span> {5, 10, 15, 20};
+</span></span><span style="display:flex;"><span>        Random random <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Random();
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 区长儿子 领导意思是加5分</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> realScore <span style="color:#f92672">=</span> scores<span style="color:#f92672">[</span>random.<span style="color:#a6e22e">nextInt</span>(3) <span style="color:#f92672">+</span> 0<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (realScore <span style="color:#f92672">&lt;=</span> 15) { <span style="color:#75715e">// 满分20</span>
+</span></span><span style="display:flex;"><span>            System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(getName() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;是区长儿子，领导让加5分&#34;</span>);
+</span></span><span style="display:flex;"><span>            realScore <span style="color:#f92672">+=</span> 5;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        setScore(realScore);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">eat</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 区长儿子 巨喜欢吃鸡腿</span>
+</span></span><span style="display:flex;"><span>        String menu <span style="color:#f92672">=</span> getFoods().<span style="color:#a6e22e">toString</span>();
+</span></span><span style="display:flex;"><span>        menu <span style="color:#f92672">=</span> menu <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;,鸡腿&#34;</span>;
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;今天&#34;</span> <span style="color:#f92672">+</span> getFoods().<span style="color:#a6e22e">day</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;, 我吃了&#34;</span> <span style="color:#f92672">+</span> menu);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">toString</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;写了一篇作文《&#34;</span> <span style="color:#f92672">+</span> getTitle() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;》,得分&#34;</span> <span style="color:#f92672">+</span> getScore();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>好了，目前为止，我们实现了校长开会定下来的指导方针：区长家的孩子吃饭时候加鸡腿 … 并且他们的儿子写作的时候要加分</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> params) {
+</span></span><span style="display:flex;"><span>    Student<span style="color:#f92672">[]</span> students <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> Ordinary(<span style="color:#e6db74">&#34;小明&#34;</span>),
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> District(<span style="color:#e6db74">&#34;大明&#34;</span>)
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (Student student: students) {
+</span></span><span style="display:flex;"><span>        student.<span style="color:#a6e22e">eat</span>();
+</span></span><span style="display:flex;"><span>        student.<span style="color:#a6e22e">write</span>(<span style="color:#e6db74">&#34;作文题目都一样&#34;</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(student);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>结果如下：</p>
+<pre tabindex="0"><code>今天星期五, 我吃了沙拉大白菜
+写了一篇作文《作文题目都一样》,得分5
+今天星期五, 我吃了沙拉大白菜,鸡腿
+大明是区长儿子，领导让加5分
+写了一篇作文《作文题目都一样》,得分15
+</code></pre><p>接下来，我们要实现校长的另一个英明决定：把所有孩子日常行为，都记录下来，日后好向他们家长要钱</p>
+<p>首先，异议的地方来了，楼下作者的意思是，通过代理，解决未来再出个常委的儿子、司令的儿子 … ，而我想的是，这不能够，这还是多态，有一万个不同领导的孩子，就得有一万个多态去实现，代理可以为这一万个孩子做一件相同的事（可以提条件），但不能代做任何事。你看，这两句的区别就是 代，但是此代非彼代，代理 != 代做，这是重点！MD，优秀，我怎么这么棒 …</p>
+<p>好了，假如有一万个孩子，那就有一万个实现类（多态），如果我要为孩子们写记录，就得在一万个实现类里每个接口方法前后，去写记录代码 ~ 这个时候作为攻城狮有两个选择，砸电脑回家刷抖音，或者想办法少些代码，攻城狮们永不为奴 !!! 开始他的表演 ~</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> params) {
+</span></span><span style="display:flex;"><span>    District district <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> District(<span style="color:#e6db74">&#34;皇小明&#34;</span>); <span style="color:#75715e">// 区长儿子 皇小明</span>
+</span></span><span style="display:flex;"><span>    Behaviour districtProxy <span style="color:#f92672">=</span> (Behaviour) getProxy(district); <span style="color:#75715e">// 这里为什么拿到的是 Behaviour 类型，因为接口不能实例化，Proxy.newProxyInstance 顾名思义是生成代理接口对象</span>
+</span></span><span style="display:flex;"><span>    districtProxy.<span style="color:#a6e22e">eat</span>(); <span style="color:#75715e">// 区长儿子吃饭饭</span>
+</span></span><span style="display:flex;"><span>    districtProxy.<span style="color:#a6e22e">write</span>(<span style="color:#e6db74">&#34;爸爸的爸爸学代理&#34;</span>); <span style="color:#75715e">// 区长儿子写作文</span>
+</span></span><span style="display:flex;"><span>    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(districtProxy);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Object <span style="color:#a6e22e">getProxy</span>(<span style="color:#66d9ef">final</span> Object target) {
+</span></span><span style="display:flex;"><span>    Object proxy <span style="color:#f92672">=</span> Proxy.<span style="color:#a6e22e">newProxyInstance</span>(
+</span></span><span style="display:flex;"><span>            target.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getClassLoader</span>(), <span style="color:#75715e">// 代理目标类的 class 的 class 生成器</span>
+</span></span><span style="display:flex;"><span>            target.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getSuperclass</span>().<span style="color:#a6e22e">getInterfaces</span>(), <span style="color:#75715e">// 代理类要实现的接口 本例中是 目标类的父类的接口</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> InvocationHandler() { <span style="color:#75715e">// 中转反射器，代理类执行方法，到这里，中转反射到目标类上，如果感觉名字怪怪的那就对了，我自己瞎起的，不在意这些细节</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">invoke</span>(Object proxy, Method method, Object<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Throwable {
+</span></span><span style="display:flex;"><span>                    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;孩子们&#34;</span> <span style="color:#f92672">+</span> method.<span style="color:#a6e22e">getName</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;了...&#34;</span>);
+</span></span><span style="display:flex;"><span>                    Object result <span style="color:#f92672">=</span> method.<span style="color:#a6e22e">invoke</span>(target, args);
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// System.out.println(result);</span>
+</span></span><span style="display:flex;"><span>                    System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;孩子们&#34;</span> <span style="color:#f92672">+</span> method.<span style="color:#a6e22e">getName</span>() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;结束了...&#34;</span>);
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> result;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>    );
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> proxy;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>孩子们开始eat了...
+</span></span><span style="display:flex;"><span>今天星期五, 我吃了沙拉大白菜,鸡腿
+</span></span><span style="display:flex;"><span>孩子们eat完了...
+</span></span><span style="display:flex;"><span>孩子们开始write了...
+</span></span><span style="display:flex;"><span>皇小明是区长儿子<span style="color:#960050;background-color:#1e0010">，</span>领导让加5分
+</span></span><span style="display:flex;"><span>孩子们write完了...
+</span></span></code></pre></div><h2 id="参考文章">参考文章：</h2>
+<p><a href="https://github.com/Maskhe/javasec/blob/master/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.md" target="_blank" rel="noopener noreffer">https://github.com/Maskhe/javasec/blob/master/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86.md</a>
+</p>
+<p><a href="https://www.liaoxuefeng.com/wiki/1252599548343744/1264804593397984#0" target="_blank" rel="noopener noreffer">https://www.liaoxuefeng.com/wiki/1252599548343744/1264804593397984#0</a>
+</p>
+<p><a href="https://www.jianshu.com/p/95970b089360" target="_blank" rel="noopener noreffer">https://www.jianshu.com/p/95970b089360</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-title="java动态代理" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-title="java动态代理"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-title="java动态代理"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-title="java动态代理"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%B0%84/" class="prev" rel="prev" title="java反射"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java反射</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="next" rel="next" title="java反序列化">java反序列化<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

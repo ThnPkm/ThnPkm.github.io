@@ -52,6 +52,14 @@
     <description><![CDATA[]]></description>
 </item>
 <item>
+    <title>Java</title>
+    <link>https://thnpkm.github.io/tags/java/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:50 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/tags/java/</guid>
+    <description><![CDATA[]]></description>
+</item>
+<item>
     <title>Cve</title>
     <link>https://thnpkm.github.io/tags/cve/</link>
     <pubDate>Tue, 20 Aug 2024 22:54:36 &#43;0800</pubDate>
@@ -73,14 +81,6 @@
     <pubDate>Tue, 20 Aug 2024 22:54:36 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://thnpkm.github.io/tags/php/</guid>
-    <description><![CDATA[]]></description>
-</item>
-<item>
-    <title>Ssti</title>
-    <link>https://thnpkm.github.io/tags/ssti/</link>
-    <pubDate>Tue, 20 Aug 2024 22:53:36 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://thnpkm.github.io/tags/ssti/</guid>
     <description><![CDATA[]]></description>
 </item>
 </channel>

