@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VulnHub — CH4INRULZ_v1.0.1 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="VulnHub — CH4INRULZ_v1.0.1">
+  <meta property="og:description" content="VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
+curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
+frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
+将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
+登录刚才的development目录 ，成功登录
+然后有提示 uploader目录需要安全审查 访问后可以上传图片
+传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
+8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
+没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
+并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
+nc 反弹shell nc 先监听webshell里设置的4444端口
+文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
+反弹shell 成功
+www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-19T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-19T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="VulnHub — CH4INRULZ_v1.0.1">
+  <meta name="twitter:description" content="VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
+curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
+frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
+将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
+登录刚才的development目录 ，成功登录
+然后有提示 uploader目录需要安全审查 访问后可以上传图片
+传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
+8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
+没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
+并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
+nc 反弹shell nc 先监听webshell里设置的4444端口
+文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
+反弹shell 成功
+www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VulnHub — CH4INRULZ_v1.0.1",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/vulnhub--ch4inrulz_v1.0.1\/"
+        },"genre": "posts","keywords": "","wordcount":  91 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/vulnhub--ch4inrulz_v1.0.1\/","datePublished": "2024-08-19T23:51:36+08:00","dateModified": "2024-08-19T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VulnHub — CH4INRULZ_v1.0.1</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-19">2024-08-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;91 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#扫描ip和端口">扫描ip和端口</a></li>
+        <li><a href="#可以用dirb-扫描bak备份文件"> 可以用dirb 扫描.bak备份文件</a></li>
+        <li><a href="#用join来解密">用join来解密</a></li>
+        <li><a href="#传上图片马构造的gif图片">传上图片马（构造的gif图片）</a></li>
+        <li><a href="#8011端口收集信息">8011端口收集信息 </a></li>
+        <li><a href="#nc-反弹shell">nc 反弹shell </a></li>
+        <li><a href="#脏牛提权">脏牛提权</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="vulnhub--ch4inrulz_v101">VulnHub — CH4INRULZ_v1.0.1</h1>
+<p> </p>
+<h3 id="扫描ip和端口">扫描ip和端口</h3>
+<pre tabindex="0"><code>nmap 192.168.164.0/24
+</code></pre><p><!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<h3 id="可以用dirb-扫描bak备份文件"> 可以用dirb 扫描.bak备份文件</h3>
+<pre tabindex="0"><code>dirb http://192.168.164.137/ -x .bak
+</code></pre><!-- raw HTML omitted -->
+<p> curl直接读文件</p>
+<pre tabindex="0"><code>curl http://192.168.164.137/index.html.bak
+</code></pre><!-- raw HTML omitted -->
+<pre tabindex="0"><code> &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt;
+</code></pre><h3 id="用join来解密">用join来解密</h3>
+<p>这是个用户名和密码</p>
+<blockquote>
+</blockquote>
+<p>frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0</p>
+<p>将串字符保存到1.txt 然后john工具爆破密码 </p>
+<pre tabindex="0"><code>john 1.txt 
+john 1.txt --show
+</code></pre><!-- raw HTML omitted -->
+<p>得到一组用户名和密码， frank frank!!!</p>
+<p>登录刚才的development目录 ，成功登录</p>
+<!-- raw HTML omitted -->
+<p> 然后有提示 uploader目录需要安全审查 </p>
+<p> 访问后可以上传图片</p>
+<p> <!-- raw HTML omitted --></p>
+<h3 id="传上图片马构造的gif图片">传上图片马（构造的gif图片）</h3>
+<!-- raw HTML omitted -->
+<p>显示成功上传，但是不知道路径</p>
+<h3 id="8011端口收集信息">8011端口收集信息 </h3>
+<p>能够上传图片马，但不知道路径，这时候选择回头看看8011端口 </p>
+<!-- raw HTML omitted -->
+<p>扫目录看到api目录 </p>
+<p>访问/api </p>
+<p><!-- raw HTML omitted --> 正在开发的api接口， 猜测files_api.php 可以文件读取</p>
+<!-- raw HTML omitted -->
+<p> 没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 </p>
+<!-- raw HTML omitted -->
+<p> 那么post传file参数可以进行文件读取 </p>
+<p>刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php</p>
+<p> <!-- raw HTML omitted --></p>
+<p> 并没有读取出源码，而是执行了php文件 </p>
+<p>这里继续用filter伪协议进行读取 ，成功得到源码 </p>
+<!-- raw HTML omitted -->
+<p> <!-- raw HTML omitted --></p>
+<blockquote>
+</blockquote>
+<p>FRANKuploads/ </p>
+<p> 得到上传文件存储路径</p>
+<h3 id="nc-反弹shell">nc 反弹shell </h3>
+<p>nc 先监听webshell里设置的4444端口</p>
+<p>文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行</p>
+<!-- raw HTML omitted -->
+<p>反弹shell 成功</p>
+<!-- raw HTML omitted -->
+<p> www-data权限 </p>
+<h3 id="脏牛提权">脏牛提权</h3>
+<p>内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 </p>
+<!-- raw HTML omitted -->
+<p>版本符合</p>
+<p>ls -l查看目录， 选择把脚本传入第一个a目录 cd进入a</p>
+<!-- raw HTML omitted -->
+<p> kali上压缩脚本</p>
+<!-- raw HTML omitted -->
+<p>靶机上先监听1234端口 将其输入dcow.tar.gz </p>
+<p> <!-- raw HTML omitted --></p>
+<p> kali上 nc向靶机传入 dcow.tar.gz </p>
+<!-- raw HTML omitted -->
+<p> ​​上传结束后 重新nc 4444连接上靶机</p>
+<p>然后访问到a目录发现 脚本上传成功，解压脚本</p>
+<p> <!-- raw HTML omitted --></p>
+<p> 解压后进入脚本目录  执行make命令 </p>
+<!-- raw HTML omitted -->
+<p>这里出问题了 ，靶机的g++环境有问题？？？ </p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-19</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" data-title="VulnHub — CH4INRULZ_v1.0.1" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" data-title="VulnHub — CH4INRULZ_v1.0.1"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" data-title="VulnHub — CH4INRULZ_v1.0.1"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" data-title="VulnHub — CH4INRULZ_v1.0.1"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" class="prev" rel="prev" title="VulnHub — DC-1"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>VulnHub — DC-1</a>
+            <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" class="next" rel="next" title="西湖论剑">西湖论剑<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

