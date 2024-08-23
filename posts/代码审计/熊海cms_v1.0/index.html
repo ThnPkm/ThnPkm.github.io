@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>代码审计-熊海cms_V1.0 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="代码审计-熊海cms_V1.0">
+  <meta property="og:description" content="本地环境搭建 https://article.itxueyuan.com/2dqxD2不赘述了，很坑的一点是网上的文章说php7以下可以，但是我用php5.4一直不行，最后换了5.6可以了
+漏洞发现 可以用seay来匹配一下危险函数
+Rips扫描
+这次也试试Kunlun-M白盒审计工具 https://github.com/LoRexxar/Kunlun-M代码审计 首先我在web目录里创建了一个phpinfo.php文件 来进行测试
+index.php 文件包含 可以看到seay第一个扫出来的就是这个点
+&lt;?php //单一入口模式 error_reporting(0); //关闭错误显示 $file=addslashes($_GET[&#39;r&#39;]); //接收文件名 $action=$file==&#39;&#39;?&#39;index&#39;:$file; //判断为空或者等于index include(&#39;files/&#39;.$action.&#39;.php&#39;); //载入相应文件 ?&gt; get传参文件名到$action变量，然后include进行files文件夹下的文件包含，来进行网页跳转
+变量是没有任何过滤的，明显文件名可以目录穿越
+admin/index.php中同理
+SQL注入 后台 看见扫描出来的sql注入还是挺多的，看看
+admin/files/login.php
+就是没有任何过滤，然后die了错误信息回显
+报错注入可以
+user=admin&#39; or updatexml(1,concat(0x7e,(select version()),0x7e),1);# 测试了一下时间盲注也可以
+admin/files里的文件大都是有这种没丝毫过滤的sql注入，不赘述了
+SQL注入 前台 files/content.php
+这里面倒是做了一点处理，addslashes()进行转义
+但是
+默认情况下，PHP 指令 magic_quotes_gpc 为 on，对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。不要对已经被 magic_quotes_gpc 转义过的字符串使用 addslashes()，因为这样会导致双层转义。
+这也有点小离谱哈哈哈
+所以这里的转义可能是没有用的
+/install/index.php里面
+反射型XSS $page=addslashes($_GET[&#39;page&#39;]); if ($page&lt;&gt;&#34;&#34;){ if ($page&lt;&gt;1){ $pages=&#34;第&#34;.$page.&#34;页 - &#34;; } &lt;?">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:tag" content="Php">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="代码审计-熊海cms_V1.0">
+  <meta name="twitter:description" content="本地环境搭建 https://article.itxueyuan.com/2dqxD2不赘述了，很坑的一点是网上的文章说php7以下可以，但是我用php5.4一直不行，最后换了5.6可以了
+漏洞发现 可以用seay来匹配一下危险函数
+Rips扫描
+这次也试试Kunlun-M白盒审计工具 https://github.com/LoRexxar/Kunlun-M代码审计 首先我在web目录里创建了一个phpinfo.php文件 来进行测试
+index.php 文件包含 可以看到seay第一个扫出来的就是这个点
+&lt;?php //单一入口模式 error_reporting(0); //关闭错误显示 $file=addslashes($_GET[&#39;r&#39;]); //接收文件名 $action=$file==&#39;&#39;?&#39;index&#39;:$file; //判断为空或者等于index include(&#39;files/&#39;.$action.&#39;.php&#39;); //载入相应文件 ?&gt; get传参文件名到$action变量，然后include进行files文件夹下的文件包含，来进行网页跳转
+变量是没有任何过滤的，明显文件名可以目录穿越
+admin/index.php中同理
+SQL注入 后台 看见扫描出来的sql注入还是挺多的，看看
+admin/files/login.php
+就是没有任何过滤，然后die了错误信息回显
+报错注入可以
+user=admin&#39; or updatexml(1,concat(0x7e,(select version()),0x7e),1);# 测试了一下时间盲注也可以
+admin/files里的文件大都是有这种没丝毫过滤的sql注入，不赘述了
+SQL注入 前台 files/content.php
+这里面倒是做了一点处理，addslashes()进行转义
+但是
+默认情况下，PHP 指令 magic_quotes_gpc 为 on，对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。不要对已经被 magic_quotes_gpc 转义过的字符串使用 addslashes()，因为这样会导致双层转义。
+这也有点小离谱哈哈哈
+所以这里的转义可能是没有用的
+/install/index.php里面
+反射型XSS $page=addslashes($_GET[&#39;page&#39;]); if ($page&lt;&gt;&#34;&#34;){ if ($page&lt;&gt;1){ $pages=&#34;第&#34;.$page.&#34;页 - &#34;; } &lt;?">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" /><link rel="prev" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/" /><link rel="next" href="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "代码审计-熊海cms_V1.0",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1\/%E7%86%8A%E6%B5%B7cms_v1.0\/"
+        },"genre": "posts","keywords": "php","wordcount":  108 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1\/%E7%86%8A%E6%B5%B7cms_v1.0\/","datePublished": "2024-08-20T22:52:36+08:00","dateModified": "2024-08-20T22:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">代码审计-熊海cms_V1.0</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>代码审计</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;108 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;One minute&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#本地环境搭建">本地环境搭建</a></li>
+    <li><a href="#漏洞发现">漏洞发现</a></li>
+    <li><a href="#代码审计">代码审计</a>
+      <ul>
+        <li><a href="#indexphp-文件包含">index.php 文件包含</a></li>
+        <li><a href="#sql注入-后台">SQL注入 后台</a></li>
+        <li><a href="#sql注入-前台">SQL注入 前台</a></li>
+        <li><a href="#反射型xss">反射型XSS</a></li>
+        <li><a href="#垂直越权">垂直越权</a></li>
+        <li><a href="#csrf">CSRF</a></li>
+      </ul>
+    </li>
+    <li><a href="#ctf例题">ctf例题</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="本地环境搭建">本地环境搭建</h2>
+<p><a href="https://article.itxueyuan.com/2dqxD2" target="_blank" rel="noopener noreffer">https://article.itxueyuan.com/2dqxD2</a>
+</p>
+<p>不赘述了，很坑的一点是网上的文章说php7以下可以，但是我用php5.4一直不行，最后换了5.6可以了</p>
+<h2 id="漏洞发现">漏洞发现</h2>
+<p>可以用seay来匹配一下危险函数</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281438827.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281438827.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281438827.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281438827.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281438827.png"
+        title="image-20230728143852729" /></p>
+<p>Rips扫描</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281516160.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281516160.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281516160.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281516160.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281516160.png"
+        title="image-20230728151604071" /></p>
+<p>这次也试试Kunlun-M白盒审计工具 <a href="https://github.com/LoRexxar/Kunlun-M" target="_blank" rel="noopener noreffer">https://github.com/LoRexxar/Kunlun-M</a>
+</p>
+<h2 id="代码审计">代码审计</h2>
+<p>首先我在web目录里创建了一个phpinfo.php文件 来进行测试</p>
+<h3 id="indexphp-文件包含">index.php 文件包含</h3>
+<p>可以看到seay第一个扫出来的就是这个点</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//单一入口模式
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>); <span style="color:#75715e">//关闭错误显示
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$file<span style="color:#f92672">=</span><span style="color:#a6e22e">addslashes</span>($_GET[<span style="color:#e6db74">&#39;r&#39;</span>]); <span style="color:#75715e">//接收文件名
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$action<span style="color:#f92672">=</span>$file<span style="color:#f92672">==</span><span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">?</span><span style="color:#e6db74">&#39;index&#39;</span><span style="color:#f92672">:</span>$file; <span style="color:#75715e">//判断为空或者等于index
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">include</span>(<span style="color:#e6db74">&#39;files/&#39;</span><span style="color:#f92672">.</span>$action<span style="color:#f92672">.</span><span style="color:#e6db74">&#39;.php&#39;</span>); <span style="color:#75715e">//载入相应文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>get传参文件名到$action变量，然后include进行files文件夹下的文件包含，来进行网页跳转</p>
+<p>变量是没有任何过滤的，明显文件名可以目录穿越</p>
+<!-- raw HTML omitted -->
+<p>admin/index.php中同理</p>
+<h3 id="sql注入-后台">SQL注入 后台</h3>
+<p>看见扫描出来的sql注入还是挺多的，看看</p>
+<p>admin/files/login.php</p>
+<!-- raw HTML omitted -->
+<p>就是没有任何过滤，然后die了错误信息回显</p>
+<p>报错注入可以</p>
+<pre tabindex="0"><code>user=admin&#39; or updatexml(1,concat(0x7e,(select version()),0x7e),1);#
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281705632.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281705632.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281705632.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281705632.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281705632.png"
+        title="image-20230728170535596" /></p>
+<p>测试了一下时间盲注也可以</p>
+<!-- raw HTML omitted -->
+<p>admin/files里的文件大都是有这种没丝毫过滤的sql注入，不赘述了</p>
+<h3 id="sql注入-前台">SQL注入 前台</h3>
+<p>files/content.php</p>
+<p>这里面倒是做了一点处理，addslashes()进行转义</p>
+<!-- raw HTML omitted -->
+<p>但是</p>
+<p>默认情况下，PHP 指令 magic_quotes_gpc 为 on，对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。不要对已经被 magic_quotes_gpc 转义过的字符串使用 addslashes()，因为这样会导致双层转义。</p>
+<p>这也有点小离谱哈哈哈</p>
+<p>所以这里的转义可能是没有用的</p>
+<!-- raw HTML omitted -->
+<p>/install/index.php里面</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281601570.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281601570.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281601570.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281601570.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281601570.png"
+        title="image-20230728160135525" /></p>
+<h3 id="反射型xss">反射型XSS</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$page<span style="color:#f92672">=</span><span style="color:#a6e22e">addslashes</span>($_GET[<span style="color:#e6db74">&#39;page&#39;</span>]);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($page<span style="color:#f92672">&lt;&gt;</span><span style="color:#e6db74">&#34;&#34;</span>){
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($page<span style="color:#f92672">&lt;&gt;</span><span style="color:#ae81ff">1</span>){
+</span></span><span style="display:flex;"><span>$pages<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;第&#34;</span><span style="color:#f92672">.</span>$page<span style="color:#f92672">.</span><span style="color:#e6db74">&#34;页 - &#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span> <span style="color:#66d9ef">echo</span> $pages<span style="color:#f92672">.</span>$info[<span style="color:#e6db74">&#39;name&#39;</span>]<span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281732880.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281732880.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281732880.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281732880.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307281732880.png"
+        title="image-20230728173200826" /></p>
+<p>xss没啥意思</p>
+<h3 id="垂直越权">垂直越权</h3>
+<p>inc文件夹下有checklogin.php</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$user<span style="color:#f92672">=</span>$_COOKIE[<span style="color:#e6db74">&#39;user&#39;</span>];
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ($user<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;&#34;</span>){
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">header</span>(<span style="color:#e6db74">&#34;Location: ?r=login&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">exit</span>;	
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>简单的逻辑，如果cookie的user参数是空的话，返回去登录页面</p>
+<p>虽然没给user是admin是啥情况，但是可以试试这个参数</p>
+<!-- raw HTML omitted -->
+<p>发现直接登录进后台了，这种就是最简单的垂直越权了</p>
+<h3 id="csrf">CSRF</h3>
+<p>对于后台删除文章的功能没有做check，一次点击即成功</p>
+<p>其实这种都算是黑盒了 ，也就是这个delete参数改对应的数字都能删对应的文章</p>
+<!-- raw HTML omitted -->
+<p>我们可以用bp构造出删除序号16的文章的poc，进行伪造页面</p>
+<p>然后诱骗管理员进行点击按钮 ， CSRF的危害成因主要就是敏感操作一次点击完成，不加check</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>感觉这个cms对代码审计没有啥提升哈哈哈，感觉就纯黑盒都可以，也不继续看了，都差不多</p>
+<h2 id="ctf例题">ctf例题</h2>
+<p>DASCTF 7月赛中出了一道cms题，正是熊海cms</p>
+<p>sql xxs 等漏洞依然存在，但是我们的最终目的是getshell ，那么通过文件包含进行getshell是有几种姿势的</p>
+<p>用pearcmd.php 可以利用前台的文件包含，目录穿越 来rce，注意.php后缀不用写</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" data-title="代码审计-熊海cms_V1.0" data-hashtags="php"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" data-hashtag="php"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" data-title="代码审计-熊海cms_V1.0"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" data-title="代码审计-熊海cms_V1.0"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" data-title="代码审计-熊海cms_V1.0"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/" class="prev" rel="prev" title="条件竞争"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>条件竞争</a>
+            <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" class="next" rel="next" title="代码审计-DedeCMS v5.7">代码审计-DedeCMS v5.7<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

