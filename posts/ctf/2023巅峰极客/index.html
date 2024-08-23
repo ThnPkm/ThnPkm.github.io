@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>2023巅峰极客 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="2023巅峰极客">
+  <meta property="og:description" content="web hellsql 测试后发现没有啥有用的回显，只有触发了waf才回显nonono
+只要没触发waf不论sql语句是否正确都只回显： 泰酷辣！
+所以没有布尔回显的话，布尔盲注不可行。
+想去时间盲注，发现sleep等常用的关键字被禁的很严，尝试去绕过，失败
+想去写shell，union被过滤的也很严，绕过无果
+最后wp还是时间盲注，不过是用笛卡尔积
+话说笛卡尔积确实在当初学mysql 的时候学到过，早已淡忘。现在来看看这个是什么样的思路：
+具体的方式就是将简单的表查询不断的叠加，使之以指数倍运算量的速度增长，不断增加系统执行 sql 语句的负荷，直到产生攻击者想要的时间延迟，这就非常的类似于 dos 这个系统
+unserialize 反序列化字符逃逸
+misc findme find.dmp文件
+010里
+Netfilx图片格式
+avif的文件头 66 74 79 70 61 76 69 66
+手动分离出avif图片
+生物 脑洞题
+两张相同图片。盲水印
+得到信息：甲硫氨酸
+某个图片后面拿到一串氨基酸缩写
+MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEMEMMMMWMMMTMMMMPMMMDMNMNMMMMTMMMNMNMMNMNMMGMMGMGMGMGMMMMHMKMLMAMMMMAMAMAMSMSMSMMSMMYMYMMYMMYMMHMMVMVMMMMVMMRMMMRMAMAMMAMMAMMQMMMQMEMYMYMMM 甲硫氨酸对应的缩写是 M
+到这里就挺迷惑的了
+也想到了找M对应的下标
+0 3 5 6 10 11 15 16 18 19 21 24 25 27 28 30 34 35 37 38 40 42 44 45 46 47 49 50 52 53 55 57 58 59 61 63 65 66 67 69 70 71 72 74 76 78 80 81 82 83 85 86 87 89 90 91 92 94 95 96 98 100 102 103 104 105 107 108 109 111 113 114 116 118 119 121 122 124 126 128 130 131 132 133 135 137 139 141 142 143 144 146 148 150 152 154 156 157 159 160 162 164 165 167 168 170 171 173 174 176 178 179 180 181 183 184 186 187 188 190 192 194 195 197 198 200 201 203 204 205 207 209 211 213 214 215 后面提示了找位置，但是没想到最后还是搞bin">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="2023巅峰极客">
+  <meta name="twitter:description" content="web hellsql 测试后发现没有啥有用的回显，只有触发了waf才回显nonono
+只要没触发waf不论sql语句是否正确都只回显： 泰酷辣！
+所以没有布尔回显的话，布尔盲注不可行。
+想去时间盲注，发现sleep等常用的关键字被禁的很严，尝试去绕过，失败
+想去写shell，union被过滤的也很严，绕过无果
+最后wp还是时间盲注，不过是用笛卡尔积
+话说笛卡尔积确实在当初学mysql 的时候学到过，早已淡忘。现在来看看这个是什么样的思路：
+具体的方式就是将简单的表查询不断的叠加，使之以指数倍运算量的速度增长，不断增加系统执行 sql 语句的负荷，直到产生攻击者想要的时间延迟，这就非常的类似于 dos 这个系统
+unserialize 反序列化字符逃逸
+misc findme find.dmp文件
+010里
+Netfilx图片格式
+avif的文件头 66 74 79 70 61 76 69 66
+手动分离出avif图片
+生物 脑洞题
+两张相同图片。盲水印
+得到信息：甲硫氨酸
+某个图片后面拿到一串氨基酸缩写
+MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEMEMMMMWMMMTMMMMPMMMDMNMNMMMMTMMMNMNMMNMNMMGMMGMGMGMGMMMMHMKMLMAMMMMAMAMAMSMSMSMMSMMYMYMMYMMYMMHMMVMVMMMMVMMRMMMRMAMAMMAMMAMMQMMMQMEMYMYMMM 甲硫氨酸对应的缩写是 M
+到这里就挺迷惑的了
+也想到了找M对应的下标
+0 3 5 6 10 11 15 16 18 19 21 24 25 27 28 30 34 35 37 38 40 42 44 45 46 47 49 50 52 53 55 57 58 59 61 63 65 66 67 69 70 71 72 74 76 78 80 81 82 83 85 86 87 89 90 91 92 94 95 96 98 100 102 103 104 105 107 108 109 111 113 114 116 118 119 121 122 124 126 128 130 131 132 133 135 137 139 141 142 143 144 146 148 150 152 154 156 157 159 160 162 164 165 167 168 170 171 173 174 176 178 179 180 181 183 184 186 187 188 190 192 194 195 197 198 200 201 203 204 205 207 209 211 213 214 215 后面提示了找位置，但是没想到最后还是搞bin">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/b01lers-ctf/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "2023巅峰极客",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2\/"
+        },"genre": "posts","keywords": "","wordcount":  224 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">2023巅峰极客</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;224 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#hellsql">hellsql</a></li>
+    <li><a href="#unserialize">unserialize</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#findme">findme</a></li>
+    <li><a href="#生物">生物</a></li>
+    <li><a href="#song">song</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">web</h1>
+<h2 id="hellsql">hellsql</h2>
+<p>测试后发现没有啥有用的回显，只有触发了waf才回显nonono</p>
+<p>只要没触发waf不论sql语句是否正确都只回显： 泰酷辣！</p>
+<p>所以没有布尔回显的话，布尔盲注不可行。</p>
+<p>想去时间盲注，发现sleep等常用的关键字被禁的很严，尝试去绕过，失败</p>
+<!-- raw HTML omitted -->
+<p>想去写shell，union被过滤的也很严，绕过无果</p>
+<p>最后wp还是时间盲注，不过是用笛卡尔积</p>
+<p>话说笛卡尔积确实在当初学mysql 的时候学到过，早已淡忘。现在来看看这个是什么样的思路：</p>
+<blockquote>
+<p>具体的方式就是将简单的表查询不断的叠加，使之以指数倍运算量的速度增长，不断增加系统执行 sql 语句的负荷，直到产生攻击者想要的时间延迟，这就非常的类似于 dos 这个系统</p>
+</blockquote>
+<h2 id="unserialize">unserialize</h2>
+<p>反序列化字符逃逸</p>
+<h1 id="misc">misc</h1>
+<h2 id="findme">findme</h2>
+<p>find.dmp文件</p>
+<p>010里</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212040009.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212040009.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212040009.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212040009.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212040009.png"
+        title="image-20230721204020975" /></p>
+<p>Netfilx图片格式</p>
+<!-- raw HTML omitted -->
+<p>avif的文件头 <code>66 74 79 70 61 76 69 66</code></p>
+<p>手动分离出avif图片</p>
+<h2 id="生物">生物</h2>
+<p>脑洞题</p>
+<p>两张相同图片。盲水印</p>
+<p>得到信息：甲硫氨酸</p>
+<p>某个图片后面拿到一串氨基酸缩写</p>
+<!-- raw HTML omitted -->
+<pre tabindex="0"><code>MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEMEMMMMWMMMTMMMMPMMMDMNMNMMMMTMMMNMNMMNMNMMGMMGMGMGMGMMMMHMKMLMAMMMMAMAMAMSMSMSMMSMMYMYMMYMMYMMHMMVMVMMMMVMMRMMMRMAMAMMAMMAMMQMMMQMEMYMYMMM
+</code></pre><p>甲硫氨酸对应的缩写是 M</p>
+<p>到这里就挺迷惑的了</p>
+<p>也想到了找M对应的下标</p>
+<pre tabindex="0"><code>0 3 5 6 10 11 15 16 18 19 21 24 25 27 28 30 34 35 37 38 40 42 44 45 46 47 49 50 52 53 55 57 58 59 61 63 65 66 67 69 70 71 72 74 76 78 80 81 82 83 85 86 87 89 90 91 92 94 95 96 98 100 102 103 104 105 107 108 109 111 113 114 116 118 119 121 122 124 126 128 130 131 132 133 135 137 139 141 142 143 144 146 148 150 152 154 156 157 159 160 162 164 165 167 168 170 171 173 174 176 178 179 180 181 183 184 186 187 188 190 192 194 195 197 198 200 201 203 204 205 207 209 211 213 214 215 
+</code></pre><p>后面提示了找位置，但是没想到最后还是搞bin</p>
+<p>用余2来找 0 和 1</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>s <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;MFFMNMMFGHMMQWEMMTMMPMDFMMYMMRMKKKMMLMMGMPMPMMMMSMMVMMGMGMMMQMQMQMMMQMMMMEMEMEMEMMMMWMMMTMMMMPMMMDMNMNMMMMTMMMNMNMMNMNMMGMMGMGMGMGMMMMHMKMLMAMMMMAMAMAMSMSMSMMSMMYMYMMYMMYMMHMMVMVMMMMVMMRMMMRMAMAMMAMMAMMQMMMQMEMYMYMMM&#39;</span>
+</span></span><span style="display:flex;"><span>l <span style="color:#f92672">=</span> list(s)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i  <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">300</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> l[i]<span style="color:#f92672">==</span><span style="color:#e6db74">&#39;M&#39;</span>:
+</span></span><span style="display:flex;"><span>        bin <span style="color:#f92672">=</span> i<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>        print(bin)
+</span></span></code></pre></div><pre tabindex="0"><code>0110011001101100011000010110011101111011010000010110110100100001011011100011000001011111010000000110001100110001011001000011001101111101
+</code></pre><pre tabindex="0"><code>flag{Am!n0_@c1d3}
+</code></pre><h2 id="song">song</h2>
+<p>文件尾是zip</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212027757.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212027757.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212027757.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212027757.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212027757.png"
+        title="image-20230721202749727" /></p>
+<p>文件头加一下50 4B 03 04 14</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212029912.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212029912.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212029912.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212029912.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212029912.png"
+        title="image-20230721202913880" /></p>
+<p>这个jpeg里面有个zip</p>
+<p>分离出来</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212031584.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212031584.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212031584.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212031584.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212031584.png"
+        title="image-20230721203106554" /></p>
+<p>hint:</p>
+<pre tabindex="0"><code>9iZ!r@n(9KAQV])&lt;,6_K:,$L-&lt;`N0U&gt;&#39;`J\@;A:f@X:pc;__&lt;N;f-&gt;);/8c[&lt;(K&gt;S=u&amp;Q&lt;&lt;C\oJA2-DK9l+cpAQMnd;/LD5=&amp;s-8@T?rP;cdd&#39;:,$@!;_g1U&lt;ARX#;)&lt;$*;/J0E@P^bo;f-JGAQ3=t:/tFO@r$$s9gs:q@kgl&#39;&lt;`Lh:
+</code></pre><p>入口是base85 ,base家族</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307211956112.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307211956112.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307211956112.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307211956112.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307211956112.png"
+        title="image-20230721195608289" /></p>
+<p>这里说的密码不是flag.txt的密码</p>
+<p>回到ppt文件夹下，media文件夹有个png</p>
+<!-- raw HTML omitted -->
+<p>直接修改后缀为ape</p>
+<p>用deepsound2.0解密。密码就用到了hint里的6位数字弱口令123456</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212211060.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212211060.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212211060.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212211060.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307212211060.png"
+        title="image-20230721221122005" /></p>
+<p>里面是ook编码</p>
+<pre tabindex="0"><code>this_zip_password_is_QazWsx147!@#
+</code></pre><p>flag.txt密码 QazWsx147!@#</p>
+<pre tabindex="0"><code>flag{lW9tUyrh8RzzvysrswAwY7MHR4mmbLSt}
+</code></pre></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" data-title="2023巅峰极客" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" data-title="2023巅峰极客"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" data-title="2023巅峰极客"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/2023%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A2/" data-title="2023巅峰极客"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/b01lers-ctf/" class="prev" rel="prev" title="b01lers CTF"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>b01lers CTF</a>
+            <a href="/posts/ctf/2020%E7%BE%8A%E5%9F%8E%E6%9D%AF/" class="next" rel="next" title="2020羊城杯">2020羊城杯<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

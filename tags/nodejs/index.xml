@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Nodejs - Tag - ThnPinkman’s blog</title>
+        <link>https://thnpkm.github.io/tags/nodejs/</link>
+        <description>Nodejs - Tag - ThnPinkman’s blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</lastBuildDate><atom:link href="https://thnpkm.github.io/tags/nodejs/" rel="self" type="application/rss+xml" /><item>
+    <title>nodejs</title>
+    <link>https://thnpkm.github.io/posts/ctf/nodejs/</link>
+    <pubDate>Tue, 20 Aug 2024 23:51:36 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://thnpkm.github.io/posts/ctf/nodejs/</guid>
+    <description><![CDATA[前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
+nnodejs语言的缺点 大小写特性 toUpperCase()toLowerCase()对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K) 例题：ctfshow 334 打开题目是一个登录界面，阅读源码，这里贴出关键代码
+module.exports = { items: [ {username: &#39;CTFSHOW&#39;, password: &#39;123456&#39;} ] }; var findUser = function(name, password){ return users.find(function(item){ return name!==&#39;CTFSHOW&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; }); }; 这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。
+将题面改成这样又该如何绕过呢？
+return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; js中有大小写特性
+这题刚好用到了类s字符，输入 ctfſhow/123456。成功登录
+弱类型比较 大小比较
+console.log(1==&#39;1&#39;); //true console.log(1&gt;&#39;2&#39;); //false console.log(&#39;1&#39;&lt;&#39;2&#39;); //true console.log(111&gt;&#39;3&#39;); //true console.log(&#39;111&#39;&gt;&#39;3&#39;); //false console.]]></description>
+</item>
+</channel>
+</rss>

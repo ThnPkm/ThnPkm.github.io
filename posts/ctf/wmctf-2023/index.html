@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>WMCTF 2023 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/wmctf-2023/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="WMCTF 2023">
+  <meta property="og:description" content="WEB AnyFileRead 看网页以为是SpringSecurity的鉴权绕过嘛，也去跟了下源码
+/admin/ 路径需要鉴权
+protected void configure(HttpSecurity httpSecurity) throws Exception { httpSecurity.authorizeRequests().antMatchers(&#34;/admin/**&#34;).authenticated(); } 出题人解释：SpringSecurity 用的PathPatternParser ，但是题目用的antpatter 差异化解析导致的bypass
+admin控制器
+@RequestMapping({&#34;/admin&#34;}) @Controller /* loaded from: app.jar:BOOT-INF/classes/cc/saferoad/controller/AdminController.class */ public class AdminController { @GetMapping({&#34;/*&#34;}) public String Manage() { return &#34;manage&#34;; } @RequestMapping({&#34;/{*path}&#34;}) @ResponseBody public void fileDownload(@PathVariable(&#34;path&#34;) String path, HttpServletResponse response) throws IOException { File file = new File(&#34;/tmp/&#34; &#43; path); FileInputStream fileInputStream = new FileInputStream(file); InputStream fis = new BufferedInputStream(fileInputStream); byte[] buffer = new byte[fis.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="WMCTF 2023">
+  <meta name="twitter:description" content="WEB AnyFileRead 看网页以为是SpringSecurity的鉴权绕过嘛，也去跟了下源码
+/admin/ 路径需要鉴权
+protected void configure(HttpSecurity httpSecurity) throws Exception { httpSecurity.authorizeRequests().antMatchers(&#34;/admin/**&#34;).authenticated(); } 出题人解释：SpringSecurity 用的PathPatternParser ，但是题目用的antpatter 差异化解析导致的bypass
+admin控制器
+@RequestMapping({&#34;/admin&#34;}) @Controller /* loaded from: app.jar:BOOT-INF/classes/cc/saferoad/controller/AdminController.class */ public class AdminController { @GetMapping({&#34;/*&#34;}) public String Manage() { return &#34;manage&#34;; } @RequestMapping({&#34;/{*path}&#34;}) @ResponseBody public void fileDownload(@PathVariable(&#34;path&#34;) String path, HttpServletResponse response) throws IOException { File file = new File(&#34;/tmp/&#34; &#43; path); FileInputStream fileInputStream = new FileInputStream(file); InputStream fis = new BufferedInputStream(fileInputStream); byte[] buffer = new byte[fis.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/wmctf-2023/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/%E5%AD%97%E8%8A%82ctf/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/vnctf2023/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "WMCTF 2023",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/wmctf-2023\/"
+        },"genre": "posts","keywords": "","wordcount":  263 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/wmctf-2023\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">WMCTF 2023</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;263 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;2 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#anyfileread">AnyFileRead</a></li>
+    <li><a href="#ez_java_agagin">ez_java_agagin</a></li>
+    <li><a href="#你的权限放着我来">你的权限放着我来</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#find-me">find me</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">WEB</h1>
+<h2 id="anyfileread">AnyFileRead</h2>
+<p>看网页以为是SpringSecurity的鉴权绕过嘛，也去跟了下源码</p>
+<p>/admin/ 路径需要鉴权</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">protected</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">configure</span>(HttpSecurity httpSecurity) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        httpSecurity.<span style="color:#a6e22e">authorizeRequests</span>().<span style="color:#a6e22e">antMatchers</span>(<span style="color:#e6db74">&#34;/admin/**&#34;</span>).<span style="color:#a6e22e">authenticated</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><blockquote>
+<p>出题人解释：SpringSecurity 用的PathPatternParser ，但是题目用的antpatter 差异化解析导致的bypass</p>
+</blockquote>
+<p>admin控制器</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#a6e22e">@RequestMapping</span>({<span style="color:#e6db74">&#34;/admin&#34;</span>})
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@Controller</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* loaded from: app.jar:BOOT-INF/classes/cc/saferoad/controller/AdminController.class */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AdminController</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@GetMapping</span>({<span style="color:#e6db74">&#34;/*&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> String <span style="color:#a6e22e">Manage</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;manage&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@RequestMapping</span>({<span style="color:#e6db74">&#34;/{*path}&#34;</span>})
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@ResponseBody</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">fileDownload</span>(<span style="color:#a6e22e">@PathVariable</span>(<span style="color:#e6db74">&#34;path&#34;</span>) String path, HttpServletResponse response) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        File file <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> File(<span style="color:#e6db74">&#34;/tmp/&#34;</span> <span style="color:#f92672">+</span> path);
+</span></span><span style="display:flex;"><span>        FileInputStream fileInputStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> FileInputStream(file);
+</span></span><span style="display:flex;"><span>        InputStream fis <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedInputStream(fileInputStream);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">byte</span><span style="color:#f92672">[]</span> buffer <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">byte</span><span style="color:#f92672">[</span>fis.<span style="color:#a6e22e">available</span>()<span style="color:#f92672">]</span>;
+</span></span><span style="display:flex;"><span>        fis.<span style="color:#a6e22e">read</span>(buffer);
+</span></span><span style="display:flex;"><span>        fis.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>        response.<span style="color:#a6e22e">reset</span>();
+</span></span><span style="display:flex;"><span>        response.<span style="color:#a6e22e">setCharacterEncoding</span>(UriEscape.<span style="color:#a6e22e">DEFAULT_ENCODING</span>);
+</span></span><span style="display:flex;"><span>        response.<span style="color:#a6e22e">addHeader</span>(HttpHeaders.<span style="color:#a6e22e">CONTENT_DISPOSITION</span>, <span style="color:#e6db74">&#34;attachment;filename=&#34;</span> <span style="color:#f92672">+</span> URLEncoder.<span style="color:#a6e22e">encode</span>(path, UriEscape.<span style="color:#a6e22e">DEFAULT_ENCODING</span>));
+</span></span><span style="display:flex;"><span>        response.<span style="color:#a6e22e">addHeader</span>(HttpHeaders.<span style="color:#a6e22e">CONTENT_LENGTH</span>, <span style="color:#e6db74">&#34;&#34;</span> <span style="color:#f92672">+</span> file.<span style="color:#a6e22e">length</span>());
+</span></span><span style="display:flex;"><span>        OutputStream outputStream <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> BufferedOutputStream(response.<span style="color:#a6e22e">getOutputStream</span>());
+</span></span><span style="display:flex;"><span>        response.<span style="color:#a6e22e">setContentType</span>(<span style="color:#e6db74">&#34;application/octet-stream&#34;</span>);
+</span></span><span style="display:flex;"><span>        outputStream.<span style="color:#a6e22e">write</span>(buffer);
+</span></span><span style="display:flex;"><span>        outputStream.<span style="color:#a6e22e">flush</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<h2 id="ez_java_agagin">ez_java_agagin</h2>
+<p>查看源代码 有提示</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221846876.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221846876.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221846876.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221846876.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221846876.png"
+        title="image-20230822184655840" /></p>
+<p>文件读取</p>
+<p>url1参数说是废弃了</p>
+<!-- raw HTML omitted -->
+<p>回显表示不能有flag并且需要有java</p>
+<p>这题当时非预期了，肯定是绕过直接读flag了</p>
+<p>java用#的url编码%23绕过放在最后，flag用双重url编码绕过，用file://协议直接读flag</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221849726.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221849726.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221849726.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221849726.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221849726.png"
+        title="image-20230822184932685" /></p>
+<h2 id="你的权限放着我来">你的权限放着我来</h2>
+<p>注册了个邮箱</p>
+<!-- raw HTML omitted -->
+<p>看源码发现存在别的邮箱</p>
+<p>提示其他功能有意外收获，就是密码找回功能了</p>
+<!-- raw HTML omitted -->
+<p>当时可能是环境不太好，一直失败，没有收到回复邮箱</p>
+<p>解法其实就是</p>
+<ol>
+<li>邮箱收到重置密码链接，访问该链接，输入重置的密码，并进行抓包，抓到/api/change接口。</li>
+<li>token设置为空，并将邮箱更改为管理员邮箱，重放请求包即可获取flag。</li>
+</ol>
+<h1 id="misc">MISC</h1>
+<h2 id="find-me">find me</h2>
+<p><a href="https://www.reddit.com/user/WearyMeadow/comments/15u7773/hello/" target="_blank" rel="noopener noreffer">https://www.reddit.com/user/WearyMeadow/comments/15u7773/hello/</a>
+</p>
+<p><a href="https://ufile.io/670unszp" target="_blank" rel="noopener noreffer">https://ufile.io/670unszp</a>
+</p>
+<p>根据提示拿到加密流量。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726898.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726898.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726898.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726898.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726898.png"
+        title="image-20230821174001507" /></p>
+<p>根据出题人的id搜到github</p>
+<p>有博客平台 正好有个加密算法的文章不过是需要密码才能看</p>
+<p><a href="https://wearymeadow.icu/2023/07/31/My-secret-encryption-algorithm/" target="_blank" rel="noopener noreffer">https://wearymeadow.icu/2023/07/31/My-secret-encryption-algorithm/</a>
+</p>
+<p>试了几个弱口令不行，继续翻github</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726892.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726892.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726892.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726892.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202308221726892.png"
+        title="image-20230821174044069" /></p>
+<p>拿这个密码登录即可</p>
+<p>给了个服务端和客户端交互的加密通信脚本</p>
+<p>自己根据加密逻辑来解密</p>
+<p>加密逻辑：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">encrypt</span>(message, key):
+</span></span><span style="display:flex;"><span>    seed  <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">11451</span>)
+</span></span><span style="display:flex;"><span>    random<span style="color:#f92672">.</span>seed(seed)
+</span></span><span style="display:flex;"><span>    encrypted <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(message)):
+</span></span><span style="display:flex;"><span>        encrypted <span style="color:#f92672">+=</span> bytes([message[i] <span style="color:#f92672">^</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">255</span>)])
+</span></span><span style="display:flex;"><span>    cipher <span style="color:#f92672">=</span> AES<span style="color:#f92672">.</span>new(key, AES<span style="color:#f92672">.</span>MODE_ECB)
+</span></span><span style="display:flex;"><span>    encrypted <span style="color:#f92672">=</span> cipher<span style="color:#f92672">.</span>encrypt(pad(encrypted))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> encrypted
+</span></span></code></pre></div><p>首先这里有个seed 随机0-11451</p>
+<p>重点是下面异或加密字符串时候每个字符都是不同的异或key，随机0-255</p>
+<p>但是用到了seed，如果seed值知道的话，那么异或key是固定的顺序和值根据这个逻辑就清楚了我们需要遍历所有的seed 0-11451，拿到所有的异或key的序列</p>
+<p>（但其实是拿不到所有的，因为加密字符串长度不同，异或key的值也不同，所以需要知道加密字符串的长度）</p>
+<p>解密脚本</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> Crypto.Cipher <span style="color:#f92672">import</span> AES
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sys <span style="color:#f92672">import</span> argv
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">pad</span>(s):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> s <span style="color:#f92672">+</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">*</span> (AES<span style="color:#f92672">.</span>block_size <span style="color:#f92672">-</span> len(s) <span style="color:#f92672">%</span> AES<span style="color:#f92672">.</span>block_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>all_list <span style="color:#f92672">=</span> [] <span style="color:#75715e">#所有异或key序列 </span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> seed <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">11451</span>): <span style="color:#75715e">#遍历seed值来记录固定长度下所有异或key的序列</span>
+</span></span><span style="display:flex;"><span>    random<span style="color:#f92672">.</span>seed(seed)
+</span></span><span style="display:flex;"><span>    list1 <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">48</span>):  <span style="color:#75715e">#这里的值是加密字符的长度</span>
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">255</span>)
+</span></span><span style="display:flex;"><span>        list1<span style="color:#f92672">.</span>append(a)
+</span></span><span style="display:flex;"><span>    all_list<span style="color:#f92672">.</span>append(list1)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> pad(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;mysecretkey&#39;</span>)
+</span></span><span style="display:flex;"><span>cip <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39;778f6cc13090c6a4f0b51939d784a6b38512f80a92b82bf8225fb8bfed713b2f8eee53dfbe228c7296449d904467a1677c83b9534e2dfcfcbc6f7b08f77f96f2
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">11451</span>): <span style="color:#75715e">#遍历不同seed值的不同异或key</span>
+</span></span><span style="display:flex;"><span>    print(j)
+</span></span><span style="display:flex;"><span>    use_list <span style="color:#f92672">=</span> all_list[j]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">decrypt</span>(ciphertext, key):
+</span></span><span style="display:flex;"><span>        cipher <span style="color:#f92672">=</span> AES<span style="color:#f92672">.</span>new(key, AES<span style="color:#f92672">.</span>MODE_ECB)
+</span></span><span style="display:flex;"><span>        decrypted <span style="color:#f92672">=</span> cipher<span style="color:#f92672">.</span>decrypt(ciphertext)
+</span></span><span style="display:flex;"><span>        decrypted <span style="color:#f92672">=</span> decrypted<span style="color:#f92672">.</span>rstrip(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\0</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># print(len(decrypted))</span>
+</span></span><span style="display:flex;"><span>        decrypted <span style="color:#f92672">=</span> bytes([decrypted[i] <span style="color:#f92672">^</span> use_list[i] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(decrypted))]) <span style="color:#75715e">#对应异或解密</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> decrypted
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    re <span style="color:#f92672">=</span> decrypt(bytes<span style="color:#f92672">.</span>fromhex(cip), key)
+</span></span><span style="display:flex;"><span>    print(re)
+</span></span></code></pre></div><p>这里的加密字符串长度如何知道? 脚本中先输出</p>
+<pre tabindex="0"><code>bytes.fromhex(cip)
+print(len(decrypted))
+</code></pre><p>每次通讯需要分别解密</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/wmctf-2023/" data-title="WMCTF 2023" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/wmctf-2023/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/wmctf-2023/" data-title="WMCTF 2023"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/wmctf-2023/" data-title="WMCTF 2023"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/wmctf-2023/" data-title="WMCTF 2023"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/%E5%AD%97%E8%8A%82ctf/" class="prev" rel="prev" title="字节CTF"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>字节CTF</a>
+            <a href="/posts/ctf/vnctf2023/" class="next" rel="next" title="VNCTF2023">VNCTF2023<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

