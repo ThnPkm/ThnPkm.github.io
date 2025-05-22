@@ -110,6 +110,20 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">强网拟态wp</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web noumisotuitennnoka 本地测一下，确实是，执行了默认的create 、zip 、unzip后
+会在/var/www/html目录下生成jsons文件夹，里面就是backdoor.php 和 .hatccess
+刚开始想通过clean把/var/www/html/jsons/.htaccess 删掉，但是$substr的正则匹配拦住了，绕不过。
+换个思路，通过'remove_path' =&gt; $dev_dir 来清除。
+要满足realpath($dev_dir) == $dir 并且 删除.htaccess
+可以构造dev=/tmp/. 这里是重点，这样就可以在压缩过程中删除.htaccess了。
+所以创建和解压也用/tmp作为目录
+?action=create&amp;subdir=/tmp?action=zip&amp;subdir=/tmp&amp;dev=/tmp/.?action=unzip&amp;subdir=/tmp 解压后就没有.htaccess了
+直接访问backdoor.php</div><div class="post-footer">
+        <a href="/posts/ctf/%E5%BC%BA%E7%BD%91%E6%8B%9F%E6%80%81wp/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/%E8%A5%BF%E6%B9%96%E8%AE%BA%E5%89%91/">西湖论剑</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">web 扭转乾坤 在实际产品场景中常见存在多种中间件的情况，这时如果存在某种拦截，可以利用框架或者中间件对于RFC标准中实现差异进行绕过。注意查看80端口服务
@@ -191,25 +205,6 @@ InitialContext - 上下文 构造方法：
 //构建一个初始上下文。 InitialContext() //构造一个初始上下文，并选择不初始化它。 InitialContext(boolean lazy) //使用提供的环境构建初始上下文。 InitialContext(Hashtable&lt;?</div><div class="post-footer">
         <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-jndi%E6%B3%A8%E5%85%A5/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/">java安全 RMI</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div><div class="content">前言 本篇主要先搞懂rmi机制，对fastjson复现有个基础
-RMI java RMI全称为 java Remote Method Invocation（java 远程方法调用），是java编程语言中，一种实现远程过程调用的应用程序编程接口。存储于java.rmi包中，使用其方法调用对象时，必须实现Remote远程接口，能够让某个java虚拟机上的对象调用另外一个Java虚拟机中的对象上的方法。两个虚拟机可以运行在相同计算机上的不同进程，也可以是网络上的不同计算机。
-他是由三层架构模式来实现的
-Client-客户端：客户端调用服务端的方法 Server-服务端：远程调用方法对象的提供者，也是代码真正执行的地方，执行结束会返回给客户端一个方法执行的结果。 Registry-注册中心：其实本质就是一个map，相当于是字典一样，用于客户端查询要调用的方法的引用 客户端:
-存根/桩(Stub):远程对象在客户端上的代理; 远程引用层(Remote Reference Layer):解析并执行远程引用协议; 传输层(Transport):发送调用、传递远程方法参数、接收远程方法执行结果。
-服务端:
-骨架(Skeleton):读取客户端传递的方法参数，调用服务器方的实际对象方法， 并接收方法执行后的返回值; 远程引用层(Remote Reference Layer):处理远程引用后向骨架发送远程方法调用; 传输层(Transport):监听客户端的入站连接，接收并转发调用到远程引用层。
-**注册表(Registry):**以URL形式注册远程对象，并向客户端回复对远程对象的引用。
-基本流程 引用先知好文总结的图
-还是通过代码示例来学习
-Server-demo 写个服务端的demo
-⼀个RMIServer分为三部分：
-⼀个继承了 java.rmi.Remote 的接⼝，其中定义我们要远程调⽤的函数，⽐如这⾥的 hello() ⼀个实现了此接⼝的类 ⼀个主类，⽤来创建Registry，并将上⾯的类实例化后绑定到⼀个地址。这就是我们所谓的Server 了。 1.定义一个远程接口 import java.rmi.Remote; import java.rmi.RemoteException; // 定义一个远程接口，继承java.rmi.Remote接口 public interface HelloInterface extends Remote { public String hello() throws RemoteException; } 这里我们定义了一个HelloInterface接口，定义了一个hello方法，同时抛出RemoteException异常。
-这个接口需要使用public声明，否则客户端尝试加载远程接口的对象会出错（除非客户端、服务端放在一起） 继承 java.rmi.Remote接口 接口的方法需要抛出RemoteException异常 2.远程接口实现类 import java.rmi.RemoteException; import java.rmi.server.UnicastRemoteObject; public class RMIServer extends UnicastRemoteObject implements HelloInterface { protected RMIServer() throws RemoteException { super(); } @Override public String hello() throws RemoteException { System.</div><div class="post-footer">
-        <a href="/posts/java%E5%AE%89%E5%85%A8/java%E5%AE%89%E5%85%A8-rmi/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -240,12 +235,12 @@ Server-demo 写个服务端的demo
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/11/">11</a>
+                        <a href="/page/12/">12</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

